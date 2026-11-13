@@ -95,8 +95,8 @@ draft ──> candidate claims: declared factual_claims + every factual sentence
 
 | Check | Result |
 |---|---|
-| Full suite, Python 3.12, PostgreSQL test DB required (`TREND_AGENT_REQUIRE_DB_TESTS=1`) | <<FULL312>> |
-| Full suite, Python 3.13 | <<FULL313>> |
+| Full suite, Python 3.12, PostgreSQL test DB required (`TREND_AGENT_REQUIRE_DB_TESTS=1`) | **557 passed**, 3 deselected (opt-in live tests), 0 failed, 7 min 19 s; line+branch coverage 91 % (Phase 1–4 suite unchanged and passing) |
+| Full suite, Python 3.13 | **557 passed**, 3 deselected, 0 failed (3 min 40 s) |
 | Verification unit tests (offline) | 55 passed |
 | Verification integration tests (database) | 6 passed |
 | ruff check / ruff format --check / mypy --strict | clean |
