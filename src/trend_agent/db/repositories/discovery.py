@@ -461,6 +461,40 @@ class DiscoveryRepository:
             sa.select(DiscoveredKeywordRow).where(DiscoveredKeywordRow.query_id == query_id)
         ).scalar_one_or_none()
 
+    def cluster_first_seen(
+        self, intent_cluster_id: int | None, topic_cluster_id: int | None
+    ) -> tuple[datetime | None, datetime | None]:
+        """Earliest discovery time of any keyword in the intent cluster / the topic."""
+
+        def earliest(column: Any, value: int | None) -> datetime | None:
+            if value is None:
+                return None
+            found: datetime | None = self._s.execute(
+                sa.select(sa.func.min(DiscoveredKeywordRow.first_discovered_at)).where(
+                    column == value
+                )
+            ).scalar_one()
+            return found
+
+        return (
+            earliest(DiscoveredKeywordRow.intent_cluster_id, intent_cluster_id),
+            earliest(DiscoveredKeywordRow.topic_cluster_id, topic_cluster_id),
+        )
+
+    def ancestor_known_before(self, entity: DiscoveredEntityRow, max_depth: int = 3) -> bool:
+        """Was a parent (or grandparent) entity first seen before ``entity``?"""
+        current = entity
+        for _ in range(max_depth):
+            if current.parent_entity_id is None:
+                return False
+            parent = self._s.get(DiscoveredEntityRow, current.parent_entity_id)
+            if parent is None:
+                return False
+            if parent.first_seen_at < entity.first_seen_at:
+                return True
+            current = parent
+        return False
+
     def create_keyword(self, values: dict[str, Any]) -> DiscoveredKeywordRow:
         row = DiscoveredKeywordRow(**values)
         self._s.add(row)

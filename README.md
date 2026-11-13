@@ -1,10 +1,11 @@
-# YouTube Trend Agent — Phase 1: Foundation & Data Acquisition
+# YouTube Trend Agent — Phases 1–2: Foundation, Data Acquisition & Keyword Discovery
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
-existing videos, and what videos to make. This repository contains **Phase 1 of 8**: the
-typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
-controls that every later phase depends on.
+existing videos, and what videos to make. This repository contains **Phases 1 and 2 of 8**:
+the typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
+controls (Phase 1), and an autonomous **keyword discovery engine** for AI, technology and
+gaming (Phase 2).
 
 > **Read this first — what the data can and cannot tell you.**
 > YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
@@ -29,7 +30,22 @@ controls that every later phase depends on.
 | Retention / compliance controls (30-day expiry, statistics persistence off by default) | Implemented |
 | CLI (`trend-agent`) | Implemented |
 
-Not in scope for Phase 1 (by design): keyword discovery, scheduling, surge detection,
+## What Phase 2 adds — keyword discovery
+
+Discovery finds **candidate** keywords and explains where each came from; it never
+estimates demand. Details: [docs/keyword_discovery.md](docs/keyword_discovery.md).
+
+| Area | Status |
+|---|---|
+| Discovery providers: YouTube Data API (search/charts/channel uploads), RSS/Atom feeds, GitHub releases, Hacker News, Reddit (OAuth), Google Trends related queries, curated seeds, synthetic fixture | Implemented. In the build environment only PyPI feeds were reachable live; see [phase2 report §C](docs/phase2_report.md#c-working-discovery-sources) |
+| Grounded entity extraction (no LLM needed; optional LLM interface with grounding checks) | Implemented |
+| Expansion with origin labels (`observed_query` / `generated_hypothesis`), grounded templates, limits | Implemented |
+| Intent (13) + category classification, two-level clustering with decision records | Implemented |
+| Novelty + `priority-v1` scoring (components stored), lifecycle with logged transitions | Implemented |
+| Budget allocation (AI 45 / tech 25 / gaming 30, 20 % exploration), scheduling, quotas | Implemented |
+| YAML configuration (`config/`), migration `0002`, `trend-agent discover` CLI | Implemented |
+
+Not in scope yet (by design): monitoring of candidates (Phase 3), surge detection,
 forecasting, LLM analysis, recommendations, dashboard.
 
 ## Architecture overview
@@ -40,13 +56,17 @@ A modular monolith (`src/trend_agent/`):
 providers/   provider protocols, registry, YouTube, Google Trends, mock, quota, retry
 schemas/     provider-neutral domain models and enums (the data contracts)
 ingestion/   validation, storage/retention policy, ingestion orchestration
+discovery/   Phase 2: discovery providers, extraction, expansion, intent, clustering,
+             evidence, scoring, lifecycle, budget, DiscoveryService
 db/          SQLAlchemy models, session management, repositories (all SQL lives here)
 comparability.py   decides whether two observations' values may be compared
-container.py composition root (dependency injection), cli.py Typer CLI
+container.py composition root (dependency injection), cli.py / cli_discover.py Typer CLI
+config/      Phase 2 discovery configuration (budgets, seeds, sources)
 ```
 
 Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
--> ingestion run record -> summary`. See [docs/architecture.md](docs/architecture.md).
+-> ingestion run record -> summary`. See [docs/architecture.md](docs/architecture.md) and,
+for discovery, [docs/phase2_architecture.md](docs/phase2_architecture.md).
 
 ## Prerequisites
 
@@ -80,6 +100,10 @@ The most important ones:
 | `TREND_AGENT_YOUTUBE_PERSIST_STATISTICS` | Store view/like/comment counts. **Default `false`** — read [docs/compliance.md](docs/compliance.md) first. |
 | `TREND_AGENT_GOOGLE_TRENDS_ACCESS_MODE` | `disabled` (default) or `official_alpha` |
 | `TREND_AGENT_GOOGLE_TRENDS_RETENTION_DAYS` | Empty = Trends data is never stored |
+| `TREND_AGENT_DISCOVERY_CONFIG_DIR` | Discovery configuration directory (default `./config`) |
+| `TREND_AGENT_HTTP_USER_AGENT` | User-Agent for feeds and public APIs (put a real contact in it) |
+| `TREND_AGENT_GITHUB_TOKEN` | Optional read-only GitHub token (higher rate limit) |
+| `TREND_AGENT_REDDIT_CLIENT_ID` / `..._SECRET` | Reddit OAuth app; Reddit sources are `not_configured` without them |
 
 Getting a YouTube key: Google Cloud Console → create/select a project → *APIs & Services*
 → enable **YouTube Data API v3** → *Credentials* → *Create API key* → restrict the key to
@@ -130,7 +154,23 @@ trend-agent data runs --rejections          # ingestion runs and quarantined rec
 trend-agent data retention [--purge]        # expired third-party data
 
 trend-agent quota status                    # local quota estimate per bucket
+
+# Phase 2: keyword discovery (run from the repository root, or set TREND_AGENT_DISCOVERY_CONFIG_DIR)
+trend-agent discover demo                   # full pipeline on the SYNTHETIC fixture (no network/quota)
+trend-agent discover run --category ai      # or --category gaming, --all; --dry-run plans only
+trend-agent discover keywords --category gaming --limit 50   # [--include-synthetic] [--status ...]
+trend-agent discover show --query "glacier lance location"   # evidence, scores, clusters, history
+trend-agent discover expand --entity "Nimbus Coder 2"        # grounded hypotheses + skip reasons
+trend-agent discover entities --recent [--days 7]
+trend-agent discover sources                # providers, readiness, source health
+trend-agent discover clusters               # topic -> intent clusters with merge decisions
+trend-agent discover stats [--days 7]
 ```
+
+`discover run` fetches within budgets, quotas and poll intervals (`--force` ignores
+intervals, never quotas). Keyword listings hide synthetic data unless
+`--include-synthetic` is given. Priority ranks candidates for monitoring; it is **not**
+search volume.
 
 Mock scenarios: `stable`, `gradual_growth`, `sudden_surge`, `declining`, `sparse`,
 `missing_data`, `out_of_order`, `duplicates`, `mixed_normalization`, `invalid_records`,
@@ -160,6 +200,8 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
   `TREND_AGENT_REQUIRE_DB_TESTS=1` to make that a failure (recommended in CI).
 * Live tests (`tests/live`) consume real quota and are opt-in only:
   `TREND_AGENT_RUN_LIVE_TESTS=1 TREND_AGENT_YOUTUBE_API_KEY=... pytest -m live tests/live`
+  (the PyPI feed test needs no key: `TREND_AGENT_RUN_LIVE_TESTS=1 pytest -m live tests/live/test_discovery_feeds_live.py`).
+* Discovery tests use the synthetic fixture and mocked HTTP only.
 
 ## Troubleshooting
 
@@ -173,6 +215,9 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 | `[quota_exhausted]` | Wait for the reset (midnight Pacific) shown by `trend-agent quota status`; local estimates can differ from Google's — the Cloud Console is authoritative |
 | `invalid region code 'UK'` | Use ISO 3166-1 codes (`GB`) |
 | Google Trends `not_configured` | Expected: the official API is limited-access alpha. See [docs/data_sources.md](docs/data_sources.md) |
+| `discovery configuration: ... not found` (exit 2) | Run from the repository root or set `TREND_AGENT_DISCOVERY_CONFIG_DIR` |
+| Discovery source `access_restricted` | The network refused the host (proxy/firewall) or the API returned 403; nothing is retried or fabricated |
+| `discover keywords` shows nothing after `discover demo` | Demo data is synthetic: add `--include-synthetic` |
 | Integration tests all skipped | Test DB unreachable; `docker compose up -d` (the init script creates `trend_agent_test` on first start — if your volume predates it, run `docker compose exec postgres createdb -U trend_agent trend_agent_test`) |
 
 ## Documentation
@@ -182,3 +227,7 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/data_contracts.md](docs/data_contracts.md) — canonical models and comparison rules
 * [docs/compliance.md](docs/compliance.md) — YouTube API policies, retention, permissions
 * [docs/phase1_report.md](docs/phase1_report.md) — what was built and verified; Phase 2 readiness
+* [docs/phase2_architecture.md](docs/phase2_architecture.md) — discovery modules, pipeline, schema, Phase 1 changes
+* [docs/keyword_discovery.md](docs/keyword_discovery.md) — sources, entities, labels, clustering, scoring, lifecycle
+* [docs/discovery_configuration.md](docs/discovery_configuration.md) — every configuration key and how to add sources
+* [docs/phase2_report.md](docs/phase2_report.md) — what was built, demonstrated and verified; limitations; Phase 3 readiness

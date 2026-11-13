@@ -228,7 +228,6 @@ class _Fetch:
 class _EntityState:
     row: DiscoveredEntityRow
     new_this_run: bool
-    parent_known_before: bool
 
 
 # ---------------------------------------------------------------------------- service
@@ -746,6 +745,9 @@ def _version_tuple(version: str | None) -> tuple[int, ...]:
     return tuple(int(p) for p in re.findall(r"\d+", version or ""))
 
 
+_LEVEL_RANK = {"major": 3, "minor": 2}
+
+
 def _entity_view(
     repo: DiscoveryRepository, row: DiscoveredEntityRow, max_comparisons: int
 ) -> EntityView:
@@ -762,19 +764,32 @@ def _entity_view(
         else:
             parent_game = parent.canonical_name
     competitors: list[str] = []
+    superseded_by: str | None = None
     # Nearest earlier version of the same family (e.g. "X 2" vs "X 1.5").
     if parent is not None and row.version:
-        older = [
+        siblings = [
             s
             for s in repo.children(parent.id)
             if s.id != row.id
             and s.entity_type is row.entity_type
             and s.version
             and s.status is EntityStatus.VERIFIED
-            and _version_tuple(s.version) < _version_tuple(row.version)
         ]
+        older = [s for s in siblings if _version_tuple(s.version) < _version_tuple(row.version)]
         if older:
             competitors.append(max(older, key=lambda s: _version_tuple(s.version)).canonical_name)
+        # A newer release of the same or a higher level supersedes this one (a newer minor
+        # supersedes a minor; only a newer major supersedes a major; patches never do).
+        own_rank = _LEVEL_RANK.get(row.release_level or "", 0)
+        newer = [
+            s
+            for s in siblings
+            if _version_tuple(s.version) > _version_tuple(row.version)
+            and own_rank > 0
+            and _LEVEL_RANK.get(s.release_level or "", 0) >= own_rank
+        ]
+        if newer:
+            superseded_by = max(newer, key=lambda s: _version_tuple(s.version)).canonical_name
     # Co-mentioned with a comparison cue in the evidence. Never the entity's own family
     # (parent/children) and never a *newer* sibling: comparisons are generated from the
     # newer release ("X 2 vs X 1.5"), so the reverse pair is not produced again.
@@ -812,6 +827,7 @@ def _entity_view(
         parent_game=parent_game,
         competitors=tuple(competitors[: max(max_comparisons, 0) + 2]),
         evergreen=row.evergreen or row.is_family,
+        superseded_by=superseded_by,
     )
 
 
@@ -1090,15 +1106,12 @@ class _RunContext:
                     entity_type = parents[0].entity_type
                     key = entity_key(ex.category.value, entity_type.value, ex.canonical_name)
                     existing = self.repo.entity_by_key(key)
-        parent_row: DiscoveredEntityRow | None = None
-        parent_known_before = False
-        if ex.parent_name:
-            parent_row, parent_known_before = self._parent(ex, entity_type, item)
+        parent_row = self._parent(ex, entity_type, item) if ex.parent_name else None
         if existing is not None:
             key = existing.entity_key
             state = self.entities.get(key)
             if state is None:
-                state = _EntityState(existing, False, parent_known_before)
+                state = _EntityState(existing, False)
                 self.entities[key] = state
             row = existing
             row.last_seen_at = max(row.last_seen_at, self.now)
@@ -1137,7 +1150,7 @@ class _RunContext:
                     "extra": {"flags": list(ex.flags), "extractor": ex.extractor},
                 }
             )
-            state = _EntityState(row, True, parent_known_before)
+            state = _EntityState(row, True)
             self.entities[key] = state
             self.summary.entities_new += 1
             if ex.origin is not EntityOrigin.GAZETTEER:
@@ -1148,7 +1161,7 @@ class _RunContext:
 
     def _parent(
         self, ex: ExtractedEntity, child_type: EntityType, item: DiscoveryItemRow
-    ) -> tuple[DiscoveredEntityRow, bool]:
+    ) -> DiscoveredEntityRow:
         assert ex.parent_name is not None
         parent_type = ex.parent_type or child_type
         candidates = [
@@ -1159,10 +1172,7 @@ class _RunContext:
         exact = [e for e in candidates if e.entity_type is parent_type]
         chosen = exact[0] if exact else (candidates[0] if len(candidates) == 1 else None)
         if chosen is not None:
-            known_before = chosen.first_seen_at < self.now or chosen.entity_key not in {
-                k for k, s in self.entities.items() if s.new_this_run
-            }
-            return chosen, known_before
+            return chosen
         key = entity_key(ex.category.value, parent_type.value, ex.parent_name)
         row = self.repo.create_entity(
             {
@@ -1182,10 +1192,10 @@ class _RunContext:
             }
         )
         self.repo.add_alias(row.id, ex.parent_name, "family")
-        self.entities[key] = _EntityState(row, True, False)
+        self.entities[key] = _EntityState(row, True)
         self.summary.entities_new += 1
         self._add_known(row)
-        return row, False
+        return row
 
     def _aggregate_entity(self, row: DiscoveredEntityRow) -> None:
         mentions = self.repo.mentions_for_entity(row.id)
@@ -1394,7 +1404,6 @@ class _RunContext:
             intent,
         ) in self.repo.cluster_members():
             clusterer.add_intent_member(topic_key, intent_key, query, intent, entity_name)
-        existing_topics = {k for k, _ in self.repo.topic_keys()}
         language = self.config.languages[0] if self.config.languages else None
 
         for c in sorted(candidates, key=lambda c: (c.entity_key or "", c.canonical)):
@@ -1453,16 +1462,7 @@ class _RunContext:
                     CandidateStatus.MONITORING,
                 ):
                     continue
-                self._score_and_transition(
-                    keyword,
-                    entity,
-                    cat.scores,
-                    cat.primary,
-                    primary_intent,
-                    False,
-                    False,
-                    existing_topics,
-                )
+                self._score_and_transition(keyword, entity, cat.scores, cat.primary, primary_intent)
                 continue
 
             if not outcome.valid:
@@ -1473,16 +1473,13 @@ class _RunContext:
                 entity.entity_key if entity else None,
                 entity.canonical_name if entity else None,
             )
-            topic_existed = topic_key in existing_topics
             topic_id, _ = self.repo.topic_cluster(
                 topic_key, canonical_topic, cat.primary, entity.id if entity else None
             )
             intent_key, intent_decision = clusterer.assign_intent(
                 topic_key, c.query, primary_intent, self._entity_context(entity)
             )
-            intent_id, intent_new = self.repo.intent_cluster(
-                topic_id, intent_key, primary_intent, c.query
-            )
+            intent_id, _ = self.repo.intent_cluster(topic_id, intent_key, primary_intent, c.query)
             keyword = self.repo.create_keyword(
                 {
                     "query_id": query_id,
@@ -1541,17 +1538,7 @@ class _RunContext:
             if not outcome.valid:
                 continue
             self.summary.candidates_new += 1
-            self._score_and_transition(
-                keyword,
-                entity,
-                cat.scores,
-                cat.primary,
-                primary_intent,
-                True,
-                intent_new,
-                existing_topics,
-                topic_existed,
-            )
+            self._score_and_transition(keyword, entity, cat.scores, cat.primary, primary_intent)
 
     def _evidence_items(
         self, c: KeywordCandidate, entity: DiscoveredEntityRow | None
@@ -1584,10 +1571,6 @@ class _RunContext:
         category_scores: dict[Category, float],
         primary: Category,
         intent: SearchIntent,
-        query_new: bool,
-        intent_new: bool,
-        existing_topics: set[str],
-        topic_existed: bool = True,
     ) -> None:
         items = self.repo.evidence_items(keyword.id)
         conflicting = set((entity.extra or {}).get("conflicting_item_ids", [])) if entity else set()
@@ -1607,20 +1590,20 @@ class _RunContext:
             else 0.0
         )
         newest = max((v.observed_at for v in views), default=None)
-        state = self.entities.get(entity.entity_key) if entity else None
+        intent_first, topic_first = self.repo.cluster_first_seen(
+            keyword.intent_cluster_id, keyword.topic_cluster_id
+        )
         nov = novelty(
             NoveltyInputs(
                 now=self.now,
                 has_entity=entity is not None,
-                entity_new_this_run=bool(state and state.new_this_run),
                 entity_first_seen=entity.first_seen_at if entity else None,
                 entity_type=entity.entity_type if entity else None,
-                parent_known_before=bool(state and state.parent_known_before),
+                ancestor_known_before=bool(entity and self.repo.ancestor_known_before(entity)),
                 evergreen=bool(entity and (entity.evergreen or entity.is_family)),
-                query_new_this_run=query_new,
                 query_first_seen=keyword.first_discovered_at,
-                intent_cluster_new=intent_new,
-                topic_existed_before=topic_existed,
+                intent_cluster_first_seen=intent_first,
+                topic_first_seen=topic_first,
                 release_date=entity.release_date if entity else None,
             ),
             self.config.scoring.recency_half_life_days,

@@ -119,12 +119,13 @@ provider with `ProviderType.LICENSED_THIRD_PARTY` and document its methodology h
 
 ---
 
-## YouTube search suggestions (not implemented — Phase 2 decision)
+## YouTube search suggestions (not implemented — decided in Phase 2)
 
 YouTube's autocomplete suggestions are served by an undocumented endpoint with no
-published terms for programmatic use. They would be a `SEARCH_SUGGESTION` discovery signal
-(never volume). Whether and how to use them must be decided — with a terms-of-service
-review — before Phase 2 relies on them.
+published terms for programmatic use. Phase 2 does **not** use them. Observed queries come
+only from documented query-level providers (Google Trends related queries, when alpha
+access and a transport exist). Phase 2 discovery sources are described in
+[keyword_discovery.md](keyword_discovery.md) and [compliance.md](compliance.md#keyword-discovery-sources-phase-2).
 
 ---
 

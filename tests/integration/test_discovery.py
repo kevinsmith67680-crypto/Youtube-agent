@@ -172,6 +172,9 @@ async def test_demo_end_to_end(container: AppContainer, session_factory: Session
     assert ent["Glacier Lance"].parent_entity_id == event.id
     assert {"frostfall festival challenges", "glacier lance location"} <= set(kw)
     assert kw["how to unlock rime glider"].candidate_status is CandidateStatus.PRIORITIZED
+    assert kw["frostfall festival challenges"].novelty_kind.value == "new_event"
+    assert kw["glacier lance location"].novelty_kind.value == "new_event"  # item of new event
+    assert kw["nimbus 2 review"].novelty_kind.value == "new_entity"
     assert "Void Crown" not in ent  # speculative item claim never becomes an entity
     # The previous event (90 days ago, not seen since) went dormant.
     ember = [k for q, k in kw.items() if "ember rush" in q or "cinder bow" in q]
@@ -272,7 +275,14 @@ async def test_rerun_is_idempotent(
         m.__tablename__: count(session_factory, m)
         for m in (DiscoveryItemRow, DiscoveredKeywordRow, DiscoveryEvidenceRow, DiscoveredEntityRow)
     }
-    statuses = {q: k.candidate_status for q, k in keywords(session_factory).items()}
+
+    def snapshot() -> dict[str, tuple[Any, ...]]:
+        return {
+            q: (k.candidate_status, k.priority_score, k.novelty_kind, k.intent_cluster_id)
+            for q, k in keywords(session_factory).items()
+        }
+
+    first = snapshot()
     results = dict(await run_demo(container))
     after = {
         m.__tablename__: count(session_factory, m)
@@ -281,7 +291,8 @@ async def test_rerun_is_idempotent(
     assert after == before
     assert all(c.items_new == 0 for c in results["current"].categories.values())
     assert all(c.candidates_new == 0 for c in results["current"].categories.values())
-    assert {q: k.candidate_status for q, k in keywords(session_factory).items()} == statuses
+    # Same evidence, same clock: same statuses, scores, novelty kinds and clusters.
+    assert snapshot() == first
     assert count(session_factory, DiscoveryRunRow) == 12  # 2 demo runs x 2 stages x 3 categories
 
 

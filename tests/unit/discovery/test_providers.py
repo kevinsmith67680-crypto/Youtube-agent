@@ -481,12 +481,22 @@ async def test_youtube_discovery_query_uses_search_bucket(
 ) -> None:
     fake_youtube.queue("search", json_response(200, load_fixture("search_page1.json")))
     yt = make_youtube(max_pages=1)
-    provider = YouTubeDiscoveryProvider(yt, enabled=True, retention_days=90, results_per_query=2)
+    cap = request_quota("youtube_discovery", 1, InMemoryQuotaStore(), MutableClock(NOW))
+    provider = YouTubeDiscoveryProvider(
+        yt, enabled=True, retention_days=90, results_per_query=2, discovery_quota=cap
+    )
     src = yt_source(SourceType.API_QUERY, "AI agents")
     assert provider.can_afford(src) == (True, "")
     context = ctx()
     result = await provider.discover(DiscoveryRequest(source=src, max_items=10), context)
-    assert context.ledger.used == {"search": 1}
+    assert context.ledger.used == {"search": 1, REQUEST_BUCKET: 1}
+    # Discovery's own daily cap is enforced before any YouTube quota is spent.
+    ok, why = provider.can_afford(src)
+    assert not ok
+    assert why.startswith("discovery cap")
+    with pytest.raises(QuotaExhaustedError):
+        await provider.discover(DiscoveryRequest(source=src), ctx())
+    assert len(fake_youtube.calls("search")) == 1
     assert result.items
     assert all(i.evidence_type is EvidenceType.VIDEO_TITLE for i in result.items)
     assert fake_youtube.calls("search")[0].url.params["order"] == "date"

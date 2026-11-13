@@ -5,6 +5,9 @@ PostgreSQL database, one CLI. No services, queues or orchestrators — the syste
 a laptop and be easy to reason about. Module boundaries are enforced by convention and by
 dependency direction (below), not by deployment.
 
+> Phase 2 (keyword discovery) extends this architecture with the `discovery/` package,
+> migration `0002` and the `discover` CLI. See [phase2_architecture.md](phase2_architecture.md).
+
 ## Module responsibilities
 
 ```

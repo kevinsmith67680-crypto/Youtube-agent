@@ -222,6 +222,18 @@ def test_software_release_gating() -> None:
     ).candidates
 
 
+def test_superseded_code_releases_are_not_expanded() -> None:
+    old_minor = view(
+        "SDK 3.42", EntityType.SOFTWARE, release_level="minor", superseded_by="SDK 3.50"
+    )
+    report = expand_entity(old_minor, CFG)
+    assert report.candidates == []
+    assert "superseded by SDK 3.50" in report.skipped[0][1]
+    # AI model versions are not semver releases: an older model stays a topic.
+    model = view("Nimbus Coder 1.5", EntityType.AI_MODEL, superseded_by="Nimbus Coder 2")
+    assert expand_entity(model, CFG).candidates
+
+
 def test_curated_and_low_confidence_entities_are_not_expanded() -> None:
     assert expand_entity(view("Fortnite", EntityType.GAME, evergreen=True), CFG).candidates == []
     assert expand_entity(view("X", EntityType.AI_MODEL, confidence=0.3), CFG).candidates == []

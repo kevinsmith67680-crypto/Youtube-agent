@@ -199,19 +199,20 @@ def test_release_dates_are_sentence_scoped_and_conflicts_detected() -> None:
 # ---------------------------------------------------------------------------- 13. novelty
 
 
+OLD = NOW - timedelta(days=30)
+
+
 def nov(**kw: object) -> NoveltyInputs:
     base: dict[str, object] = {
         "now": NOW,
         "has_entity": True,
-        "entity_new_this_run": True,
         "entity_first_seen": NOW,
         "entity_type": EntityType.AI_MODEL,
-        "parent_known_before": False,
+        "ancestor_known_before": False,
         "evergreen": False,
-        "query_new_this_run": True,
         "query_first_seen": NOW,
-        "intent_cluster_new": True,
-        "topic_existed_before": False,
+        "intent_cluster_first_seen": NOW,
+        "topic_first_seen": NOW,
         "release_date": NOW,
     }
     base.update(kw)
@@ -220,26 +221,37 @@ def nov(**kw: object) -> NoveltyInputs:
 
 def test_novelty_kinds() -> None:
     assert novelty(nov(), 7).kind is NoveltyKind.NEW_ENTITY
-    assert novelty(nov(parent_known_before=True), 7).kind is NoveltyKind.NEW_VERSION
-    event = nov(parent_known_before=True, entity_type=EntityType.GAME_EVENT)
+    assert novelty(nov(ancestor_known_before=True), 7).kind is NoveltyKind.NEW_VERSION
+    event = nov(ancestor_known_before=True, entity_type=EntityType.GAME_EVENT)
     assert novelty(event, 7).kind is NoveltyKind.NEW_EVENT
-    new_intent = nov(entity_new_this_run=False, topic_existed_before=True)
+    item = nov(ancestor_known_before=True, entity_type=EntityType.GAME_ITEM)
+    assert novelty(item, 7).kind is NoveltyKind.NEW_EVENT
+    new_intent = nov(entity_first_seen=OLD, topic_first_seen=OLD)
     assert novelty(new_intent, 7).kind is NoveltyKind.NEW_INTENT
-    recurring = nov(entity_new_this_run=False, intent_cluster_new=False)
+    recurring = nov(entity_first_seen=OLD, intent_cluster_first_seen=OLD, topic_first_seen=OLD)
     assert novelty(recurring, 7).kind is NoveltyKind.RECURRING
     assert novelty(nov(evergreen=True), 7).kind is NoveltyKind.EVERGREEN
+    # "New" is a time window, not "first seen in this run": three days later it is still new.
+    later = nov(now=NOW + timedelta(days=3), ancestor_known_before=True)
+    assert novelty(later, 7).kind is NoveltyKind.NEW_VERSION
+    assert novelty(nov(now=NOW + timedelta(days=8)), 7).kind is NoveltyKind.RECURRING
+
+
+def test_novelty_is_a_function_of_timestamps() -> None:
+    """Re-processing the same evidence at the same time gives the same novelty."""
+    inputs = nov(ancestor_known_before=True)
+    assert novelty(inputs, 7) == novelty(inputs, 7)
 
 
 def test_novelty_decays_with_age_and_unknown_dates_are_neutral() -> None:
     fresh = novelty(nov(), 7).score
     month_old = novelty(
         nov(
-            entity_new_this_run=False,
-            entity_first_seen=NOW - timedelta(days=30),
-            query_new_this_run=False,
-            query_first_seen=NOW - timedelta(days=30),
-            intent_cluster_new=False,
-            release_date=NOW - timedelta(days=30),
+            entity_first_seen=OLD,
+            query_first_seen=OLD,
+            intent_cluster_first_seen=OLD,
+            topic_first_seen=OLD,
+            release_date=OLD,
         ),
         7,
     ).score
@@ -247,6 +259,10 @@ def test_novelty_decays_with_age_and_unknown_dates_are_neutral() -> None:
     unknown = novelty(nov(release_date=None), 7)
     assert unknown.components["recency"] == 30.0
     assert novelty(nov(evergreen=True), 7).score < fresh
+    # A new intent on an existing topic scores higher than one on a brand-new topic.
+    on_known_topic = novelty(nov(topic_first_seen=OLD), 7).components["intent"]
+    on_new_topic = novelty(nov(), 7).components["intent"]
+    assert on_known_topic > on_new_topic
 
 
 # ---------------------------------------------------------------------------- 14. priority

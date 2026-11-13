@@ -390,6 +390,7 @@ class EntityView:
     competitors: tuple[str, ...] = ()  # grounded comparison targets
     evergreen: bool = False
     evidence_refs: tuple[str, ...] = ()
+    superseded_by: str | None = None  # newer same-or-higher-level release of the same family
 
 
 @dataclass(frozen=True)
@@ -465,6 +466,12 @@ def expand_entity(entity: EntityView, config: ExpansionConfig) -> ExpansionRepor
     code_release = entity.entity_type in CODE_RELEASE_TYPES
     if entity.release_level == "prerelease" or (code_release and entity.release_level == "patch"):
         report.skipped.append(("*", f"{entity.release_level} release; recorded as evidence only"))
+        return report
+    if code_release and entity.superseded_by:
+        # Libraries/SDKs ship minor releases every few days; only the newest is a topic.
+        report.skipped.append(
+            ("*", f"superseded by {entity.superseded_by}; recorded as evidence only")
+        )
         return report
 
     # Every hypothesis records why it exists: the verified entity plus what the template needed.

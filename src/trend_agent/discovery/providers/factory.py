@@ -70,6 +70,9 @@ def register_discovery_providers(
                 results_per_query=int(p.params.get("search_results_per_query", 25)),
                 default_region=cfg.regions[0] if cfg.regions else "US",
                 default_language=cfg.languages[0] if cfg.languages else None,
+                discovery_quota=request_quota(
+                    "youtube_discovery", p.daily_request_limit, quota_store, clock
+                ),
             )
         )
     p = cfg.provider("feeds")

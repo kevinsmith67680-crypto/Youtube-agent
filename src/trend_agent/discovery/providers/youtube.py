@@ -24,9 +24,15 @@ from trend_agent.discovery.models import (
     EvidenceType,
     SourceType,
 )
-from trend_agent.discovery.providers.base import afford, discovery_descriptor
+from trend_agent.discovery.providers.base import (
+    REQUEST_BUCKET,
+    REQUEST_ENDPOINT,
+    afford,
+    discovery_descriptor,
+)
 from trend_agent.providers.base import RequestContext
 from trend_agent.providers.errors import InvalidRequestError
+from trend_agent.providers.quota import QuotaManager
 from trend_agent.providers.youtube import BUCKET_DEFAULT, BUCKET_SEARCH, YouTubeDataApiProvider
 from trend_agent.schemas.enums import Capability, MeasurementType, ProviderStatus, ProviderType
 from trend_agent.schemas.provider import (
@@ -54,8 +60,12 @@ class YouTubeDiscoveryProvider:
         results_per_query: int = 25,
         default_region: str = "US",
         default_language: str | None = "en",
+        discovery_quota: QuotaManager | None = None,
     ) -> None:
         self._yt = youtube
+        # Optional cap on discovery's own share of the YouTube quota (one unit per fetch),
+        # so discovery cannot spend the whole search.list budget other phases need.
+        self._discovery_quota = discovery_quota
         self._enabled = enabled
         self._per_query = results_per_query
         self._region = default_region
@@ -109,6 +119,10 @@ class YouTubeDiscoveryProvider:
         return source.source_type in QUERY_TYPES | {SourceType.CHART, SourceType.CHANNEL}
 
     def can_afford(self, source: DiscoverySource) -> tuple[bool, str]:
+        if self._discovery_quota is not None:
+            ok, why = afford(self._discovery_quota, REQUEST_BUCKET, 1)
+            if not ok:
+                return False, f"discovery cap: {why}"
         if source.source_type in QUERY_TYPES:
             return afford(self._yt.quota, BUCKET_SEARCH, 1)
         cost = 2 if source.source_type is SourceType.CHANNEL else 1
@@ -116,6 +130,8 @@ class YouTubeDiscoveryProvider:
 
     async def discover(self, request: DiscoveryRequest, ctx: RequestContext) -> DiscoveryResult:
         source = request.source
+        if self._discovery_quota is not None:
+            self._discovery_quota.reserve(REQUEST_ENDPOINT, ctx.ledger)
         region = source.region or self._region
         if source.source_type in QUERY_TYPES:
             response = await self._yt.search_videos(

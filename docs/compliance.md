@@ -65,6 +65,27 @@ demand: it is labelled at the record level (`data_nature`, `is_synthetic`,
 `synthetic://` reference), enforced by validation and a database constraint, and flagged
 in CLI output.
 
+## Keyword discovery sources (Phase 2)
+
+| Source | Access | Stored | Retention (default) | Notes |
+|---|---|---|---|---|
+| YouTube Data API (search, charts, channel uploads) | API key | title, ≤ 1,500-char description excerpt, channel id, URL, timestamps | **30 days** (capped by code, whatever the config says) | discovery fetches also count against a local daily cap (`providers.youtube_discovery.daily_request_limit`) |
+| RSS/Atom feeds | public feeds offered by the publisher | title, ≤ 2,000-char excerpt (HTML stripped), link | 90 days | conditional GET; respect publisher terms and poll intervals |
+| GitHub releases | public REST API (optional token) | release name, notes excerpt, URL | 180 days | API rate limits respected (403/429 handling) |
+| Hacker News | public Algolia API | title, story text excerpt, URLs | 90 days | |
+| Reddit | OAuth Data API (registered app) | title, self-text excerpt, permalink | 30 days | requires accepting Reddit's Data API terms; commercial use may need an agreement |
+| Google Trends related queries | official alpha API only | query strings | not stored as interest data | never scraped |
+| Curated seeds | local configuration | seed text | — | |
+
+Rules enforced in code: no scraping or undocumented endpoints (a source without a
+registered provider is skipped as `unsupported`); network-policy refusals are reported as
+`access_restricted` and not retried; untrusted XML is parsed with `defusedxml`; responses
+over 5 MB are rejected; secrets are `SecretStr` and never stored or logged; discovery items
+expire per provider retention and the purge (`trend-agent data retention --purge`) cascades
+to evidence links and entity mentions. Search suggestions and related queries are recorded as
+discovery evidence only — never as search-interest observations. YouTube autocomplete
+(undocumented endpoint) is **not** used.
+
 ## Default posture (conservative)
 
 | Control | Default |
@@ -75,6 +96,8 @@ in CLI output.
 | Trends persistence | off until a retention period is configured |
 | Unknown record kinds from any provider | storage denied (`ProviderDescriptor.retention_for`) |
 | Live API calls in tests | never (opt-in `live` marker only) |
+| Discovery item retention | per provider (YouTube ≤ 30 days, Reddit 30, feeds/HN 90, GitHub 180) |
+| YouTube monitored channels | disabled until handles are confirmed |
 
 ## Operator checklist before production use
 

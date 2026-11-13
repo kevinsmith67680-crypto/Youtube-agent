@@ -57,11 +57,13 @@ lifecycle:
 
 # Per-provider switches, local daily request caps (on top of each API's own limits) and
 # retention of stored source items. retention_days empty = keep (first-party/public feeds);
-# YouTube is capped at 30 days by policy regardless of this value.
+# YouTube is capped at 30 days by policy regardless of this value. daily_request_limit
+# applies to the HTTP providers and to youtube_discovery (its share of the YouTube quota).
 providers:
   youtube_discovery:
     enabled: true
-    daily_request_limit: 40      # search.list calls come from the 100/day search bucket
+    daily_request_limit: 40      # discovery fetches/day; each search also uses 1 of the
+                                 # 100/day search.list calls (Phase 1 YouTube quota)
     retention_days: 30
     params: {search_results_per_query: 25}
   feeds:
@@ -82,8 +84,6 @@ providers:
     daily_request_limit: 200
     retention_days: 30
   google_trends_discovery:
-    enabled: true
-    daily_request_limit: 100
+    enabled: true                # needs Trends API alpha access + a related-queries transport
   curated_seeds:
-    enabled: true
-    daily_request_limit: 100000
+    enabled: true                # local configuration; no requests
