@@ -1,0 +1,179 @@
+# Phase 5 evaluation - DEV split (used while developing the rules).
+# Fictional entities and videos (see world.yaml). Labels were written from the case
+# descriptions by the author of the rules, not by independent annotators.
+# Video grades g: 3 = directly serves the intent for the right entity/version,
+# 2 = relevant (right entity and intent, partial), 1 = related (other intent or older
+# version), 0 = unrelated. Gap labels: a gap type, "none", "abstain" or "blocked";
+# gap_ok lists other acceptable gap types.
+as_of: 2026-11-10T12:00:00Z
+cases:
+  - id: D01
+    query: "codeforge 2 install windows"
+    target: codeforge
+    labels: {primary_intent: tutorial, sub_intent: model_installation, entity: "CodeForge 2",
+             gap: version_mismatch, gap_ok: [missing_specific_answer, insufficient_practical_demonstration]}
+    videos:
+      - {id: d01a, t: "CodeForge 2 announced", d: "Everything new in CodeForge 2.", ch: AI Daily, p: 2026-11-06, s: 600, g: 1}
+      - {id: d01b, t: "How to install CodeForge 1 on Windows", d: "Install and configure CodeForge 1.", ch: SetupGuru, p: 2025-08-01, s: 640, g: 1}
+      - {id: d01c, t: "CodeForge 1 Windows setup", d: "Step by step setup of CodeForge 1 on Windows.", ch: WinTech, p: 2025-09-01, s: 700, g: 1}
+      - {id: d01d, t: "CodeForge 1 install guide", d: "Download, install and sign in.", ch: QuickTech, p: 2025-07-01, s: 500, g: 1}
+      - {id: d01e, t: "Install CodeForge 2 on Windows 11", d: "Download, install and configure CodeForge 2 step by step.", ch: QuickTech, p: 2026-11-08, s: 720, g: 3}
+      - {id: d01f, t: "CodeForge 2 first impressions", d: "My first look.", ch: DevReviews, p: 2026-11-07, s: 800, g: 1}
+      - {id: d01g, t: "Windows 11 tips", d: "Ten Windows tips.", ch: WinTech, p: 2026-10-01, s: 600, g: 0}
+      - {id: d01h, t: "CodeForge 1 tutorial for beginners", d: "Learn CodeForge 1.", ch: CodeWithMira, p: 2025-06-20, s: 1300, g: 1}
+      - {id: d01i, t: "Top coding assistants", d: "A roundup.", ch: ToolRoundup, p: 2026-09-01, s: 900, g: 0}
+      - {id: d01j, t: "Lumen AI keynote", d: "CodeForge 2 and more.", ch: TechRecap, p: 2026-11-06, s: 1500, g: 1}
+
+  - id: D02
+    query: "quanta notes 3 tutorial"
+    target: quanta
+    labels: {primary_intent: tutorial, entity: "Quanta Notes 3", gap: none}
+    videos:
+      - {id: d02a, t: "Quanta Notes 3 tutorial for beginners", d: "Learn Quanta Notes 3 step by step: linked notes, templates and setup.", ch: NoteSchool, p: 2026-04-01, s: 1500, g: 3}
+      - {id: d02b, t: "Quanta Notes 3 complete tutorial", d: "Every feature of Quanta Notes 3 explained step by step.", ch: ProdTips, p: 2026-05-10, s: 2400, g: 3}
+      - {id: d02c, t: "Quanta Notes 3 templates tutorial", d: "How to build templates in Quanta Notes 3.", ch: NoteSchool, p: 2026-06-01, s: 900, g: 3}
+      - {id: d02d, t: "How to use Quanta Notes 3 linked notes", d: "A step by step guide to linked notes.", ch: ProdTips, p: 2026-07-15, s: 700, g: 3}
+      - {id: d02e, t: "Quanta Notes 3 review", d: "Is it worth it?", ch: AppReviews, p: 2026-03-20, s: 600, g: 1}
+      - {id: d02f, t: "Quanta Notes 3 setup guide", d: "Set up Quanta Notes 3 for the first time.", ch: SetupGuru, p: 2026-03-15, s: 800, g: 2}
+      - {id: d02g, t: "Best productivity apps", d: "A roundup.", ch: ToolRoundup, p: 2026-08-01, s: 900, g: 0}
+      - {id: d02h, t: "Quanta Notes 3 vs paper notebooks", d: "Comparison.", ch: AppReviews, p: 2026-04-20, s: 650, g: 1}
+
+  - id: D03
+    query: "skyforge arena season 8 ember lantern location"
+    target: skyforge
+    labels: {primary_intent: gaming_guide, sub_intent: item_location, entity: "Skyforge Arena Season 8", gap: none}
+    videos:
+      - {id: d03a, t: "Skyforge Arena Season 8 Ember Lantern location", d: "Where to find the Ember Lantern in the volcano region.", ch: ArenaGuides, p: 2026-11-08, s: 300, g: 3}
+      - {id: d03b, t: "Ember Lantern location - Skyforge Arena Season 8", d: "Fast route to the Ember Lantern.", ch: QuestLog, p: 2026-11-09, s: 240, g: 3}
+      - {id: d03c, t: "Where to find the Ember Lantern (Skyforge Arena Season 8)", d: "Ember Lantern spawn and location guide.", ch: GlideGuru, p: 2026-11-09, s: 360, g: 3}
+      - {id: d03d, t: "Skyforge Arena Season 8 all new items", d: "Ember Lantern and other new items.", ch: MapNerd, p: 2026-11-09, s: 900, g: 2}
+      - {id: d03e, t: "Skyforge Arena Season 7 chest locations", d: "Season 7 chests.", ch: ChestHunter, p: 2026-09-10, s: 600, g: 1}
+      - {id: d03f, t: "Skyforge Arena Season 8 map tour", d: "The volcano region and more.", ch: MapNerd, p: 2026-11-08, s: 800, g: 1}
+      - {id: d03g, t: "Skyforge Arena funny moments", d: "Fails compilation.", ch: FunnyArena, p: 2026-11-05, s: 600, g: 0}
+      - {id: d03h, t: "Skyforge Arena Season 8 Ember Lantern quest", d: "Complete the Ember Lantern quest and find its location.", ch: EventPro, p: 2026-11-09, s: 420, g: 3}
+
+  - id: D04
+    query: "helios agent tutorial python"
+    target: helios
+    labels: {primary_intent: tutorial, entity: "Helios Agent", gap: no_relevant_results,
+             gap_ok: [missing_specific_answer, low_relevance, insufficient_practical_demonstration]}
+    videos:
+      - {id: d04a, t: "Helios Labs announces Helios Agent", d: "News from the launch.", ch: AI Daily, p: 2026-10-20, s: 400, g: 1}
+      - {id: d04b, t: "Helios Agent first look", d: "First impressions of the agent framework.", ch: DevReviews, p: 2026-10-22, s: 700, g: 1}
+      - {id: d04c, t: "Python tutorial for beginners", d: "Learn Python basics.", ch: CodeSchool, p: 2026-05-01, s: 3600, g: 0}
+      - {id: d04d, t: "Python decorators explained", d: "Decorators in Python.", ch: CodeSchool, p: 2026-06-01, s: 900, g: 0}
+      - {id: d04e, t: "Agent frameworks compared", d: "A comparison of agent frameworks.", ch: DevCompare, p: 2026-09-01, s: 1200, g: 0}
+      - {id: d04f, t: "Helios Agent news recap", d: "What was announced.", ch: TechRecap, p: 2026-10-21, s: 500, g: 1}
+      - {id: d04g, t: "Python web scraping tutorial", d: "Scrape websites with Python.", ch: CodeSchool, p: 2026-07-01, s: 1500, g: 0}
+      - {id: d04h, t: "AI agents explained", d: "What are AI agents?", ch: AIExplained, p: 2026-08-01, s: 800, g: 0}
+
+  - id: D05
+    query: "orbit review"
+    target: orbit
+    labels: {primary_intent: review, entity: ambiguous, gap: abstain}
+    videos:
+      - {id: d05a, t: "Orbit review", d: "My review after a week.", ch: TechReviews, p: 2026-10-10, s: 700, g: 2}
+      - {id: d05b, t: "Orbit model review", d: "Testing the Orbit model.", ch: AIBench, p: 2026-09-10, s: 900, g: 2}
+      - {id: d05c, t: "Orbit glasses review", d: "Smart glasses tested.", ch: GadgetLab, p: 2026-10-05, s: 800, g: 2}
+      - {id: d05d, t: "Orbit unboxing", d: "Unboxing.", ch: GadgetLab, p: 2026-10-03, s: 400, g: 1}
+      - {id: d05e, t: "Best smart glasses", d: "A roundup.", ch: GadgetLab, p: 2026-10-20, s: 900, g: 0}
+      - {id: d05f, t: "Open-weight models compared", d: "Comparison.", ch: AIBench, p: 2026-09-20, s: 1200, g: 0}
+      - {id: d05g, t: "Orbit first impressions", d: "First impressions.", ch: TechReviews, p: 2026-10-02, s: 600, g: 1}
+      - {id: d05h, t: "Space orbit explained", d: "How orbits work.", ch: ScienceNow, p: 2026-02-01, s: 700, g: 0}
+
+  - id: D06
+    query: "skyforge arena aimbot undetected"
+    target: skyforge
+    # Label correction during development: entity was first labelled "none", but the
+    # query names the game; corrected to "Skyforge Arena" (a labelling error).
+    labels: {primary_intent: gaming_guide, entity: "Skyforge Arena", gap: blocked}
+    videos:
+      - {id: d06a, t: "Skyforge Arena aim training", d: "Improve your aim legitimately.", ch: ArenaGuides, p: 2026-11-01, s: 600, g: 0}
+
+  - id: D07
+    query: "how to migrate to pyxis 5"
+    target: pyxis
+    labels: {primary_intent: tutorial, sub_intent: version_migration, entity: "Pyxis 5", gap: none}
+    videos:
+      - {id: d07a, t: "Migrate to Pyxis 5: step by step", d: "Migrating from Pyxis 4 to Pyxis 5: file-based routes and the new config format.", ch: WebDev, p: 2026-10-29, s: 1500, g: 3}
+      - {id: d07b, t: "Pyxis 5 migration guide", d: "Upgrade a Pyxis 4 app to Pyxis 5 step by step, replacing the router API with file-based routes.", ch: FrameworkNews, p: 2026-10-30, s: 1300, g: 3}
+      - {id: d07c, t: "Upgrading to Pyxis 5 (complete guide)", d: "Migrate your project to Pyxis 5: routes, config and breaking changes.", ch: CodeSchool, p: 2026-11-01, s: 2000, g: 3}
+      - {id: d07d, t: "Pyxis 5: what changed", d: "What changed in Pyxis 5.", ch: FrameworkNews, p: 2026-10-28, s: 600, g: 1}
+      - {id: d07e, t: "Pyxis 4 router deep dive", d: "Everything about the Pyxis 4 router.", ch: WebDev, p: 2026-01-10, s: 1800, g: 1}
+      - {id: d07f, t: "Pyxis 4 tutorial", d: "Learn Pyxis 4.", ch: CodeSchool, p: 2025-11-01, s: 2400, g: 1}
+      - {id: d07g, t: "Pyxis 5 migration in 10 minutes", d: "Quick migration from Pyxis 4 to Pyxis 5.", ch: QuickTech, p: 2026-11-02, s: 600, g: 3}
+      - {id: d07h, t: "JavaScript tips", d: "Ten tips.", ch: CodeSchool, p: 2026-03-01, s: 700, g: 0}
+
+  - id: D08
+    query: "nova lens review"
+    target: nova
+    labels: {primary_intent: review, sub_intent: product_review, entity: "Nova Lens", gap: none}
+    videos:
+      - {id: d08a, t: "Nova Lens review: two weeks later", d: "A hands-on review of the Nova Lens smart glasses.", ch: GadgetLab, p: 2026-10-30, s: 900, g: 3}
+      - {id: d08b, t: "Nova Lens honest review", d: "Pros and cons of Nova Lens.", ch: TechReviews, p: 2026-10-25, s: 800, g: 3}
+      - {id: d08c, t: "Nova Lens review - worth it?", d: "My Nova Lens review.", ch: DailyTech, p: 2026-11-01, s: 700, g: 3}
+      - {id: d08d, t: "Nova Lens unboxing", d: "Unboxing the Nova Lens.", ch: GadgetLab, p: 2026-10-17, s: 400, g: 1}
+      - {id: d08e, t: "Best smart glasses", d: "A roundup including Nova Lens.", ch: GadgetLab, p: 2026-11-02, s: 1000, g: 1}
+      - {id: d08f, t: "Nova Lens long-term review", d: "Review after a month of daily use.", ch: TechReviews, p: 2026-11-08, s: 1000, g: 3}
+      - {id: d08g, t: "Phone camera comparison", d: "Comparison.", ch: DailyTech, p: 2026-09-01, s: 800, g: 0}
+      - {id: d08h, t: "Nova Lens announced", d: "Vantage announces Nova Lens.", ch: AI Daily, p: 2026-10-15, s: 300, g: 1}
+
+  - id: D09
+    query: "glimmer shards farming"
+    target: glimmer
+    demand: none
+    labels: {primary_intent: gaming_guide, entity: none, gap: abstain}
+    videos:
+      - {id: d09a, t: "Glimmer shards farming guide", d: "Farm glimmer shards fast.", ch: FarmPro, p: 2026-10-01, s: 500, g: 2}
+      - {id: d09b, t: "Best glimmer shard farm", d: "Fastest route.", ch: FarmPro, p: 2026-10-10, s: 400, g: 2}
+      - {id: d09c, t: "Glimmer shards explained", d: "What they are.", ch: GameFacts, p: 2026-09-01, s: 300, g: 1}
+      - {id: d09d, t: "Farming simulator tips", d: "Tips.", ch: SimTips, p: 2026-08-01, s: 600, g: 0}
+      - {id: d09e, t: "How to farm glimmer", d: "Glimmer farming.", ch: FarmPro, p: 2026-10-20, s: 450, g: 1}
+      - {id: d09f, t: "Shard locations", d: "All shard locations.", ch: GameFacts, p: 2026-10-05, s: 700, g: 1}
+      - {id: d09g, t: "Glimmer shards fast", d: "Fast shards.", ch: FarmPro, p: 2026-10-25, s: 300, g: 2}
+      - {id: d09h, t: "Gaming news", d: "News.", ch: GameNews, p: 2026-11-01, s: 600, g: 0}
+
+  - id: D10
+    query: "codeforge 2 api tutorial"
+    target: codeforge_api
+    labels: {primary_intent: tutorial, sub_intent: api_integration, entity: "CodeForge 2",
+             gap: missing_specific_answer, gap_ok: [insufficient_practical_demonstration, low_relevance, no_relevant_results]}
+    videos:
+      - {id: d10a, t: "CodeForge 2 announced", d: "Everything new.", ch: AI Daily, p: 2026-11-06, s: 600, g: 1}
+      - {id: d10b, t: "CodeForge 2 benchmarks", d: "Benchmark results.", ch: BenchLab, p: 2026-11-08, s: 700, g: 0}
+      - {id: d10c, t: "CodeForge 2 review", d: "Is it good?", ch: DevReviews, p: 2026-11-09, s: 800, g: 1}
+      - {id: d10d, t: "CodeForge 2 pricing explained", d: "Plans and API pricing.", ch: AI Daily, p: 2026-11-07, s: 400, g: 1}
+      - {id: d10e, t: "REST API tutorial", d: "What is a REST API?", ch: CodeSchool, p: 2026-03-01, s: 1200, g: 0}
+      - {id: d10f, t: "CodeForge 2 launch recap", d: "Highlights.", ch: TechRecap, p: 2026-11-07, s: 500, g: 0}
+      - {id: d10g, t: "CodeForge 1 API tutorial", d: "Call the CodeForge 1 API from Python.", ch: CodeWithMira, p: 2025-08-01, s: 1100, g: 1}
+      - {id: d10h, t: "Top AI APIs", d: "A roundup of AI APIs.", ch: ToolRoundup, p: 2026-10-01, s: 900, g: 0}
+
+  - id: D11
+    query: "where to find the void scythe skyforge arena season 8"
+    target: voidscythe
+    labels: {primary_intent: gaming_guide, sub_intent: item_location, entity: "Skyforge Arena Season 8", gap: abstain}
+    videos:
+      - {id: d11a, t: "Void Scythe location?? (Skyforge Arena)", d: "Is the Void Scythe in the game yet?", ch: SkyforgeLeaks, p: 2026-11-10, s: 300, g: 1}
+      - {id: d11b, t: "Skyforge Arena Season 8 weapons", d: "All Season 8 weapons.", ch: ArenaGuides, p: 2026-11-09, s: 600, g: 1}
+      - {id: d11c, t: "Void Scythe found! Skyforge Arena Season 8", d: "Exact Void Scythe location.", ch: FakeNews, p: 2026-11-12, s: 300, g: 3}
+      - {id: d11d, t: "Skyforge Arena Season 8 map tour", d: "Map tour.", ch: MapNerd, p: 2026-11-08, s: 800, g: 0}
+      - {id: d11e, t: "Skyforge Arena Season 8 tier list", d: "Weapon tier list.", ch: ArenaGuides, p: 2026-11-09, s: 700, g: 0}
+      - {id: d11f, t: "Skyforge Arena leaks", d: "Upcoming content leaks.", ch: SkyforgeLeaks, p: 2026-11-09, s: 500, g: 1}
+      - {id: d11g, t: "Skyforge Arena Season 8 chests", d: "Chest locations.", ch: ChestHunter, p: 2026-11-09, s: 480, g: 0}
+      - {id: d11h, t: "Skyforge Arena funny moments", d: "Fails.", ch: FunnyArena, p: 2026-11-05, s: 600, g: 0}
+      - {id: d11i, t: "Skyforge Arena Season 8 guide", d: "Season overview.", ch: EventPro, p: 2026-11-08, s: 900, g: 0}
+
+  - id: D12
+    query: "pyxis 5 config format explained"
+    target: pyxis
+    labels: {primary_intent: informational, entity: "Pyxis 5", gap: version_mismatch,
+             gap_ok: [missing_specific_answer, potentially_outdated, low_relevance]}
+    videos:
+      - {id: d12a, t: "Pyxis 4 config explained", d: "The Pyxis 4 config format in depth.", ch: ConfigNerd, p: 2026-02-01, s: 900, g: 1}
+      - {id: d12b, t: "Pyxis 4 config tips", d: "Config tips for Pyxis 4.", ch: WebDev, p: 2026-03-01, s: 600, g: 1}
+      - {id: d12c, t: "Pyxis 4 configuration guide", d: "Configure a Pyxis 4 project.", ch: CodeSchool, p: 2025-12-01, s: 1000, g: 1}
+      - {id: d12d, t: "Pyxis 5: what changed", d: "What changed in Pyxis 5.", ch: FrameworkNews, p: 2026-10-30, s: 600, g: 2}
+      - {id: d12e, t: "Pyxis 4 config deep dive", d: "Every Pyxis 4 config option.", ch: ConfigNerd, p: 2026-04-01, s: 1400, g: 1}
+      - {id: d12f, t: "JSON vs YAML explained", d: "Config formats compared.", ch: DevFacts, p: 2026-01-01, s: 500, g: 0}
+      - {id: d12g, t: "Pyxis 4 environment config", d: "Environment variables in Pyxis 4.", ch: WebDev, p: 2026-05-01, s: 700, g: 1}
+      - {id: d12h, t: "Pyxis 4 crash course", d: "Pyxis 4 in one hour.", ch: CodeSchool, p: 2025-09-12, s: 3600, g: 0}

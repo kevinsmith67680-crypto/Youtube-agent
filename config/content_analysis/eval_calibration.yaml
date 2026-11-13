@@ -1,0 +1,122 @@
+# Phase 5 evaluation - CALIBRATION split (used only for the relevance-threshold sweep).
+# Fictional entities and videos; labels by the rules' author, written before the run.
+# Grades g: 3 direct, 2 relevant/partial, 1 related, 0 unrelated (see eval_dev.yaml).
+as_of: 2026-11-11T12:00:00Z
+cases:
+  - id: K01
+    query: "codeforge 2 setup guide"
+    target: codeforge
+    labels: {primary_intent: tutorial, entity: "CodeForge 2", gap: version_mismatch,
+             gap_ok: [missing_specific_answer, insufficient_practical_demonstration, low_relevance]}
+    videos:
+      - {id: k01a, t: "CodeForge 2 setup guide", d: "Set up CodeForge 2: install, sign in and configure your first project.", ch: SetupGuru, p: 2026-11-09, s: 900, g: 3}
+      - {id: k01b, t: "CodeForge 1 setup guide", d: "Set up CodeForge 1.", ch: SetupGuru, p: 2025-07-01, s: 800, g: 1}
+      - {id: k01c, t: "CodeForge 1 configuration", d: "Configure CodeForge 1.", ch: CodeWithMira, p: 2025-08-01, s: 700, g: 1}
+      - {id: k01d, t: "CodeForge 2 news", d: "What was announced.", ch: AI Daily, p: 2026-11-06, s: 300, g: 1}
+      - {id: k01e, t: "CodeForge 2 review", d: "My review.", ch: DevReviews, p: 2026-11-09, s: 800, g: 1}
+      - {id: k01f, t: "CodeForge 1 beginner setup", d: "Beginner setup for CodeForge 1.", ch: QuickTech, p: 2025-09-01, s: 600, g: 1}
+      - {id: k01g, t: "VS Code setup guide", d: "Set up VS Code.", ch: CodeSchool, p: 2026-02-01, s: 900, g: 0}
+      - {id: k01h, t: "CodeForge 1 settings explained", d: "All settings.", ch: CodeWithMira, p: 2025-10-01, s: 1000, g: 1}
+      - {id: k01i, t: "AI news this week", d: "Roundup.", ch: AI Daily, p: 2026-11-08, s: 700, g: 0}
+
+  - id: K02
+    query: "quanta notes 3 review"
+    target: quanta
+    labels: {primary_intent: review, entity: "Quanta Notes 3", gap: none}
+    videos:
+      - {id: k02a, t: "Quanta Notes 3 review", d: "A hands-on review of Quanta Notes 3.", ch: AppReviews, p: 2026-03-20, s: 700, g: 3}
+      - {id: k02b, t: "Quanta Notes 3 honest review", d: "Pros and cons after six months.", ch: ProdTips, p: 2026-09-01, s: 900, g: 3}
+      - {id: k02c, t: "Quanta Notes 3 review: worth it?", d: "Is Quanta Notes 3 worth paying for?", ch: DailyTech, p: 2026-05-01, s: 650, g: 3}
+      - {id: k02d, t: "Quanta Notes 3 tutorial", d: "Learn Quanta Notes 3.", ch: NoteSchool, p: 2026-04-01, s: 1500, g: 1}
+      - {id: k02e, t: "Quanta Notes 3 long-term review", d: "Review after a year of use.", ch: AppReviews, p: 2026-10-01, s: 1000, g: 3}
+      - {id: k02f, t: "Best note apps", d: "A roundup.", ch: ToolRoundup, p: 2026-08-01, s: 900, g: 1}
+      - {id: k02g, t: "Note taking tips", d: "Tips.", ch: StudyTips, p: 2026-06-01, s: 500, g: 0}
+      - {id: k02h, t: "Quanta Notes 3 vs paper", d: "Comparison.", ch: AppReviews, p: 2026-04-20, s: 650, g: 1}
+
+  - id: K03
+    query: "skyforge arena season 8 event guide"
+    target: skyforge
+    labels: {primary_intent: gaming_guide, sub_intent: event_guide, entity: "Skyforge Arena Season 8", gap: version_mismatch,
+             gap_ok: [missing_specific_answer, potentially_outdated]}
+    videos:
+      - {id: k03a, t: "Skyforge Arena Season 7 event guide", d: "Complete every Season 7 event quest.", ch: EventPro, p: 2026-09-10, s: 800, g: 1}
+      - {id: k03b, t: "Skyforge Arena Season 6 event guide", d: "Season 6 event quests.", ch: EventPro, p: 2026-07-01, s: 800, g: 1}
+      - {id: k03c, t: "Skyforge Arena Season 7 all quests", d: "All Season 7 quests.", ch: QuestLog, p: 2026-09-15, s: 900, g: 1}
+      - {id: k03d, t: "Skyforge Arena Season 8 trailer reaction", d: "Reacting to the trailer.", ch: FunnyArena, p: 2026-11-08, s: 600, g: 0}
+      - {id: k03e, t: "Skyforge Arena Season 8 event guide: Emberfall", d: "Complete the Season 8 Emberfall event quests.", ch: EventPro, p: 2026-11-09, s: 900, g: 3}
+      - {id: k03f, t: "Skyforge Arena Season 7 event rewards", d: "Season 7 event rewards.", ch: ArenaGuides, p: 2026-09-20, s: 500, g: 1}
+      - {id: k03g, t: "Skyforge Arena Season 7 challenges", d: "Season 7 challenges guide.", ch: QuestLog, p: 2026-09-25, s: 700, g: 1}
+      - {id: k03h, t: "Skyforge Arena funny moments", d: "Fails.", ch: FunnyArena, p: 2026-11-05, s: 600, g: 0}
+
+  - id: K04
+    query: "pyxis 5 tutorial for beginners"
+    target: pyxis
+    labels: {primary_intent: tutorial, entity: "Pyxis 5", gap: version_mismatch,
+             gap_ok: [missing_specific_answer, potentially_outdated, insufficient_practical_demonstration]}
+    videos:
+      - {id: k04a, t: "Pyxis 4 tutorial for beginners", d: "Build your first Pyxis 4 app.", ch: CodeSchool, p: 2025-11-01, s: 2400, g: 1}
+      - {id: k04b, t: "Pyxis 4 crash course", d: "Pyxis 4 in one hour.", ch: CodeSchool, p: 2025-09-12, s: 3600, g: 1}
+      - {id: k04c, t: "Pyxis 4 beginner project", d: "A beginner Pyxis 4 project.", ch: WebDev, p: 2026-01-01, s: 1800, g: 1}
+      - {id: k04d, t: "Pyxis 5: what changed", d: "What changed in Pyxis 5.", ch: FrameworkNews, p: 2026-10-30, s: 600, g: 1}
+      - {id: k04e, t: "Learn Pyxis 4 in 2026", d: "Full Pyxis 4 course.", ch: WebDev, p: 2026-03-01, s: 4000, g: 1}
+      - {id: k04f, t: "Pyxis 4 for absolute beginners", d: "Start with Pyxis 4.", ch: CodeSchool, p: 2026-02-01, s: 1500, g: 1}
+      - {id: k04g, t: "Pyxis 5 tutorial for beginners", d: "Build your first Pyxis 5 app with file-based routes, step by step.", ch: QuickTech, p: 2026-11-05, s: 1500, g: 3}
+      - {id: k04h, t: "CSS tutorial", d: "Learn CSS.", ch: CodeSchool, p: 2026-01-01, s: 2000, g: 0}
+
+  - id: K05
+    query: "helios agent vs codeforge 2"
+    target: helios
+    labels: {primary_intent: comparison, entity: "Helios Agent", gap: no_relevant_results,
+             gap_ok: [missing_specific_answer, low_relevance, format_gap]}
+    videos:
+      - {id: k05a, t: "Helios Agent first look", d: "First impressions.", ch: DevReviews, p: 2026-10-22, s: 700, g: 1}
+      - {id: k05b, t: "CodeForge 2 review", d: "My review of CodeForge 2.", ch: DevReviews, p: 2026-11-09, s: 800, g: 1}
+      - {id: k05c, t: "Agent frameworks compared", d: "A comparison of agent frameworks.", ch: DevCompare, p: 2026-09-01, s: 1200, g: 1}
+      - {id: k05d, t: "Helios Agent news", d: "Launch news.", ch: AI Daily, p: 2026-10-20, s: 400, g: 0}
+      - {id: k05e, t: "CodeForge 2 announced", d: "Launch news.", ch: AI Daily, p: 2026-11-06, s: 600, g: 0}
+      - {id: k05f, t: "Best AI coding tools", d: "A roundup.", ch: ToolRoundup, p: 2026-10-01, s: 900, g: 1}
+      - {id: k05g, t: "Python tutorial", d: "Python basics.", ch: CodeSchool, p: 2026-05-01, s: 3600, g: 0}
+      - {id: k05h, t: "AI agents explained", d: "What are AI agents?", ch: AIExplained, p: 2026-08-01, s: 800, g: 0}
+
+  - id: K06
+    query: "orbit smart glasses setup"
+    target: orbit
+    category: technology
+    labels: {primary_intent: tutorial, entity: "Orbit", gap: none}
+    videos:
+      - {id: k06a, t: "Orbit smart glasses setup guide", d: "Set up the Orbit smart glasses and the companion app step by step.", ch: GadgetLab, p: 2026-10-05, s: 700, g: 3}
+      - {id: k06b, t: "How to set up Orbit smart glasses", d: "Pairing, companion app and first setup.", ch: DailyTech, p: 2026-10-08, s: 600, g: 3}
+      - {id: k06c, t: "Orbit smart glasses: first setup", d: "Setup walkthrough of the Orbit smart glasses.", ch: TechReviews, p: 2026-10-10, s: 650, g: 3}
+      - {id: k06d, t: "Orbit glasses review", d: "Review.", ch: GadgetLab, p: 2026-10-12, s: 800, g: 1}
+      - {id: k06e, t: "Orbit model explained", d: "The Orbit AI model.", ch: AIExplained, p: 2026-09-05, s: 700, g: 0}
+      - {id: k06f, t: "Smart glasses roundup", d: "A roundup.", ch: GadgetLab, p: 2026-10-20, s: 900, g: 0}
+      - {id: k06g, t: "Orbit smart glasses tips", d: "Tips for daily use.", ch: DailyTech, p: 2026-10-25, s: 500, g: 1}
+      - {id: k06h, t: "Orbit companion app guide", d: "Set up the Orbit smart glasses companion app.", ch: GadgetLab, p: 2026-10-15, s: 550, g: 2}
+
+  - id: K07
+    query: "nova lens unboxing"
+    target: nova
+    labels: {primary_intent: review, entity: "Nova Lens", gap: none}
+    videos:
+      - {id: k07a, t: "Nova Lens unboxing", d: "Unboxing the Nova Lens smart glasses.", ch: GadgetLab, p: 2026-10-17, s: 400, g: 3}
+      - {id: k07b, t: "Nova Lens unboxing and first impressions", d: "What is in the box.", ch: DailyTech, p: 2026-10-18, s: 500, g: 3}
+      - {id: k07c, t: "Unboxing Nova Lens", d: "Unboxing video.", ch: TechReviews, p: 2026-10-16, s: 450, g: 3}
+      - {id: k07d, t: "Nova Lens review", d: "Review.", ch: GadgetLab, p: 2026-10-30, s: 900, g: 2}
+      - {id: k07e, t: "Best smart glasses", d: "Roundup.", ch: GadgetLab, p: 2026-11-02, s: 1000, g: 0}
+      - {id: k07f, t: "Nova Lens announced", d: "News.", ch: AI Daily, p: 2026-10-15, s: 300, g: 0}
+      - {id: k07g, t: "Phone unboxing", d: "Unboxing a phone.", ch: DailyTech, p: 2026-09-01, s: 400, g: 0}
+      - {id: k07h, t: "Nova Lens first look", d: "First look at Nova Lens.", ch: TechReviews, p: 2026-10-16, s: 500, g: 2}
+
+  - id: K08
+    query: "codeforge 2 pricing"
+    target: codeforge
+    labels: {primary_intent: informational, sub_intent: model_pricing, entity: "CodeForge 2", gap: none}
+    videos:
+      - {id: k08a, t: "CodeForge 2 pricing explained", d: "Every CodeForge 2 plan and price.", ch: AI Daily, p: 2026-11-07, s: 400, g: 3}
+      - {id: k08b, t: "CodeForge 2 news: pricing and availability", d: "Release date, plans and pricing.", ch: AI Daily, p: 2026-11-06, s: 300, g: 3}
+      - {id: k08c, t: "Is CodeForge 2 worth the price?", d: "CodeForge 2 pricing compared with the free tier.", ch: DevReviews, p: 2026-11-09, s: 700, g: 3}
+      - {id: k08d, t: "CodeForge 2 plans compared", d: "Free vs Pro pricing.", ch: DevCompare, p: 2026-11-08, s: 500, g: 3}
+      - {id: k08e, t: "CodeForge 1 pricing", d: "CodeForge 1 plans.", ch: AI Daily, p: 2025-06-05, s: 300, g: 1}
+      - {id: k08f, t: "CodeForge 2 review", d: "Review.", ch: DevReviews, p: 2026-11-09, s: 800, g: 1}
+      - {id: k08g, t: "AI subscriptions compared", d: "Roundup.", ch: ToolRoundup, p: 2026-10-01, s: 900, g: 0}
+      - {id: k08h, t: "CodeForge 2 benchmarks", d: "Benchmarks.", ch: BenchLab, p: 2026-11-08, s: 700, g: 0}

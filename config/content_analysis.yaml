@@ -14,7 +14,7 @@ retrieval:
   fetch_details: true            # videos.list for duration/language (1 unit per 50 videos)
 
 relevance:                       # uncalibrated relevance index (0-100)
-  relevant_threshold: 45
+  relevant_threshold: 60  # calibration split sweep 30-70: F1 plateau 60-70 (see docs/phase5_evaluation.md)
   high_threshold: 70
   weights: {entity: 0.35, intent: 0.25, title: 0.20, description: 0.10, keywords: 0.10}
 

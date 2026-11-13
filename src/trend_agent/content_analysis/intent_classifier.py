@@ -378,7 +378,8 @@ RULES: tuple[Rule, ...] = (
     ),
     _r(
         "g_strategy",
-        r"\b(?:strategy|strategies|tips|how to win|tier list|meta)\b",
+        r"\b(?:strategy|strategies|tips|how to win|tier list|meta|farm(?:ing)?|grind(?:ing)?|"
+        r"fastest way)\b",
         1.4,
         sub=S.STRATEGY_GUIDE,
         categories=GAME,
