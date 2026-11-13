@@ -6,7 +6,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from trend_agent.db.repositories import ObservationRepository, VideoRepository
+from trend_agent.db.repositories.detection_runs import DetectionRunRepository
 from trend_agent.db.repositories.discovery import DiscoveryRepository
+from trend_agent.db.repositories.surge_events import SurgeEventRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
 from trend_agent.db.session import SessionFactory, transaction
 from trend_agent.logging import get_logger, log_event
@@ -60,6 +62,9 @@ class RetentionService:
             )
             expired["discovery_items"] = DiscoveryRepository(session).count_expired_items(now)
             expired["ts_observations"] = TimeSeriesRepository(session).count_expired(now)
+            # Phase 4: derived detection records carry the expiry of their sources.
+            expired["anomaly_results"] = DetectionRunRepository(session).count_expired(now)
+            expired["surge_events"] = SurgeEventRepository(session).count_expired(now)
             due = len(VideoRepository(session).videos_due_for_refresh(now, horizon, 100_000))
         return RetentionReport(
             checked_at=now, expired=expired, expiring_videos_within_horizon=due, horizon=horizon
@@ -78,6 +83,10 @@ class RetentionService:
             deleted["discovery_items"] = DiscoveryRepository(session).purge_expired_items(now)
             # Phase 3: monitoring observations expire per their data policy (derived values
             # never outlive their sources: their expiry is the earliest source expiry).
+            # Phase 4: detection results and episodes derived from expiring observations go
+            # first (also enforced by cascades when the source observations are deleted).
+            deleted["anomaly_results"] = DetectionRunRepository(session).purge_expired(now)
+            deleted["surge_events"] = SurgeEventRepository(session).purge_expired(now)
             deleted["ts_observations"] = TimeSeriesRepository(session).purge_expired(now)
         log_event(_log, "retention.purged", deleted=deleted, as_of=now.isoformat())
         return deleted

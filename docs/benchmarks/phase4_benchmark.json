@@ -1,0 +1,94 @@
+{
+  "label": "SYNTHETIC benchmark data; measurements on this machine only",
+  "hardware": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus": 4,
+    "memory": "16472076 kB"
+  },
+  "config_version": "detection-v1@49accd881f70",
+  "memory": {
+    "single_series": {
+      "history_days": 365,
+      "incremental_update_ms_p50": 0.863,
+      "incremental_update_ms_p95": 1.504,
+      "preprocess_365_days_ms_p50": 0.676,
+      "full_recompute_365_days_ms_p50": 96.37,
+      "per_period_full_recompute_us": 263.3
+    },
+    "baseline": {
+      "periods": 366,
+      "seconds_cold_cache": 0.0434,
+      "us_per_period": 118.5,
+      "note": "robust window statistics vectorised; seasonal profile refitted once per week"
+    },
+    "batch_incremental": {
+      "series": 1000,
+      "history_days": 120,
+      "seconds": 1.05,
+      "series_per_second": 948.1,
+      "note": "includes preprocessing (knowledge -> grid) and state restore per series"
+    },
+    "fast_causal_replay": {
+      "series": 1000,
+      "days": 120,
+      "evaluations": 120000,
+      "seconds": 44.26,
+      "evaluations_per_second": 2711.3
+    },
+    "stepwise_replay": {
+      "series": 100,
+      "days": 60,
+      "steps": 64,
+      "evaluations": 6000,
+      "seconds": 7.58,
+      "evaluations_per_second": 791.5,
+      "note": "re-prepares each series from its visible snapshot at every step"
+    }
+  },
+  "database": {
+    "seed_seconds": 42.25,
+    "initial_run": {
+      "series": 1000,
+      "observations": 120000,
+      "seconds": 400.92,
+      "series_per_second": 2.5,
+      "observations_per_second": 299.3,
+      "anomaly_results_rows": 360000,
+      "episodes": 77,
+      "errors": 0
+    },
+    "daily_incremental_run": {
+      "series": 1000,
+      "observations": 1000,
+      "seconds": 25.39,
+      "series_per_second": 39.4,
+      "hypotheses": 0,
+      "notifications": 8,
+      "errors": 0
+    },
+    "retrieval": {
+      "series": 200,
+      "points_each": 121,
+      "p50_ms": 4.18,
+      "p95_ms": 7.03
+    },
+    "state_persistence": {
+      "series": 300,
+      "ms_per_series_load_and_save": 5.71
+    },
+    "episode_creation": {
+      "episodes": 300,
+      "ms_per_episode": 3.41,
+      "note": "advisory key lock + open-episode lookup + insert + transition"
+    }
+  },
+  "dataset": {
+    "active_targets": 1000,
+    "dormant_targets": 10000,
+    "history_days": 120,
+    "observations": 121000
+  },
+  "total_seconds": 565.3
+}

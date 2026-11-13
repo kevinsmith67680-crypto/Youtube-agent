@@ -1,11 +1,12 @@
-# YouTube Trend Agent — Phases 1–3: Data Acquisition, Keyword Discovery & Historical Monitoring
+# YouTube Trend Agent — Phases 1–4: Data Acquisition, Keyword Discovery, Historical Monitoring & Surge Detection
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
-existing videos, and what videos to make. This repository contains **Phases 1 and 2 of 8**:
+existing videos, and what videos to make. This repository contains **Phases 1–4 of 8**:
 the typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
-controls (Phase 1), and an autonomous **keyword discovery engine** for AI, technology and
-gaming (Phase 2).
+controls (Phase 1), an autonomous **keyword discovery engine** for AI, technology and
+gaming (Phase 2), **historical monitoring** with time-series storage and scheduling
+(Phase 3), and a **statistical surge detection engine** (Phase 4).
 
 > **Read this first — what the data can and cannot tell you.**
 > YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
@@ -61,8 +62,27 @@ history from sources that can actually measure them, with full provenance. Detai
 | Comparability engine, baseline readiness, data quality, backfill, deterministic replay | Implemented |
 | Real search-interest source | **None available here**: Google Trends API alpha not configured; YouTube Data API has no search interest. Proxy event signals and synthetic providers work |
 
-Not in scope yet (by design): surge detection (Phase 4), forecasting, LLM analysis,
-recommendations, dashboard.
+## What Phase 4 adds — statistical surge detection
+
+Detection decides, causally and explainably, whether what a source measures rose
+abnormally or persistently, and keeps one persistent, deduplicated **surge episode** per
+event. Details: [docs/phase4_architecture.md](docs/phase4_architecture.md),
+[docs/statistical_detection.md](docs/statistical_detection.md),
+[docs/surge_alerts.md](docs/surge_alerts.md).
+
+| Area | Status |
+|---|---|
+| Causal preprocessing (knowledge at T, comparability, period grid, missing ≠ zero) | Implemented |
+| Robust rolling (median/MAD, zero-MAD handling) and seasonal (weekday / hour-of-day, Kruskal–Wallis-gated) baselines | Implemented |
+| Rapid anomaly detector, one-sided CUSUM, Bayesian online change points, cold-start states | Implemented (persisted state; incremental == recomputed) |
+| Strict evidence classes: only direct YouTube search interest can be CONFIRMED; external → `EXTERNAL_SEARCH_SURGE`; video/suggestion/event/community → proxy attention | Implemented (policy, contract validator, DB constraint) |
+| Calibrated p-values (empirical null + GPD tail), per-run Benjamini–Hochberg/Yekutieli, daily alert budget | Implemented; calibrations exist for **synthetic** data only |
+| Severity components, episodes (dedupe, escalate, downgrade, resolve, reopen), deterministic explanations, `surge-alert/1.0` contract for Phase 5 | Implemented |
+| Phase 3 integration: transactional outbox + `LISTEN/NOTIFY` worker, `monitor run --once` hook | Implemented |
+| Causal replay, walk-forward calibration, independent synthetic evaluation | Implemented — results in [docs/phase4_report.md](docs/phase4_report.md); **synthetic only**, real-world accuracy unknown |
+
+Not in scope yet (by design): search-intent and content-gap analysis (Phase 5),
+forecasting, recommendations, dashboard.
 
 ## Architecture overview
 
@@ -76,10 +96,13 @@ discovery/   Phase 2: discovery providers, extraction, expansion, intent, cluste
              evidence, scoring, lifecycle, budget, DiscoveryService
 monitoring/  Phase 3: targets, scheduler, planner, executor, freshness, comparability,
              readiness, quality, backfill, replay, metrics, MonitoringService
+detection/   Phase 4: preprocessing, baselines, anomaly, CUSUM, change points, cold
+             start, significance, severity, alert policy, episodes, replay, evaluation
 db/          SQLAlchemy models, session management, repositories (all SQL lives here)
 comparability.py   decides whether two observations' values may be compared
 container.py composition root (dependency injection), cli*.py Typer CLI
-config/      discovery.yaml, seeds/, sources/ (Phase 2); monitoring.yaml (Phase 3)
+config/      discovery.yaml, seeds/, sources/ (Phase 2); monitoring.yaml (Phase 3);
+             detection.yaml (Phase 4)
 ```
 
 Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
@@ -198,6 +221,18 @@ trend-agent monitor history --query "AI coding agents"
 trend-agent monitor backfill --query "AI coding agents" --provider mock --days 30
 trend-agent monitor replay --query "AI coding agents" --provider mock
 trend-agent monitor activate|pause|resume|disable|override --query "..."
+
+# Phase 4: surge detection (see docs/statistical_detection.md, docs/surge_alerts.md)
+trend-agent detect demo                     # SYNTHETIC end-to-end demo, scenarios A-N (checked)
+trend-agent detect run --all                # detect on new/revised observations (also --category ai|technology|gaming, --query)
+trend-agent detect worker                   # event-driven: LISTEN for new observations (Phase 3 outbox)
+trend-agent detect alerts --active          # open surge episodes (synthetic hidden unless --include-synthetic)
+trend-agent detect explain --event-id 12    # evidence, reasoning, transitions, versioned payload
+trend-agent detect query --query "AI coding agents"
+trend-agent detect readiness | thresholds | stats | schema
+trend-agent detect replay --query "AI coding agents" --provider mock
+trend-agent detect calibrate --dataset synthetic
+trend-agent detect evaluate --dataset synthetic
 ```
 
 `discover run` fetches within budgets, quotas and poll intervals (`--force` ignores
@@ -270,3 +305,8 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/historical_replay.md](docs/historical_replay.md) — replay without look-ahead; interface for Phase 4
 * [docs/monitoring_operations.md](docs/monitoring_operations.md) — commands, processes, troubleshooting, retention, benchmarks
 * [docs/phase3_report.md](docs/phase3_report.md) — what was built and verified, benchmarks, limitations, Phase 4 readiness
+* [docs/phase4_architecture.md](docs/phase4_architecture.md) — detection modules, Phase 3 integration, schema, design decisions
+* [docs/statistical_detection.md](docs/statistical_detection.md) — baselines, anomaly, CUSUM, change points, cold start, multiple testing, failure modes
+* [docs/surge_alerts.md](docs/surge_alerts.md) — evidence classes, stages, severity, episodes, output contract, explanations
+* [docs/detection_evaluation.md](docs/detection_evaluation.md) — ground truth, metrics, causal replay, calibration, leakage control
+* [docs/phase4_report.md](docs/phase4_report.md) — what was built and verified, synthetic accuracy, benchmarks, limitations, Phase 5 readiness

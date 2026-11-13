@@ -785,6 +785,39 @@ class DetectionService:
             "expires_at": ev.observation.expires_at,
         }
         a, c, p = ev.anomaly, ev.cusum, ev.change_point
+        if ev.is_late:
+            # Historical/late values never open alerts: keep the numbers (score, baseline,
+            # threshold, status) but not the full decision trace, to avoid storing a large
+            # derived copy of the whole history on the first run.
+            return [
+                result_row(
+                    base,
+                    detector=det,
+                    score=score,
+                    threshold=threshold,
+                    p_value=None,
+                    status=status,
+                    reasons=reasons,
+                    details={"late": True},
+                )
+                for det, score, threshold, status, reasons in (
+                    (
+                        DetectorType.ROBUST_ANOMALY,
+                        a.z,
+                        a.alert_threshold,
+                        a.status.value,
+                        list(a.reasons),
+                    ),
+                    (DetectorType.CUSUM, c.statistic, c.threshold, c.status.value, list(c.reasons)),
+                    (
+                        DetectorType.CHANGE_POINT,
+                        p.probability,
+                        cfg.change_point.probability_threshold,
+                        p.status.value,
+                        list(p.reasons),
+                    ),
+                )
+            ]
         rows = [
             result_row(
                 base,

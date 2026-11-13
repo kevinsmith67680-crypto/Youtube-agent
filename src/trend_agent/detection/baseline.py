@@ -137,16 +137,18 @@ class SeasonalFit:
     reason: str
 
     def as_dict(self) -> dict[str, Any]:
+        """Exact (unrounded) values: this is persisted detector state, and a restored fit
+        must reproduce the recomputed one bit for bit."""
         return {
             "block": self.block,
             "eligible": self.eligible,
             "selected": self.selected,
-            "profile": [round(x, 6) for x in self.profile],
-            "dispersion": round(self.dispersion, 6),
-            "robust_dispersion": round(self.robust_dispersion, 6),
-            "reduction": round(self.reduction, 6),
-            "kw_statistic": _r(self.kw_statistic, 6),
-            "kw_p_value": None if self.kw_p_value is None else float(f"{self.kw_p_value:.6g}"),
+            "profile": list(self.profile),
+            "dispersion": self.dispersion,
+            "robust_dispersion": self.robust_dispersion,
+            "reduction": self.reduction,
+            "kw_statistic": self.kw_statistic,
+            "kw_p_value": self.kw_p_value,
             "n": self.n,
             "reason": self.reason,
         }

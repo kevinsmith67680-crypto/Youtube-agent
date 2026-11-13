@@ -88,8 +88,8 @@ class DetectorStateRepository:
         if current is not None and expected_version is None:
             return False
         new_version = (current or 0) + 1
-        for detector, payload in payloads.items():
-            values = {
+        rows = [
+            {
                 "series_id": series_id,
                 "target_id": target_id,
                 "provider_name": provider,
@@ -106,14 +106,16 @@ class DetectorStateRepository:
                 "is_synthetic": is_synthetic,
                 "updated_at": now,
             }
-            stmt = pg_insert(t).values(**values)
-            stmt = stmt.on_conflict_do_update(
+            for detector, payload in payloads.items()
+        ]
+        stmt = pg_insert(t).values(rows)  # one round trip for all detector types
+        keep = ("series_id", "detector_type")
+        self._s.execute(
+            stmt.on_conflict_do_update(
                 index_elements=[t.series_id, t.detector_type],
-                set_={
-                    k: stmt.excluded[k] for k in values if k not in ("series_id", "detector_type")
-                },
+                set_={k: stmt.excluded[k] for k in rows[0] if k not in keep},
             )
-            self._s.execute(stmt)
+        )
         return True
 
     def summaries(self, series_ids: list[int] | None = None) -> list[DetectorStateRow]:

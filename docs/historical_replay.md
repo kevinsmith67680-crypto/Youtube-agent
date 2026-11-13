@@ -39,10 +39,15 @@ database. The demo checks this.
 
 ## Interface for Phase 4
 
+Phase 4 implements this interface in `detection/replay_adapter.py::DetectionReplayer`
+(`trend-agent detect replay`): the full detection engine, alert policy and episode rules
+run on each snapshot. See [detection_evaluation.md](detection_evaluation.md).
+
+
 ```python
 from trend_agent.monitoring.replay import ReplayConsumer, ReplaySnapshot, replay
 
-class MyDetector:                      # Phase 4 implements this; nothing is shipped now
+class MyDetector:                      # any custom consumer; Phase 4 ships DetectionReplayer
     def on_step(self, snapshot: ReplaySnapshot) -> None:
         for series_id, points in snapshot.series.items():   # one scale per series
             ...                                               # points sorted by event time

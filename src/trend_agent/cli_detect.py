@@ -529,8 +529,8 @@ def detect_stats(include_synthetic: SyntheticOpt = False, as_json: base.JsonOpt 
         for e in data["evaluations"]:
             base.console.print(
                 f"evaluation {e['dataset']} ({e['split']}"
-                f"{', synthetic' if e['synthetic'] else ''}): precision {e['precision']} recall {e['recall']} "
-                f"false alerts/day {e['false_alerts_per_day']}"
+                f"{', synthetic' if e['synthetic'] else ''}): precision {e['precision']} "
+                f"recall {e['recall']} false alerts/day {e['false_alerts_per_day']}"
             )
 
 

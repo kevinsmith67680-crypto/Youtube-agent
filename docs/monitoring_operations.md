@@ -76,10 +76,19 @@ the synthetic providers.
 | demo checks fail on re-run | run with the default `--reset` (removes earlier synthetic monitoring rows only) |
 | Google Trends data `withheld` | storage denied until `TREND_AGENT_GOOGLE_TRENDS_RETENTION_DAYS` is set per your access terms |
 
+## Detection hand-off (Phase 4)
+
+Every job that stores new or revised observations also queues the series for detection
+(`detection_queue`, in the same transaction) and sends `NOTIFY trend_agent_detection`.
+`monitor run --once` ends by running detection on the queued series when
+`integration.run_after_collection` is true in `config/detection.yaml`; for continuous
+operation run `trend-agent detect worker` next to the monitoring workers. See
+[phase4_architecture.md](phase4_architecture.md).
+
 ## Retention
 
 `trend-agent data retention [--purge]` reports and deletes expired monitoring observations
-along with Phase 1/2 data. Observations expire by data policy:
+along with Phase 1/2 data and the Phase 4 detection results derived from them. Observations expire by data policy:
 
 * synthetic: never;
 * Google Trends: only stored once a retention period is configured;

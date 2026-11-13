@@ -1,0 +1,662 @@
+{
+  "label": "SYNTHETIC BENCHMARK - not real-world performance",
+  "sizes": {
+    "train_null_series": 155,
+    "test_series": 400,
+    "null_series": 1000,
+    "days": 150,
+    "eval_window_days": 60,
+    "null_eval_window_days": 60
+  },
+  "calibration": {
+    "version": "synthetic-thresholds-2026-11-13-synthetic",
+    "source": "synthetic",
+    "dataset": "synthetic-train-null-155x150d",
+    "series": 155,
+    "periods": 20741,
+    "strata": {
+      "synthetic_trends|day|direct_youtube_search_interest|index|robust_anomaly": {
+        "n_total": 20741,
+        "tail_threshold": 2.023472,
+        "max": 8.76838,
+        "gpd": {
+          "shape": 0.076671,
+          "scale": 0.878171,
+          "exceedances": 1032,
+          "checks": [
+            {
+              "quantile": 0.99,
+              "x": 3.3938,
+              "observed": 208,
+              "predicted": 292.2
+            },
+            {
+              "quantile": 0.995,
+              "x": 4.2718,
+              "observed": 105,
+              "predicted": 123.2
+            },
+            {
+              "quantile": 0.999,
+              "x": 5.8209,
+              "observed": 21,
+              "predicted": 30.5
+            }
+          ],
+          "ok": true
+        }
+      },
+      "synthetic_trends|day|direct_youtube_search_interest|index|cusum": {
+        "n_total": 20741,
+        "tail_threshold": 2.070417,
+        "max": 7.676964,
+        "gpd": {
+          "shape": -0.232199,
+          "scale": 1.4326,
+          "exceedances": 1036,
+          "checks": [
+            {
+              "quantile": 0.99,
+              "x": 4.0,
+              "observed": 236,
+              "predicted": 206.4
+            },
+            {
+              "quantile": 0.995,
+              "x": 4.3466,
+              "observed": 104,
+              "predicted": 143.0
+            },
+            {
+              "quantile": 0.999,
+              "x": 5.7189,
+              "observed": 21,
+              "predicted": 22.0
+            }
+          ],
+          "ok": true
+        }
+      }
+    },
+    "cusum_arl_table": [
+      {
+        "k": 0.5,
+        "h": 3.0,
+        "alarms": 651,
+        "periods": 20741,
+        "arl0_empirical": 31.9,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 118.6
+      },
+      {
+        "k": 0.5,
+        "h": 4.0,
+        "alarms": 425,
+        "periods": 20741,
+        "arl0_empirical": 48.8,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 338.1
+      },
+      {
+        "k": 0.5,
+        "h": 5.0,
+        "alarms": 238,
+        "periods": 20741,
+        "arl0_empirical": 87.1,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 938.2
+      },
+      {
+        "k": 0.5,
+        "h": 6.0,
+        "alarms": 148,
+        "periods": 20741,
+        "arl0_empirical": 140.1,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 2573.0
+      },
+      {
+        "k": 0.5,
+        "h": 7.0,
+        "alarms": 90,
+        "periods": 20741,
+        "arl0_empirical": 230.5,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 7020.1
+      },
+      {
+        "k": 0.5,
+        "h": 8.0,
+        "alarms": 58,
+        "periods": 20741,
+        "arl0_empirical": 357.6,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 19112.2
+      },
+      {
+        "k": 0.5,
+        "h": 9.0,
+        "alarms": 43,
+        "periods": 20741,
+        "arl0_empirical": 482.3,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 51985.4
+      },
+      {
+        "k": 0.5,
+        "h": 10.0,
+        "alarms": 31,
+        "periods": 20741,
+        "arl0_empirical": 669.1,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 141347.3
+      },
+      {
+        "k": 0.5,
+        "h": 12.0,
+        "alarms": 14,
+        "periods": 20741,
+        "arl0_empirical": 1481.5,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 1044574.4
+      },
+      {
+        "k": 0.5,
+        "h": 14.0,
+        "alarms": 7,
+        "periods": 20741,
+        "arl0_empirical": 2963.0,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 7718595.6
+      },
+      {
+        "k": 0.75,
+        "h": 3.0,
+        "alarms": 410,
+        "periods": 20741,
+        "arl0_empirical": 50.6,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 453.6
+      },
+      {
+        "k": 0.75,
+        "h": 4.0,
+        "alarms": 247,
+        "periods": 20741,
+        "arl0_empirical": 84.0,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 2053.8
+      },
+      {
+        "k": 0.75,
+        "h": 5.0,
+        "alarms": 87,
+        "periods": 20741,
+        "arl0_empirical": 238.4,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 9230.1
+      },
+      {
+        "k": 0.75,
+        "h": 6.0,
+        "alarms": 49,
+        "periods": 20741,
+        "arl0_empirical": 423.3,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 41397.0
+      },
+      {
+        "k": 0.75,
+        "h": 7.0,
+        "alarms": 27,
+        "periods": 20741,
+        "arl0_empirical": 768.2,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 185563.7
+      },
+      {
+        "k": 0.75,
+        "h": 8.0,
+        "alarms": 18,
+        "periods": 20741,
+        "arl0_empirical": 1152.3,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 831678.5
+      },
+      {
+        "k": 0.75,
+        "h": 9.0,
+        "alarms": 8,
+        "periods": 20741,
+        "arl0_empirical": 2592.6,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 3727368.7
+      },
+      {
+        "k": 0.75,
+        "h": 10.0,
+        "alarms": 3,
+        "periods": 20741,
+        "arl0_empirical": 6913.7,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 16704956.3
+      },
+      {
+        "k": 0.75,
+        "h": 12.0,
+        "alarms": 1,
+        "periods": 20741,
+        "arl0_empirical": 20741.0,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 335528315.7
+      },
+      {
+        "k": 0.75,
+        "h": 14.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 6739266723.4
+      },
+      {
+        "k": 1.0,
+        "h": 3.0,
+        "alarms": 283,
+        "periods": 20741,
+        "arl0_empirical": 73.3,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 2072.7
+      },
+      {
+        "k": 1.0,
+        "h": 4.0,
+        "alarms": 64,
+        "periods": 20741,
+        "arl0_empirical": 324.1,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 15344.1
+      },
+      {
+        "k": 1.0,
+        "h": 5.0,
+        "alarms": 28,
+        "periods": 20741,
+        "arl0_empirical": 740.8,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 113413.3
+      },
+      {
+        "k": 1.0,
+        "h": 6.0,
+        "alarms": 15,
+        "periods": 20741,
+        "arl0_empirical": 1382.7,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 838058.9
+      },
+      {
+        "k": 1.0,
+        "h": 7.0,
+        "alarms": 4,
+        "periods": 20741,
+        "arl0_empirical": 5185.2,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 6192512.3
+      },
+      {
+        "k": 1.0,
+        "h": 8.0,
+        "alarms": 3,
+        "periods": 20741,
+        "arl0_empirical": 6913.7,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 45756874.8
+      },
+      {
+        "k": 1.0,
+        "h": 9.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 338100175.9
+      },
+      {
+        "k": 1.0,
+        "h": 10.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 2498241233.8
+      },
+      {
+        "k": 1.0,
+        "h": 12.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 136399350326.2
+      },
+      {
+        "k": 1.0,
+        "h": 14.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 7447152194262.5
+      },
+      {
+        "k": 1.25,
+        "h": 3.0,
+        "alarms": 176,
+        "periods": 20741,
+        "arl0_empirical": 117.8,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 10670.3
+      },
+      {
+        "k": 1.25,
+        "h": 4.0,
+        "alarms": 23,
+        "periods": 20741,
+        "arl0_empirical": 901.8,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 130031.4
+      },
+      {
+        "k": 1.25,
+        "h": 5.0,
+        "alarms": 6,
+        "periods": 20741,
+        "arl0_empirical": 3456.8,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 1584156.1
+      },
+      {
+        "k": 1.25,
+        "h": 6.0,
+        "alarms": 3,
+        "periods": 20741,
+        "arl0_empirical": 6913.7,
+        "arl0_lower_bound": null,
+        "arl0_siegmund_normal": 19299030.2
+      },
+      {
+        "k": 1.25,
+        "h": 7.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 235110385.6
+      },
+      {
+        "k": 1.25,
+        "h": 8.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 2864230928.2
+      },
+      {
+        "k": 1.25,
+        "h": 9.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 34893476069.3
+      },
+      {
+        "k": 1.25,
+        "h": 10.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 425089561576.1
+      },
+      {
+        "k": 1.25,
+        "h": 12.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 63088884736394.9
+      },
+      {
+        "k": 1.25,
+        "h": 14.0,
+        "alarms": 0,
+        "periods": 20741,
+        "arl0_empirical": null,
+        "arl0_lower_bound": 20741,
+        "arl0_siegmund_normal": 9363220687988296.0
+      }
+    ],
+    "anomaly_exceedance": {
+      "synthetic_trends|day|direct_youtube_search_interest|index|robust_anomaly": [
+        {
+          "z": 3.0,
+          "exceedances": 355,
+          "rate_per_series_period": 0.017116,
+          "normal_theory_rate": 0.0013499
+        },
+        {
+          "z": 3.5,
+          "exceedances": 197,
+          "rate_per_series_period": 0.009498,
+          "normal_theory_rate": 0.00023263
+        },
+        {
+          "z": 4.0,
+          "exceedances": 157,
+          "rate_per_series_period": 0.00757,
+          "normal_theory_rate": 3.167e-05
+        },
+        {
+          "z": 4.5,
+          "exceedances": 88,
+          "rate_per_series_period": 0.004243,
+          "normal_theory_rate": 3.4e-06
+        },
+        {
+          "z": 5.0,
+          "exceedances": 50,
+          "rate_per_series_period": 0.002411,
+          "normal_theory_rate": 2.9e-07
+        },
+        {
+          "z": 6.0,
+          "exceedances": 21,
+          "rate_per_series_period": 0.001012,
+          "normal_theory_rate": 0.0
+        },
+        {
+          "z": 8.0,
+          "exceedances": 4,
+          "rate_per_series_period": 0.000193,
+          "normal_theory_rate": 0.0
+        }
+      ]
+    },
+    "recommended_h_for_target_arl0": 6.0,
+    "recommended_h_by_k": {
+      "0.5": 12.0,
+      "0.75": 8.0,
+      "1.0": 6.0,
+      "1.25": 5.0
+    },
+    "budget_rate_per_series_period": 0.002,
+    "train_range": [
+      "2026-01-05T00:00:00+00:00",
+      "2026-06-03T00:00:00+00:00"
+    ]
+  },
+  "test_calibrated": {
+    "dataset": "synthetic-test-400x150d",
+    "split": "test",
+    "series": 400,
+    "days": 60,
+    "labels": 99,
+    "tp": 99,
+    "fp": 8,
+    "fn": 0,
+    "duplicates": 0,
+    "ambiguous_alerts": 41,
+    "alerts": 148,
+    "precision": 0.9252,
+    "recall": 1.0,
+    "false_alerts_per_day": 0.1333,
+    "false_alerts_per_1000_series_day": 0.3333,
+    "false_alert_rate_per_series_day": 0.000333,
+    "delay_median_days": 0.5,
+    "delay_p90_days": 6.5,
+    "delay_from_observable_median_days": 0.5,
+    "duplication_rate": 0.0,
+    "coverage": 1.0,
+    "severity_spearman": 0.5754,
+    "severity_spearman_p": 4.66e-10,
+    "confirmed_precision": 0.9733,
+    "confirmed_recall": 0.7374,
+    "confirmed_delay_median_days": 1.5,
+    "recall_by_kind": {
+      "event": {
+        "labels": 26,
+        "detected": 26,
+        "recall": 1.0
+      },
+      "ramp": {
+        "labels": 28,
+        "detected": 28,
+        "recall": 1.0
+      },
+      "spike": {
+        "labels": 27,
+        "detected": 27,
+        "recall": 1.0
+      },
+      "step": {
+        "labels": 18,
+        "detected": 18,
+        "recall": 1.0
+      }
+    },
+    "false_alerts_by_category": {
+      "technology": 3,
+      "ai": 4,
+      "gaming": 1
+    },
+    "budget_held_back": 0,
+    "notes": []
+  },
+  "test_uncalibrated": {
+    "dataset": "synthetic-test-400x150d",
+    "split": "test",
+    "series": 400,
+    "days": 60,
+    "labels": 99,
+    "tp": 99,
+    "fp": 13,
+    "fn": 0,
+    "duplicates": 0,
+    "ambiguous_alerts": 45,
+    "alerts": 157,
+    "precision": 0.8839,
+    "recall": 1.0,
+    "false_alerts_per_day": 0.2167,
+    "false_alerts_per_1000_series_day": 0.5417,
+    "false_alert_rate_per_series_day": 0.000542,
+    "delay_median_days": 0.5,
+    "delay_p90_days": 6.5,
+    "delay_from_observable_median_days": 0.5,
+    "duplication_rate": 0.0,
+    "coverage": 1.0,
+    "severity_spearman": 0.5754,
+    "severity_spearman_p": 4.66e-10,
+    "confirmed_precision": null,
+    "confirmed_recall": 0.0,
+    "confirmed_delay_median_days": null,
+    "recall_by_kind": {
+      "event": {
+        "labels": 26,
+        "detected": 26,
+        "recall": 1.0
+      },
+      "ramp": {
+        "labels": 28,
+        "detected": 28,
+        "recall": 1.0
+      },
+      "spike": {
+        "labels": 27,
+        "detected": 27,
+        "recall": 1.0
+      },
+      "step": {
+        "labels": 18,
+        "detected": 18,
+        "recall": 1.0
+      }
+    },
+    "false_alerts_by_category": {
+      "technology": 6,
+      "ai": 4,
+      "gaming": 3
+    },
+    "budget_held_back": 0,
+    "notes": [
+      "no calibration: thresholds + alert budget only"
+    ]
+  },
+  "null_scale": {
+    "dataset": "synthetic-null-1000x120d-50pct-correlated",
+    "split": "null",
+    "series": 1000,
+    "days": 60,
+    "labels": 0,
+    "tp": 0,
+    "fp": 66,
+    "fn": 0,
+    "duplicates": 0,
+    "ambiguous_alerts": 0,
+    "alerts": 66,
+    "precision": 0.0,
+    "recall": null,
+    "false_alerts_per_day": 1.1,
+    "false_alerts_per_1000_series_day": 1.1,
+    "false_alert_rate_per_series_day": 0.0011,
+    "delay_median_days": null,
+    "delay_p90_days": null,
+    "delay_from_observable_median_days": null,
+    "duplication_rate": null,
+    "coverage": 1.0,
+    "severity_spearman": null,
+    "severity_spearman_p": null,
+    "confirmed_precision": 0.0,
+    "confirmed_recall": null,
+    "confirmed_delay_median_days": null,
+    "recall_by_kind": {},
+    "false_alerts_by_category": {
+      "technology": 28,
+      "ai": 24,
+      "gaming": 14
+    },
+    "budget_held_back": 182,
+    "notes": [
+      "no injected events: every alert is a false alert"
+    ]
+  },
+  "seconds": {
+    "calibration": 6.4,
+    "test_calibrated": 21.72,
+    "test_uncalibrated": 18.75,
+    "null_scale": 46.52
+  }
+}

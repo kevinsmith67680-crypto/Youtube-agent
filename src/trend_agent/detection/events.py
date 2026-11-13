@@ -278,8 +278,17 @@ class EpisodeManager:
         return True, True
 
     def _onset(self, ev: PointEvaluation, meta: EpisodeMeta) -> datetime:
+        """Episode start: the triggering period, or the onset located by an *elevated*
+        sustained-change detector (CUSUM run start / change point), whichever is earlier.
+        A quietly accumulating CUSUM run (noise) does not move the start."""
         start = ev.period_start
-        for slot in (ev.cusum.onset_slot, ev.change_point.change_slot):
+        elevated = ("triggered", "watch")
+        candidates = []
+        if ev.cusum.status.value in elevated:
+            candidates.append(ev.cusum.onset_slot)
+        if ev.change_point.status.value in elevated:
+            candidates.append(ev.change_point.change_slot)
+        for slot in candidates:
             if slot is not None and slot <= ev.slot:
                 start = min(start, ev.period_start - meta.step * (ev.slot - slot))
         return start

@@ -134,6 +134,31 @@ collector whose policy expiry matches the permission.
 4. Retention of job/attempt records (no third-party content is stored there, only counts
    and error categories).
 
+## Surge detection (Phase 4)
+
+* **Derived data follows its sources.** Every anomaly result carries the expiry of the
+  observation it was computed from; every surge episode the *earliest* expiry of its
+  evidence. `trend-agent data retention --purge` deletes expired detection rows, and
+  foreign keys cascade when source observations are purged. Synthetic data never expires.
+* **No new data is collected.** Detection only reads stored Phase 3 observations; it makes
+  no provider requests and consumes no quota.
+* **YouTube derived metrics stay disabled.** Video-activity series exist only where Phase 3
+  was permitted to store them (`compliance.youtube_derived_metrics_permitted`, default
+  false); detection on them is labelled a proxy attention signal, never search demand.
+* **No search counts.** Relative indices are never converted into numbers of searches; the
+  output contract and explanations state this explicitly.
+* **Synthetic isolation.** Synthetic series, calibrations, results and episodes are
+  flagged; calibrations fitted on synthetic data are never applied to real data; production
+  listings and the Phase 5 feed exclude synthetic episodes unless explicitly requested.
+
+Unresolved questions (need the operator / legal review before production):
+
+1. Whether alerts computed from Google Trends API data may be stored for the configured
+   Trends retention period or must expire earlier (the Trends alpha terms were not
+   available in this environment).
+2. Whether surge episodes derived from YouTube video statistics, if that metric is ever
+   permitted, count as "derived metrics" under the YouTube API Services policies.
+
 ## Default posture (conservative)
 
 | Control | Default |
