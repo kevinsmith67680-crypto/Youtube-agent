@@ -669,8 +669,11 @@ class ForecastingService:
             rows = ForecastRepository(s).for_maturity(
                 m.model_id, now - timedelta(hours=self.cfg.splits.embargo_extra_hours)
             )
+            # The forecast predicts (T, T + H] from its issue time T (prediction_timestamp),
+            # not from the data cutoff, which is earlier by the publication lag.
             pairs = [
-                (r.series_id, r.data_cutoff, r.horizon_hours, r.breakout_probability) for r in rows
+                (r.series_id, r.prediction_timestamp, r.horizon_hours, r.breakout_probability)
+                for r in rows
             ]
         if not pairs:
             return drift_mod.concept_drift(
@@ -678,14 +681,14 @@ class ForecastingService:
             )
         bundles = {b.meta.series_id: b for b in self.bundles(include_synthetic=True)}
         y, p = [], []
-        for sid, cutoff, h, prob in pairs:
+        for sid, issued, h, prob in pairs:
             b = bundles.get(sid) if sid is not None else None
             if b is None or prob is None:
                 continue
             pit = PointInTimeSeries(b.points)
-            ref = reference(pit.at(cutoff), b.meta, self.cfg.targets)
+            ref = reference(pit.at(issued), b.meta, self.cfg.targets)
             t, v = pit.final()
-            lab = outcome_labels(ref, t, v, hours(cutoff), b.meta, (h,), self.cfg.targets)
+            lab = outcome_labels(ref, t, v, hours(issued), b.meta, (h,), self.cfg.targets)
             if math.isfinite(lab[f"breakout_{h}"]):
                 y.append(lab[f"breakout_{h}"])
                 p.append(prob)

@@ -102,13 +102,13 @@ def check(
     if len({k for k, w in zip(vis.period_keys, window, strict=True) if w}) > 1:
         reasons.append("the normalization context changed inside the baseline window")
         return result(ForecastStatus.FORECAST_UNAVAILABLE)
+    stale_max = e.max_staleness_hours.get(meta.granularity, 96)
+    if staleness is not None and staleness > stale_max:
+        reasons.append(f"the latest observation is {staleness:.0f} h old (max {stale_max} h)")
+        return result(ForecastStatus.SOURCE_UNAVAILABLE)
     if missing is not None and missing > e.max_missing_rate:
         reasons.append(
             f"{missing:.0%} of recent periods are missing (max {e.max_missing_rate:.0%})"
         )
         return result(ForecastStatus.INSUFFICIENT_HISTORY)
-    stale_max = e.max_staleness_hours.get(meta.granularity, 96)
-    if staleness is not None and staleness > stale_max:
-        reasons.append(f"the latest observation is {staleness:.0f} h old (max {stale_max} h)")
-        return result(ForecastStatus.SOURCE_UNAVAILABLE)
     return result(ForecastStatus.READY)

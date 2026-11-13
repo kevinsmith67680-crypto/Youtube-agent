@@ -15,7 +15,8 @@ Breakout (task A), for prediction time T and horizon H:
     applicable   = the current level (median of the last p visible values) is below θ
     label        = 1 if at least p consecutive future periods in (T, T+H] reach θ, else 0
                    (p = 3 for hourly, 1 for daily data); NaN if fewer than
-                   ``min_label_coverage`` of the future periods were observed.
+                   ``min_label_coverage`` of the future periods were observed, or if
+                   the window has not matured (the data does not reach T + H).
 
 Continuation (task C): applicable when the current level is already at or above θ;
 label = 1 if the median of the last quarter of the window (T, T+H] is still ≥ θ.
@@ -40,7 +41,7 @@ from trend_agent.forecasting.config import Targets, granularity_hours
 from trend_agent.forecasting.feature_store import SeriesMeta, Visible
 from trend_agent.schemas.enums import ScaleType, TimeGranularity
 
-TARGET_VERSION = "targets-1.0.0"
+TARGET_VERSION = "targets-1.1.0"
 LEADS_HOURS = (2, 6, 8, 12, 24, 48, 72)  # publication leads used by opportunity windows
 _BOUNDED = (ScaleType.CONSISTENT_INDEX, ScaleType.RELATIVE_PER_REQUEST)
 
@@ -99,6 +100,13 @@ def _future(
     return t[m], v[m]
 
 
+def _matured(final_t: np.ndarray, window_end: float) -> bool:
+    """The outcome window is over: data reaches its end. Gaps inside a matured window are
+    handled by the coverage rule; a window that runs past the data is never labelled (a
+    "no breakout" there could be a breakout that has not happened yet)."""
+    return bool(final_t.size) and float(final_t.max()) >= window_end - 1e-6
+
+
 def _run_reaches(values: np.ndarray, threshold: float, p: int) -> bool:
     run = 0
     for x in values:
@@ -134,7 +142,7 @@ def outcome_labels(
         observed = int(np.sum(np.isfinite(fv)))
         coverage = observed / expected
         out[f"coverage_{h}"] = coverage
-        if coverage < cfg.min_label_coverage:
+        if coverage < cfg.min_label_coverage or not _matured(final_t, t_now + h):
             continue
         assert ref.elevated is not None
         if not ref.elevated:
@@ -159,7 +167,11 @@ def outcome_labels(
     expected = max(1, round(pw / step))
     finite = np.isfinite(fv)
     out["peak_coverage"] = float(np.sum(finite)) / expected
-    if out["peak_coverage"] >= cfg.min_label_coverage and finite.any():
+    if (
+        out["peak_coverage"] >= cfg.min_label_coverage
+        and finite.any()
+        and _matured(final_t, t_now + pw)
+    ):
         vals = np.where(finite, fv, -np.inf)
         i = int(np.argmax(vals))
         vmax = float(vals[i])

@@ -167,6 +167,10 @@ def _series_rows(
     b, loaded, dloaded, end = args
     cfg = loaded.config
     mode = AvailabilityMode(cfg.availability_mode)
+    if end is not None:
+        # A dataset "as of end" knows only what was available then: labels whose window
+        # has not matured by ``end`` lack coverage and stay unknown (never look-ahead).
+        b = _truncate(b, end, mode)
     horizons = cfg.horizons_hours
     lnames = label_names(horizons)
     bnames = [f"seasonal_{h}" for h in horizons]

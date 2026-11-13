@@ -294,7 +294,11 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_forecast_predictions")),
         sa.UniqueConstraint(
-            "series_id", "model_ref", "data_cutoff", "horizon_hours", name="uq_forecast_prediction"
+            "series_id",
+            "model_ref",
+            "prediction_timestamp",
+            "horizon_hours",
+            name="uq_forecast_prediction",
         ),
     )
     op.create_index(

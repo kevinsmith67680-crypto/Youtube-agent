@@ -4,14 +4,20 @@ from __future__ import annotations
 
 import math
 from dataclasses import replace
+from datetime import datetime, timedelta
 
 import numpy as np
 
 from tests.unit.forecasting.helpers import CFG, DLOADED, LOADED, at, bundle
 from trend_agent.forecasting import synthetic as syn
 from trend_agent.forecasting.dataset_builder import _support_views, row_features
-from trend_agent.forecasting.feature_engineering import FEATURE_NAMES, SPECS
-from trend_agent.forecasting.feature_store import ContentEvent, PointInTimeSeries, hours
+from trend_agent.forecasting.feature_engineering import FEATURE_NAMES, SPECS, FeatureRow
+from trend_agent.forecasting.feature_store import (
+    ContentEvent,
+    PointInTimeSeries,
+    SeriesBundle,
+    hours,
+)
 from trend_agent.forecasting.target_definition import Reference, label_names, outcome_labels
 from trend_agent.schemas.enums import ScaleType, TimeGranularity
 from trend_agent.schemas.monitoring import MeasurementCategory
@@ -83,10 +89,13 @@ def test_labels_never_appear_as_features() -> None:
     assert all(SPECS[n].availability for n in FEATURE_NAMES)
 
 
-def _features(b, t):  # type: ignore[no-untyped-def]
+def _features(b: SeriesBundle, t: datetime) -> FeatureRow:
     pit = PointInTimeSeries(b.points)
-    return row_features(b, pit, None, _support_views(b, pit.mode), t, LOADED, DLOADED,
-                        strict=True)[2]  # fmt: skip
+    _, _, row = row_features(
+        b, pit, None, _support_views(b, pit.mode), t, LOADED, DLOADED, strict=True
+    )
+    assert isinstance(row, FeatureRow)
+    return row
 
 
 def test_future_perturbation_does_not_change_features() -> None:
@@ -104,7 +113,7 @@ def test_missing_values_stay_missing_and_content_after_t_ignored() -> None:
     spec = syn.Spec(key="miss", seed=6, periods=24 * 12, missing_rate=0.1)
     b = bundle(spec)
     t = at(spec, 24 * 11)
-    b.content = [ContentEvent(t + syn.timedelta(hours=1), "missing_specific_answer", "weak", True)]
+    b.content = [ContentEvent(t + timedelta(hours=1), "missing_specific_answer", "weak", True)]
     row = _features(b, t)
     assert math.isnan(row.values["gap_strength_ord"])  # analysis completed after T
     assert math.isnan(row.values["keyword_age_h"])  # no catalog fact: NaN, not 0

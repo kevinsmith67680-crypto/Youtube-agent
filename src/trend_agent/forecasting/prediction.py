@@ -20,7 +20,7 @@ import math
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import numpy as np
@@ -114,8 +114,17 @@ def _ref(meta: ModelMetadata | None) -> ModelRef | None:
     )
 
 
-def prediction_id(series_id: int, as_of: datetime, horizon: int, models: Sequence[str]) -> str:
-    key = f"{series_id}|{as_of.isoformat()}|{horizon}|{'|'.join(sorted(models))}"
+def issue_time(requested: datetime) -> datetime:
+    """Forecasts are issued on the hour (UTC), like the training grid.
+
+    Every request within the same hour is evaluated at the same issue time and therefore
+    returns an identical forecast; a forecast an hour later predicts a different window
+    (T, T + H] and is a new forecast even when no new data arrived."""
+    return requested.astimezone(UTC).replace(minute=0, second=0, microsecond=0)
+
+
+def prediction_id(series_id: int, issued_at: datetime, horizon: int, models: Sequence[str]) -> str:
+    key = f"{series_id}|{issued_at.isoformat()}|{horizon}|{'|'.join(sorted(models))}"
     return str(uuid.uuid5(_NS, key))
 
 
@@ -172,6 +181,7 @@ class ForecastEngine:
     ) -> list[ForecastOutput]:
         cfg = self.cfg
         meta = bundle.meta
+        as_of = issue_time(as_of)
         mode = AvailabilityMode(cfg.availability_mode)
         pit = PointInTimeSeries(bundle.points, mode)
         vis, ref, row = row_features(
@@ -185,8 +195,7 @@ class ForecastEngine:
             strict=True,
         )
         # Data cutoff = availability time of the newest observation used (target and
-        # supporting series). Forecast identity uses it, so re-running without new data
-        # is idempotent even though the wall-clock prediction time differs.
+        # supporting series); recorded with every forecast for audit and replay.
         used = [a for a in pit.available.values() if a <= as_of]
         for sp in _support_views(bundle, mode).values():
             used += [a for a in sp.available.values() if a <= as_of]
@@ -244,7 +253,7 @@ class ForecastEngine:
                 reasons = list(elig.reasons) or ([ref.reason] if ref.reason else [])
                 outputs.append(
                     ForecastOutput(
-                        prediction_id=prediction_id(meta.series_id, cutoff, h, ["none"]),
+                        prediction_id=prediction_id(meta.series_id, as_of, h, ["none"]),
                         status=elig.status
                         if elig.status is not ForecastStatus.READY
                         else ForecastStatus.INSUFFICIENT_HISTORY,
@@ -449,7 +458,7 @@ class ForecastEngine:
             used_ids.append(analog[0].model_id)
         return ForecastOutput(
             prediction_id=prediction_id(
-                meta.series_id, common["data_cutoff"], h, used_ids or ["baseline"]
+                meta.series_id, common["prediction_timestamp"], h, used_ids or ["baseline"]
             ),
             status=status,
             status_reasons=tuple(reasons),

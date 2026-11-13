@@ -101,11 +101,12 @@ def score(
         b = by_series.get(o.series_id)
         if b is None:
             continue
-        vis = PointInTimeSeries(b.points).at(o.data_cutoff)
+        issued = o.prediction_timestamp  # the forecast covers (T, T + H] from its issue time
+        vis = PointInTimeSeries(b.points).at(issued)
         ref = reference(vis, b.meta, engine.cfg.targets)
         t, v = finals[o.series_id]
         lab = outcome_labels(
-            ref, t, v, hours(o.data_cutoff), b.meta, (o.forecast_horizon_hours,), engine.cfg.targets
+            ref, t, v, hours(issued), b.meta, (o.forecast_horizon_hours,), engine.cfg.targets
         )
         label = lab.get(f"breakout_{o.forecast_horizon_hours}", math.nan)
         if math.isfinite(label):

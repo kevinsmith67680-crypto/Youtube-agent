@@ -15,6 +15,7 @@ from trend_agent.forecasting.feature_store import (
     hours,
     strict_history,
 )
+from trend_agent.schemas.enums import TimeGranularity
 
 
 def test_future_observations_are_invisible() -> None:
@@ -43,8 +44,10 @@ def test_revision_visible_only_from_its_own_availability() -> None:
     period_end = spec.start + timedelta(hours=11)  # index 10 is revised
     initial = next(p for p in pts if p.period_end == period_end and p.revision == 1)
     revised = next(p for p in pts if p.period_end == period_end and p.revision == 2)
-    before = pit.at(revised.provider_published_at - timedelta(minutes=1))
-    after = pit.at(revised.provider_published_at)
+    published = revised.provider_published_at
+    assert published is not None
+    before = pit.at(published - timedelta(minutes=1))
+    after = pit.at(published)
     i_before = np.flatnonzero(np.isclose(before.t_end, hours(period_end), rtol=0.0, atol=1e-6))[0]
     i_after = np.flatnonzero(np.isclose(after.t_end, hours(period_end), rtol=0.0, atol=1e-6))[0]
     assert before.values[i_before] == initial.value
@@ -56,7 +59,7 @@ def test_delayed_publication_respected() -> None:
     spec = syn.Spec(
         key="pit_delay",
         seed=3,
-        granularity=syn.TimeGranularity.DAY,
+        granularity=TimeGranularity.DAY,
         periods=30,
         lag_h=10,
         delayed=((20, 24.0),),

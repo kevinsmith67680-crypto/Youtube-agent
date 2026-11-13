@@ -138,7 +138,11 @@ class ForecastPredictionRow(Base):
         sa.Index("ix_forecast_predictions_status", "forecast_status"),
         sa.Index("ix_forecast_predictions_expires", "expires_at"),
         sa.UniqueConstraint(
-            "series_id", "model_ref", "data_cutoff", "horizon_hours", name="uq_forecast_prediction"
+            "series_id",
+            "model_ref",
+            "prediction_timestamp",
+            "horizon_hours",
+            name="uq_forecast_prediction",
         ),
         sa.CheckConstraint(
             "breakout_probability IS NULL OR (breakout_probability >= 0 AND "

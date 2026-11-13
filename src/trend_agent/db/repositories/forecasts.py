@@ -219,7 +219,8 @@ class ForecastRepository:
                 sa.select(p).where(
                     p.breakout_model_id == model_id,
                     p.breakout_probability.is_not(None),
-                    p.data_cutoff + sa.func.make_interval(0, 0, 0, 0, p.horizon_hours) <= before,
+                    p.prediction_timestamp + sa.func.make_interval(0, 0, 0, 0, p.horizon_hours)
+                    <= before,
                 )
             ).scalars()
         )
