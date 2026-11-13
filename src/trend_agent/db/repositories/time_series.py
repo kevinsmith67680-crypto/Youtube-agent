@@ -125,11 +125,22 @@ def _point(row: ObservationRow) -> StoredPoint:
 class TimeSeriesRepository:
     def __init__(self, session: Session) -> None:
         self._s = session
+        # series_key -> id for this unit of work: one job's values share a few series, so
+        # the series upsert runs once per series instead of once per observation.
+        self._series_ids: dict[str, int] = {}
 
     # ------------------------------------------------------------------ series
     def ensure_series(self, draft: ObservationDraft) -> tuple[int, str]:
         identity = draft.identity()
         key = identity.key()
+        cached = self._series_ids.get(key)
+        if cached is not None:
+            return cached, key
+        series_id = self._upsert_series(draft, identity, key)
+        self._series_ids[key] = series_id
+        return series_id, key
+
+    def _upsert_series(self, draft: ObservationDraft, identity: Any, key: str) -> int:
         stmt = (
             pg_insert(SeriesRow)
             .values(
@@ -155,7 +166,7 @@ class TimeSeriesRepository:
         )
         new_id = self._s.execute(stmt).scalar_one_or_none()
         if new_id is not None:
-            return int(new_id), key
+            return int(new_id)
         row = self._s.execute(
             sa.select(SeriesRow.id, SeriesRow.target_id).where(SeriesRow.series_key == key)
         ).one()
@@ -163,7 +174,7 @@ class TimeSeriesRepository:
             self._s.execute(
                 sa.update(SeriesRow).where(SeriesRow.id == row.id).values(target_id=draft.target_id)
             )
-        return int(row.id), key
+        return int(row.id)
 
     # ------------------------------------------------------------------ writes
     def write(

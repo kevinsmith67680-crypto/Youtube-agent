@@ -1,4 +1,4 @@
-# YouTube Trend Agent — Phases 1–2: Foundation, Data Acquisition & Keyword Discovery
+# YouTube Trend Agent — Phases 1–3: Data Acquisition, Keyword Discovery & Historical Monitoring
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
@@ -45,8 +45,24 @@ estimates demand. Details: [docs/keyword_discovery.md](docs/keyword_discovery.md
 | Budget allocation (AI 45 / tech 25 / gaming 30, 20 % exploration), scheduling, quotas | Implemented |
 | YAML configuration (`config/`), migration `0002`, `trend-agent discover` CLI | Implemented |
 
-Not in scope yet (by design): monitoring of candidates (Phase 3), surge detection,
-forecasting, LLM analysis, recommendations, dashboard.
+## What Phase 3 adds — historical monitoring
+
+Monitoring turns prioritised candidates into **monitoring targets** and collects their
+history from sources that can actually measure them, with full provenance. Details:
+[docs/phase3_architecture.md](docs/phase3_architecture.md).
+
+| Area | Status |
+|---|---|
+| Targets with category/priority/region/provider, separate validated lifecycle (pending, active, paused, provider_unavailable, quota_blocked, stale, dormant, disabled) | Implemented |
+| Provider freshness/capability profiles; delay estimator; freshness statuses | Implemented |
+| Cadence-aware scheduler with tiers (critical…dormant), category budgets 45/25/30 + 20 % exploration, starvation guard, quota-aware planning (DST-aware resets) | Implemented |
+| PostgreSQL job queue: `SKIP LOCKED` claiming, leases, fencing, crash recovery, retries with jitter | Implemented (real-thread concurrency tested) |
+| Revision-aware, idempotent time-series storage (new / unchanged / revised / conflicting / missing) | Implemented |
+| Comparability engine, baseline readiness, data quality, backfill, deterministic replay | Implemented |
+| Real search-interest source | **None available here**: Google Trends API alpha not configured; YouTube Data API has no search interest. Proxy event signals and synthetic providers work |
+
+Not in scope yet (by design): surge detection (Phase 4), forecasting, LLM analysis,
+recommendations, dashboard.
 
 ## Architecture overview
 
@@ -58,10 +74,12 @@ schemas/     provider-neutral domain models and enums (the data contracts)
 ingestion/   validation, storage/retention policy, ingestion orchestration
 discovery/   Phase 2: discovery providers, extraction, expansion, intent, clustering,
              evidence, scoring, lifecycle, budget, DiscoveryService
+monitoring/  Phase 3: targets, scheduler, planner, executor, freshness, comparability,
+             readiness, quality, backfill, replay, metrics, MonitoringService
 db/          SQLAlchemy models, session management, repositories (all SQL lives here)
 comparability.py   decides whether two observations' values may be compared
-container.py composition root (dependency injection), cli.py / cli_discover.py Typer CLI
-config/      Phase 2 discovery configuration (budgets, seeds, sources)
+container.py composition root (dependency injection), cli*.py Typer CLI
+config/      discovery.yaml, seeds/, sources/ (Phase 2); monitoring.yaml (Phase 3)
 ```
 
 Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
@@ -167,6 +185,21 @@ trend-agent discover clusters               # topic -> intent clusters with merg
 trend-agent discover stats [--days 7]
 ```
 
+```bash
+# Phase 3: historical monitoring (see docs/monitoring_operations.md)
+trend-agent monitor demo                    # SYNTHETIC end-to-end demo, scenarios A-J (checked)
+trend-agent monitor sync                    # select/activate targets from discovered keywords
+trend-agent monitor targets [--include-synthetic]
+trend-agent monitor plan --dry-run          # planned jobs + estimated quota, nothing executed
+trend-agent monitor run --once              # sync + plan + execute eligible jobs once
+trend-agent monitor scheduler / worker      # long-running processes (share only PostgreSQL)
+trend-agent monitor status | providers | freshness | readiness | quality | quota
+trend-agent monitor history --query "AI coding agents"
+trend-agent monitor backfill --query "AI coding agents" --provider mock --days 30
+trend-agent monitor replay --query "AI coding agents" --provider mock
+trend-agent monitor activate|pause|resume|disable|override --query "..."
+```
+
 `discover run` fetches within budgets, quotas and poll intervals (`--force` ignores
 intervals, never quotas). Keyword listings hide synthetic data unless
 `--include-synthetic` is given. Priority ranks candidates for monitoring; it is **not**
@@ -231,3 +264,9 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/keyword_discovery.md](docs/keyword_discovery.md) — sources, entities, labels, clustering, scoring, lifecycle
 * [docs/discovery_configuration.md](docs/discovery_configuration.md) — every configuration key and how to add sources
 * [docs/phase2_report.md](docs/phase2_report.md) — what was built, demonstrated and verified; limitations; Phase 3 readiness
+* [docs/phase3_architecture.md](docs/phase3_architecture.md) — monitoring modules, processes, schema, Phase 1/2 changes
+* [docs/monitoring_scheduler.md](docs/monitoring_scheduler.md) — activation, tiers, cadence, budgets, quota, job queue and recovery
+* [docs/time_series_data.md](docs/time_series_data.md) — observation schema, time semantics, revisions, comparability, freshness, readiness
+* [docs/historical_replay.md](docs/historical_replay.md) — replay without look-ahead; interface for Phase 4
+* [docs/monitoring_operations.md](docs/monitoring_operations.md) — commands, processes, troubleshooting, retention, benchmarks
+* [docs/phase3_report.md](docs/phase3_report.md) — what was built and verified, benchmarks, limitations, Phase 4 readiness

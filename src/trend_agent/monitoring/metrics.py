@@ -505,6 +505,9 @@ class Insights:
             {"provider": p.name, **p.quota} for p in self._svc.providers() if p.quota is not None
         ]
         active = sum(by_status[s] for s in ("active", "stale", "quota_blocked"))
+        readiness = Counter(
+            r.state.value for r in self.readiness(include_synthetic=True, include_proxy=False)
+        )
         return {
             "as_of": now.isoformat(),
             "window_hours": window.total_seconds() / 3600,
@@ -527,6 +530,7 @@ class Insights:
             "quota": quota,
             "provider_health": health,
             "time_series": coverage,
+            "baseline_readiness": dict(readiness),
             "recent_plans": [
                 {
                     "at": p.started_at.isoformat(),

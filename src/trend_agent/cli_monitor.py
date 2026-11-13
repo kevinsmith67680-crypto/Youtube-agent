@@ -464,6 +464,7 @@ def monitor_status(
             f"(failures {h['consecutive_failures']})"
         )
     base.console.print(f"[bold]time series[/] {data['time_series']['observations']}")
+    base.console.print(f"[bold]baseline readiness[/] {data['baseline_readiness'] or 'no targets'}")
     base.console.print(f"[dim]{NOTE}[/]")
 
 

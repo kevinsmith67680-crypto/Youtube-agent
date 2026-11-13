@@ -179,14 +179,14 @@ def seed(factory: Any, active: int, dormant: int) -> list[int]:
                         "intent_scores": {"other": 1.0},
                         "candidate_status": CandidateStatus.MONITORING
                         if i < active
-                        else CandidateStatus.PRIORITIZED,
+                        else CandidateStatus.VALIDATED,  # dormant: low-priority keywords
                         "status_reason": "bench",
                         "first_discovered_at": NOW,
                         "last_discovered_at": NOW,
                         "novelty_score": 50.0,
                         "novelty_kind": NoveltyKind.RECURRING,
                         "novelty_components": {},
-                        "priority_score": 60.0 + (i % 40),
+                        "priority_score": 60.0 + (i % 40) if i < active else 30.0,
                         "scoring_version": "bench",
                         "score_components": {"independent_origins": 2},
                         "topic_assignment": {},
@@ -225,7 +225,7 @@ def seed(factory: Any, active: int, dormant: int) -> list[int]:
                         else MonitoringStatus.DORMANT,
                         "status_reason": "bench",
                         "status_changed_at": NOW - timedelta(days=30),
-                        "priority_score": 60.0 + (i % 40),
+                        "priority_score": 60.0 + (i % 40) if i < active else 30.0,
                         "novelty_kind": "recurring",
                         "activated_at": NOW - timedelta(days=30),
                         "next_collection_at": NOW,
@@ -435,15 +435,16 @@ def main() -> int:
     latencies = []
     with transaction(factory) as s:
         ts = TimeSeriesRepository(s)
-        for tid in active_ids[:100]:
+        sample = active_ids[:100]
+        for tid in sample:
             start = time.perf_counter()
             pts = ts.points(target_id=tid, start=NOW - timedelta(days=90), end=NOW)
             latencies.append((time.perf_counter() - start) * 1000)
     results["range_query"] = {
-        "targets": 100,
+        "targets": len(sample),
         "points_each": len(pts),
         "p50_ms": round(statistics.median(latencies), 2),
-        "p95_ms": round(sorted(latencies)[94], 2),
+        "p95_ms": round(sorted(latencies)[int(0.95 * (len(latencies) - 1))], 2),
     }
 
     # 6. Executor end-to-end (Phase 1 mock: request, validation, write) on 200 targets.

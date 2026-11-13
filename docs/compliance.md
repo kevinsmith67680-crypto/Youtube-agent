@@ -86,6 +86,54 @@ to evidence links and entity mentions. Search suggestions and related queries ar
 discovery evidence only — never as search-interest observations. YouTube autocomplete
 (undocumented endpoint) is **not** used.
 
+## Historical monitoring (Phase 3)
+
+Every stored monitoring observation references a versioned data policy
+(`data_policies`, e.g. `youtube-api-services@2026-11-reviewed`), and expires according to
+it. Policy and permission flags live in `config/monitoring.yaml` (`policies`,
+`compliance`).
+
+| Policy | Retention | Notes |
+|---|---|---|
+| `synthetic-test-data@1` | none | fixtures only |
+| `google-trends-alpha@1` | from `TREND_AGENT_GOOGLE_TRENDS_RETENTION_DAYS`; **storage denied while unset** | requires alpha access; terms supplied to testers |
+| `discovery-evidence-derived@1` | earliest expiry of the source discovery items | derived counts never outlive their inputs; YouTube-sourced items excluded unless permitted |
+| `youtube-api-services@2026-11-reviewed` | 30 days | collection disabled in Phase 3 |
+
+**YouTube API restrictions considered.** The YouTube API Services policies limit storage
+of API data (refresh or delete within 30 days), restrict statistics and *derived metrics*
+(values calculated from API data, such as series of view counts over time) unless the
+use is authorised, and restrict aggregation and combination with other data. A 30-day
+storage allowance does **not** permit building unlimited historical analytics.
+Accordingly:
+
+* no YouTube time-series collector is enabled (`youtube_data_api` profile:
+  `collection_disabled_reason`);
+* `compliance.youtube_derived_metrics_permitted` and `compliance.youtube_statistics_monitoring`
+  default to `false`; while false, the event-signal collector also excludes items that
+  came from YouTube (reported as `withheld`);
+* nothing derived from YouTube data is kept after the source data is deleted (no derived
+  YouTube values are stored at all);
+* the YouTube Data API is never used as a search-interest source (it has none).
+
+**Required before enabling YouTube-based monitoring:** a documented review of the current
+YouTube API Services Terms and Developer Policies for the intended calculation, any
+required audit/approval for derived metrics, and statistics persistence
+(`TREND_AGENT_YOUTUBE_PERSIST_STATISTICS`). Then set the compliance flags and implement a
+collector whose policy expiry matches the permission.
+
+**Unresolved questions (document before production):**
+
+1. Google Trends API alpha terms: permitted retention, redistribution and whether
+   derived analytics may be stored. Storage stays denied until answered.
+2. Whether consistently scaled Trends values may be stored beyond a rolling window, and
+   whether revisions must replace (not supplement) earlier values.
+3. Whether event-signal counts from third-party feeds (vendor blogs, Reddit, Hacker News)
+   are subject to those services' terms when aggregated over time (currently they expire
+   with their source items).
+4. Retention of job/attempt records (no third-party content is stored there, only counts
+   and error categories).
+
 ## Default posture (conservative)
 
 | Control | Default |
@@ -98,6 +146,8 @@ discovery evidence only — never as search-interest observations. YouTube autoc
 | Live API calls in tests | never (opt-in `live` marker only) |
 | Discovery item retention | per provider (YouTube ≤ 30 days, Reddit 30, feeds/HN 90, GitHub 180) |
 | YouTube monitored channels | disabled until handles are confirmed |
+| Monitoring observations | per data policy; Trends denied until a retention period is set; derived values expire with their sources |
+| YouTube derived metrics / statistics history | disabled (`compliance.*` false) |
 
 ## Operator checklist before production use
 
