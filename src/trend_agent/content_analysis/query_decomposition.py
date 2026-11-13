@@ -24,9 +24,15 @@ from trend_agent.schemas.search_intent import (
     RequirementPriority,
     SubIntent,
 )
+from trend_agent.verification.text import STOPWORDS, tokens
 
 ALGORITHM_VERSION = "decomposition-templates-1.0"
 _IDENTIFY = frozenset({"item_exists", "identify_event", "challenge_list", "how_obtain"})
+#: Intent words that are not the *subject* of an informational or review query.
+_INTENT_WORDS = frozenset(
+    "what is are explained explain explanation overview introduction review reviews honest "
+    "worth it test tested hands on guide meaning about".split()
+)
 ESS = RequirementPriority.ESSENTIAL
 IMP = RequirementPriority.IMPORTANT
 OPT = RequirementPriority.OPTIONAL
@@ -648,6 +654,21 @@ for _sub, _primary in (
     TEMPLATES.setdefault(_sub, _GENERIC[_primary])
 
 
+_FOCUSED = frozenset({PrimaryIntent.INFORMATIONAL, PrimaryIntent.REVIEW})
+
+
+def _focus(intent: IntentClassification, entities: QueryEntities) -> str | None:
+    """Words of the query beyond its entities and intent words (e.g. "battery life")."""
+    names = {t for f in entities.facts for t in tokens(f.ref.name)}
+    names |= {t for r in entities.refs for t in tokens(r.name)}
+    words = [
+        t
+        for t in tokens(intent.query)
+        if t not in names and t not in STOPWORDS and t not in _INTENT_WORDS and not t.isdigit()
+    ]
+    return " ".join(words[:4]) if words and names else None
+
+
 def decompose(
     intent: IntentClassification,
     entities: QueryEntities,
@@ -688,6 +709,25 @@ def decompose(
                 blocking=blocking,
                 template=key.value,
             )
+        )
+    focus = _focus(intent, entities) if key in _FOCUSED else None
+    if focus:
+        # An attribute question ("<product> battery life"): the attribute is what viewers
+        # need; a general definition becomes optional.
+        reqs = [
+            r.model_copy(update={"priority": OPT}) if r.key == "definition" else r for r in reqs
+        ]
+        reqs.insert(
+            0,
+            InformationRequirement(
+                key="focus",
+                requirement=f"Information about {focus}" + (f" ({subject})" if subject else ""),
+                priority=ESS,
+                cues=(focus, *[t for t in focus.split() if len(t) >= 4]),
+                requires_verified_entity=subject is not None,
+                blocking=False,
+                template=key.value,
+            ),
         )
     for text, prio, cues in llm_requirements[:3]:
         clean = _generic_requirement(text, entities)

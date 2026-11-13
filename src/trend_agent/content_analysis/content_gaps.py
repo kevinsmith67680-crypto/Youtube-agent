@@ -141,8 +141,21 @@ def detect(inp: GapInputs, config: ContentAnalysisConfig) -> list[ContentGap]:
         reasons.append("search results could not be retrieved")
     elif n < g.min_inspected:
         reasons.append(f"only {n} results were retrieved (at least {g.min_inspected} needed)")
+    primary = inp.entities.primary
     for ref in inp.entities.refs:
-        if ref.state == "ambiguous":
+        if ref.state == "removed":
+            reasons.append(
+                f"a credible record states that '{ref.name}' was removed or vaulted; a guide "
+                "for it is not proposed as a content opportunity"
+            )
+        elif ref.state in ("unknown", "rumored", "rejected") and (
+            ref.version is not None or primary is None or primary.ref.name == ref.name
+        ):
+            reasons.append(
+                f"the query's subject '{ref.name}' is {ref.state}: no credible record "
+                "establishes it, and a gap is not claimed for something that may not exist"
+            )
+        elif ref.state == "ambiguous":
             reasons.append(
                 f"'{ref.name}' is ambiguous ({', '.join(ref.candidates)}); evidence that "
                 "identifies the intended entity is needed"

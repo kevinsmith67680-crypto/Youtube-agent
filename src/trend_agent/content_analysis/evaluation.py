@@ -71,7 +71,7 @@ def _ndcg(grades_in_rank_order: Sequence[int], all_grades: Sequence[int], k: int
     if idcg == 0:
         return None
     dcg = sum((2**g - 1) / math.log2(i + 2) for i, g in enumerate(grades_in_rank_order[:k]))
-    return dcg / idcg
+    return float(dcg / idcg)
 
 
 def run_case(

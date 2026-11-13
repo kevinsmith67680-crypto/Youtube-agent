@@ -8,6 +8,7 @@ use stored results only; without an enabled LLM they run deterministically.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated, Any
 
 import typer
@@ -674,3 +675,57 @@ def analyze_demo(
     )
     if passed != len(results):
         raise typer.Exit(1)
+
+
+@analyze_app.command("evaluate")
+def analyze_evaluate(
+    split: Annotated[
+        str, typer.Option("--split", help="dev | calibration | heldout | all")
+    ] = "all",
+    sweep: Annotated[
+        bool, typer.Option("--sweep", help="Relevance-threshold sweep on the calibration split.")
+    ] = False,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+    as_json: base.JsonOpt = False,
+) -> None:
+    """Run the labelled offline evaluation (fictional fixtures; no database or network)."""
+    from trend_agent.content_analysis.config import load_content_config
+    from trend_agent.content_analysis.evaluation import (
+        SPLITS,
+        evaluate,
+        threshold_sweep,
+        to_json,
+    )
+    from trend_agent.verification.config import load_verification_config
+
+    root = resolve_config_dir(None)
+    loaded, vloaded = load_content_config(root), load_verification_config(root)
+    if sweep:
+        rows = threshold_sweep(loaded, vloaded, root)
+        if as_json:
+            base._emit_json(rows)
+            return
+        table = Table("threshold", "precision", "recall", "F1", "false gap rate", "gap precision")
+        for r in rows:
+            table.add_row(*(str(r[k]) for k in r))
+        base.console.print(table)
+        return
+    splits = SPLITS if split == "all" else (split,)
+    if any(s not in SPLITS for s in splits):
+        raise base._fail(f"unknown split {split!r} (dev, calibration, heldout, all)", 2)
+    results = evaluate(loaded, vloaded, root, splits=splits)
+    if output is not None:
+        output.write_text(to_json(results) + "\n", encoding="utf-8")
+    if as_json:
+        base._emit_json(results)
+        return
+    keys = [k for k in next(iter(results["splits"].values())) if k != "as_of"]
+    table = Table("metric", *results["splits"].keys())
+    for k in keys:
+        table.add_row(k, *(str(results["splits"][s].get(k)) for s in results["splits"]))
+    base.console.print(table)
+    for f in results["failures"]:
+        base.console.print(
+            f"[yellow]{f['split']} {f['case']}[/]: {escape('; '.join(f['problems']))}"
+        )
+    base.console.print(f"[dim]{escape(results['notice'])}[/]")

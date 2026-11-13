@@ -215,9 +215,55 @@ class QueryEntityResolver:
             out.facts.append(self.facts_for(check))
         return out
 
+    def _removal(self, name: str, ids: Sequence[str]) -> str | None:
+        """A credible record sentence stating that ``name`` was removed or vaulted."""
+        n = re.escape(name.casefold())
+        pattern = re.compile(
+            rf"\b(?:vaults?|vaulted|removes?|removed|retires?|retired|discontinues?)\W+"
+            rf"(?:(?:the|a|an)\s+)?(?:\w+\W+){{0,2}}{n}\b|\b{n}\W+(?:(?:is|was|has been|"
+            rf"have been|are|were|got)\s+)?(?:now\s+)?(?:vaulted|removed|retired|"
+            rf"discontinued|no longer available)\b",
+            re.IGNORECASE,
+        )
+        for eid in ids:
+            view = self.views.get(eid)
+            if view is None:
+                continue
+            for sentence in view.sentences:
+                if pattern.search(sentence.casefold()):
+                    return eid
+        return None
+
+    def _mark_removed(self, entities: QueryEntities, facts: EntityFacts, eid: str) -> None:
+        ref = facts.ref.model_copy(
+            update={"state": "removed", "evidence_ids": (*facts.ref.evidence_ids, eid)}
+        )
+        new = EntityFacts(
+            ref=ref,
+            versioned=facts.versioned,
+            entity_type=facts.entity_type,
+            release_date=facts.release_date,
+            release_state=facts.release_state,
+            changes=facts.changes,
+            event_end=facts.event_end,
+            conflicts=facts.conflicts,
+            denied=True,
+        )
+        entities.facts[entities.facts.index(facts)] = new
+        entities.refs[:] = [ref if r is facts.ref or r == facts.ref else r for r in entities.refs]
+
     def resolve_item(self, query: str, entities: QueryEntities) -> None:
-        """For item-type queries: identify the item phrase and verify it (or record why not)."""
+        """For item-type queries: identify the item phrase and verify it (or record why not).
+
+        A credible record saying the item was removed or vaulted marks it ``removed``:
+        a location guide for an item that is not in the current version is never proposed.
+        """
         if entities.item is not None:
+            current = entities.item
+            credible = self.verifier.check_name(current.ref.name, query).credible_ids
+            hit = self._removal(current.ref.name, credible)
+            if hit is not None and current.ref.state == "confirmed":
+                self._mark_removed(entities, current, hit)
             return
         mentions = self.catalog.find(query)
         covered: set[int] = set()
@@ -238,19 +284,21 @@ class QueryEntityResolver:
             ref = _ref(check, None)
         entities.refs.append(ref)
         facts = self.facts_for(check)
-        entities.facts.append(
-            EntityFacts(
-                ref=ref,
-                versioned=facts.versioned,
-                entity_type=check.entity.entity_type if check.entity else "item_phrase",
-                release_date=facts.release_date,
-                release_state=facts.release_state,
-                changes=facts.changes,
-                event_end=facts.event_end,
-                conflicts=facts.conflicts,
-                denied=facts.denied,
-            )
+        item_facts = EntityFacts(
+            ref=ref,
+            versioned=facts.versioned,
+            entity_type=check.entity.entity_type if check.entity else "item_phrase",
+            release_date=facts.release_date,
+            release_state=facts.release_state,
+            changes=facts.changes,
+            event_end=facts.event_end,
+            conflicts=facts.conflicts,
+            denied=facts.denied,
         )
+        entities.facts.append(item_facts)
+        hit = self._removal(phrase, check.credible_ids)
+        if hit is not None and ref.state == "confirmed":
+            self._mark_removed(entities, item_facts, hit)
 
     def facts_for(self, check: EntityCheck) -> EntityFacts:
         entity = check.entity
