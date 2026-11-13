@@ -16,6 +16,7 @@ For every configured horizon the engine:
 
 from __future__ import annotations
 
+import logging
 import math
 import uuid
 from collections.abc import Sequence
@@ -26,9 +27,8 @@ from typing import Any
 import numpy as np
 
 from trend_agent.detection.config import LoadedDetectionConfig
-from trend_agent.forecasting import eligibility, explainability
+from trend_agent.forecasting import eligibility, explainability, trajectory
 from trend_agent.forecasting import opportunity_window as ow
-from trend_agent.forecasting.baselines import damped_trend, seasonal_naive
 from trend_agent.forecasting.calibration import Calibrator
 from trend_agent.forecasting.config import FORECAST_VERSION, LoadedForecastingConfig
 from trend_agent.forecasting.dataset_builder import _support_views, row_features
@@ -36,11 +36,10 @@ from trend_agent.forecasting.feature_engineering import FEATURE_NAMES, FEATURE_S
 from trend_agent.forecasting.feature_store import PointInTimeSeries, SeriesBundle, hours
 from trend_agent.forecasting.model_registry import ArtifactError, Registry
 from trend_agent.forecasting.peak_estimation import STATE_FEATURES, AnalogModel
-from trend_agent.forecasting.target_definition import bounded_index
 from trend_agent.forecasting.training import LightGBMModel, LogisticModel
-from trend_agent.forecasting.uncertainty import ConformalInterval, OODReference
+from trend_agent.forecasting.uncertainty import OODReference
+from trend_agent.logging import get_logger, log_event
 from trend_agent.monitoring.replay import AvailabilityMode
-from trend_agent.schemas.enums import TimeGranularity
 from trend_agent.schemas.forecast import (
     BreakoutForecast,
     CalibrationStatus,
@@ -55,6 +54,7 @@ from trend_agent.schemas.forecast import (
 )
 from trend_agent.schemas.model_metadata import DataOrigin, ModelMetadata, ModelStatus
 
+_log = get_logger(__name__)
 _NS = uuid.UUID("5a1e6f0c-3b7d-4c55-9a7e-6f0ca5f1c006")
 
 
@@ -146,6 +146,7 @@ class ForecastEngine:
         self.cfg = loaded.config
         self.dloaded = dloaded
         self.registry = registry
+        self._artifact_failures: dict[str, str] = {}  # this forecast call only
 
     def _champion(
         self,
@@ -166,7 +167,15 @@ class ForecastEngine:
         )
         if meta is None:
             return None
-        meta, payload, text = self.registry.load(meta.model_id)
+        try:
+            meta, payload, text = self.registry.load(meta.model_id)
+        except ArtifactError as exc:
+            # A champion whose artifact fails verification is never loaded and never
+            # silently replaced: the forecast is marked unavailable with the reason.
+            self._artifact_failures[meta.model_id] = str(exc)
+            log_event(_log, "forecast.artifact_rejected", logging.ERROR,
+                      model_id=meta.model_id, error=str(exc))  # fmt: skip
+            return None
         if tuple(meta.feature_names) != FEATURE_NAMES:
             return None  # a model built on another feature schema is never used silently
         model = None if payload.get("kind") == "analog" else build_model(payload, text)
@@ -182,6 +191,7 @@ class ForecastEngine:
         cfg = self.cfg
         meta = bundle.meta
         as_of = issue_time(as_of)
+        self._artifact_failures = {}
         mode = AvailabilityMode(cfg.availability_mode)
         pit = PointInTimeSeries(bundle.points, mode)
         vis, ref, row = row_features(
@@ -453,6 +463,12 @@ class ForecastEngine:
             limitations=base_limits,
             persistence=cfg.targets.breakout_persistence.get(meta.granularity, 1),
         )
+        if self._artifact_failures:
+            status = ForecastStatus.FORECAST_UNAVAILABLE
+            reasons.append(
+                "champion model artifact failed verification and was not used: "
+                + "; ".join(sorted(self._artifact_failures))
+            )
         used_ids = [m.meta.model_id for m in (bo, co, tr) if m is not None]
         if analog is not None:
             used_ids.append(analog[0].model_id)
@@ -536,78 +552,9 @@ class ForecastEngine:
     def _trajectory(
         self, tm: _Loaded | None, x: np.ndarray, vis: Any, meta: Any, ref: Any, h: int
     ) -> tuple[TrajectoryPoint, ...]:
-        from datetime import timedelta
-
-        level = float(ref.level)
-        name = tm.meta.model_type.value if tm is not None else "persistence"
-        if name == "lightgbm_regressor" and tm is not None:
-            change = float(tm.model.score(x.reshape(1, -1))[0])
-        elif name == "seasonal_naive":
-            change = seasonal_naive(vis, meta.granularity, float(h))
-            change = 0.0 if math.isnan(change) else change
-        elif name == "damped_trend":
-            slope = float(x[FEATURE_NAMES.index("slope_recent_log_per_h")])
-            change = damped_trend(slope, float(h), meta.granularity)
-        else:
-            change = 0.0
-        interval = (
-            ConformalInterval.from_dict(tm.payload["interval"])
-            if tm is not None and tm.payload.get("interval")
-            else None
+        return trajectory.forecast_points(
+            None if tm is None else (tm.meta, tm.model, tm.payload), x, vis, meta, ref, h, self.cfg
         )
-        method = interval.method if interval and interval.half_width is not None else "none"
-        lo_c = hi_c = None
-        if interval is not None and interval.half_width is not None:
-            lo_c, hi_c = change - interval.half_width, change + interval.half_width
-        else:
-            emp = _own_history_interval(
-                vis, h, self.cfg.uncertainty.interval_level, meta.granularity
-            )
-            if emp is not None:
-                lo_c, hi_c = change + emp[0], change + emp[1]
-                method = "empirical_quantiles_of_own_history"
-
-        def to_level(c: float | None) -> float | None:
-            if c is None:
-                return None
-            v = (level + 1.0) * math.exp(c) - 1.0
-            if bounded_index(meta):
-                v = min(100.0, max(0.0, v))
-            return round(max(0.0, v), 2)
-
-        return (
-            TrajectoryPoint(
-                lead_hours=h,
-                forecast_time=vis.as_of + timedelta(hours=h),
-                value=to_level(change),
-                lower=to_level(lo_c),
-                upper=to_level(hi_c),
-                interval_level=self.cfg.uncertainty.interval_level if lo_c is not None else None,
-                interval_method=method,
-                model=tm.meta.model_name if tm is not None else "persistence (unregistered)",
-            ),
-        )
-
-
-def _own_history_interval(
-    vis: Any, h: int, level: float, g: TimeGranularity
-) -> tuple[float, float] | None:
-    """Quantiles of the series' own past h-hour log changes (persistence residuals)."""
-    ok = np.isfinite(vis.values)
-    t, v = vis.t_end[ok], vis.values[ok]
-    if t.size < 20:
-        return None
-    pos = {round(float(a), 3): float(b) for a, b in zip(t, v, strict=True)}
-    changes = [
-        math.log((pos[round(float(a) + h, 3)] + 1.0) / (float(b) + 1.0))
-        for a, b in zip(t, v, strict=True)
-        if round(float(a) + h, 3) in pos
-    ]
-    if len(changes) < 20:
-        return None
-    lo, hi = np.quantile(changes, [(1 - level) / 2, 1 - (1 - level) / 2])
-    del g
-    return float(lo), float(hi)
 
 
 __all__ = ["ForecastEngine", "build_model", "hours", "prediction_id"]

@@ -37,8 +37,8 @@ from trend_agent.forecasting.training import (
     LogisticModel,
     TrainingReport,
     train_classifier,
-    train_trajectory,
 )
+from trend_agent.forecasting.trajectory import train_trajectory
 from trend_agent.forecasting.uncertainty import OODReference
 from trend_agent.schemas.enums import TimeGranularity
 from trend_agent.schemas.model_metadata import (
@@ -60,6 +60,14 @@ _NAMES = {
     ModelType.DAMPED_TREND: "damped_trend_trajectory",
     ModelType.ANALOG_PEAK: "analog_peak_window",
 }
+
+
+def _model_name(model_type: ModelType, task: str, fallback: str) -> str:
+    """Registry name; classifiers are named by their task (breakout or continuation)."""
+    name = _NAMES.get(model_type, fallback)
+    if model_type in (ModelType.LOGISTIC_REGRESSION, ModelType.LIGHTGBM_CLASSIFIER):
+        name = name.replace("_breakout", f"_{task}")
+    return name
 
 
 @dataclass
@@ -115,7 +123,7 @@ def _metadata(
     origin: DataOrigin,
     trained_at: datetime,
 ) -> ModelMetadata:
-    name = _NAMES.get(c.model_type, c.name)
+    name = _model_name(c.model_type, report.task, c.name)
     status = ModelStatus.VALIDATED if c.validated else ModelStatus.EXPERIMENTAL
     if origin is DataOrigin.SYNTHETIC:
         reasons = ["trained on SYNTHETIC data: valid only for synthetic series", *c.reasons]
@@ -555,7 +563,7 @@ def promote_selected(
             (
                 m
                 for m in res.registered
-                if m.model_name == _NAMES.get(_type_of(res, m), m.model_name)
+                if m.model_name == _model_name(_type_of(res, m), res.task, m.model_name)
                 and _candidate_name(res, m) == res.report.selected
             ),
             None,

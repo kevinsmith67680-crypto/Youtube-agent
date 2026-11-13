@@ -271,9 +271,13 @@ def build_dataset(
     lnames = label_names(loaded.config.horizons_hours)
     jobs = [(b, loaded, dloaded, end) for b in bundles]
     if workers > 1 and len(jobs) > 1:
+        import multiprocessing as mp
         from concurrent.futures import ProcessPoolExecutor
 
-        with ProcessPoolExecutor(max_workers=workers) as pool:
+        # Never fork a multi-threaded process (database pools, BLAS threads): fork can
+        # deadlock. forkserver/spawn start clean interpreters; results are identical.
+        method = "forkserver" if "forkserver" in mp.get_all_start_methods() else "spawn"
+        with ProcessPoolExecutor(max_workers=workers, mp_context=mp.get_context(method)) as pool:
             parts = list(pool.map(_series_rows, jobs, chunksize=max(1, len(jobs) // (4 * workers))))
     else:
         parts = [_series_rows(j) for j in jobs]

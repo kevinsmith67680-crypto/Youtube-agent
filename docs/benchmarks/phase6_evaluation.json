@@ -1,0 +1,5806 @@
+{
+  "synthetic": true,
+  "note": "SYNTHETIC, fictional data only. These numbers describe pipeline behaviour and are not evidence of real-world forecasting accuracy.",
+  "configuration": "forecasting-v1@e5d37ae15e03",
+  "corpus": {
+    "scale": 1.0,
+    "seed": 6006,
+    "series": 360,
+    "rows": 72098,
+    "dataset_version": "ds-37bbaa8ce3c0",
+    "rows_hash": "7c484e91f9ac6a8f60d020dc0d2e9cc3e58c37ba0da66d247e2f1b1d32a6a3d2",
+    "leakage_audit": {
+      "checked": 6,
+      "mismatches": 0,
+      "details": []
+    },
+    "label_counts": {
+      "breakout_6": {
+        "observed": 45331,
+        "positive": 365
+      },
+      "continuation_6": {
+        "observed": 1283,
+        "positive": 989
+      },
+      "breakout_24": {
+        "observed": 69341,
+        "positive": 1725
+      },
+      "continuation_24": {
+        "observed": 2036,
+        "positive": 1595
+      },
+      "breakout_72": {
+        "observed": 66599,
+        "positive": 4284
+      },
+      "continuation_72": {
+        "observed": 1956,
+        "positive": 1123
+      }
+    },
+    "skipped_prediction_times": {
+      "INSUFFICIENT_HISTORY": 9477,
+      "label_window_not_observed": 726,
+      "stale_level": 16,
+      "SOURCE_UNAVAILABLE": 3
+    }
+  },
+  "timings_seconds": {
+    "dataset": 65.1,
+    "training_and_promotion": 59.2,
+    "heldout_dataset": 33.8
+  },
+  "scopes": [
+    {
+      "scope": "youtube_search_interest/day/6h/all",
+      "notes": [
+        "horizon not supported for this granularity"
+      ],
+      "split": {}
+    },
+    {
+      "scope": "youtube_search_interest/day/24h/breakout",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8698,
+          "validation": 2744,
+          "calibration": 3674,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 8483,
+        "validation": 2622,
+        "calibration": 3562,
+        "test": 4919,
+        "train_positives": 134,
+        "validation_positives": 66,
+        "calibration_positives": 66,
+        "test_positives": 94
+      },
+      "selected": "logistic_regression",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 4919,
+            "positives": 94,
+            "base_rate": 0.0191,
+            "brier": 0.0187,
+            "brier_climatology": 0.0187,
+            "brier_skill": -0.0,
+            "pr_auc": 0.0224,
+            "roc_auc": 0.5,
+            "ece": 0.0006,
+            "precision": null,
+            "recall": 0.0,
+            "false_positive_rate": 0.0,
+            "precision_at_50": 0.0,
+            "recall_at_50": 0.0,
+            "train_pr_auc": 0.015916885212699627,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 2382,
+              "positives": 55,
+              "base_rate": 0.0231,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0198,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0226,
+              "brier_climatology": 0.0226,
+              "brier_skill": -0.0009,
+              "ece": 0.0046,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 55,
+                "tn": 2327
+              }
+            },
+            "category=gaming": {
+              "examples": 1357,
+              "positives": 27,
+              "base_rate": 0.0199,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0938,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.1,
+              "recall_at_50": 0.1852,
+              "brier": 0.0195,
+              "brier_climatology": 0.0195,
+              "brier_skill": -0.0001,
+              "ece": 0.0014,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 27,
+                "tn": 1330
+              }
+            },
+            "category=technology": {
+              "examples": 1180,
+              "positives": 12,
+              "base_rate": 0.0102,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0199,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.02,
+              "recall_at_50": 0.0833,
+              "brier": 0.0101,
+              "brier_climatology": 0.0101,
+              "brier_skill": -0.0069,
+              "ece": 0.0084,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 12,
+                "tn": 1168
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0224,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0187,
+              "brier_climatology": 0.0187,
+              "brier_skill": -0.0,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 94,
+                "tn": 4825
+              }
+            },
+            "granularity=day": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0224,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0187,
+              "brier_climatology": 0.0187,
+              "brier_skill": -0.0,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 94,
+                "tn": 4825
+              }
+            },
+            "history=established": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0224,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0187,
+              "brier_climatology": 0.0187,
+              "brier_skill": -0.0,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 94,
+                "tn": 4825
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 4919,
+            "positives": 94,
+            "base_rate": 0.0191,
+            "brier": 0.0164,
+            "brier_climatology": 0.0187,
+            "brier_skill": 0.1245,
+            "pr_auc": 0.2398,
+            "roc_auc": 0.8106,
+            "ece": 0.0079,
+            "precision": 0.2946,
+            "recall": 0.3511,
+            "false_positive_rate": 0.0164,
+            "precision_at_50": 0.4,
+            "recall_at_50": 0.2128,
+            "train_pr_auc": 0.24946614287898233,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0023,
+              "lower": -0.0049,
+              "upper": -0.0002
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2382,
+              "positives": 55,
+              "base_rate": 0.0231,
+              "threshold": 0.167,
+              "precision": 0.4091,
+              "recall": 0.3273,
+              "f1": 0.3636,
+              "false_positive_rate": 0.0112,
+              "pr_auc": 0.3281,
+              "roc_auc": 0.8794,
+              "precision_at_50": 0.36,
+              "recall_at_50": 0.3273,
+              "brier": 0.0189,
+              "brier_climatology": 0.0226,
+              "brier_skill": 0.1636,
+              "ece": 0.0117,
+              "confusion": {
+                "tp": 18,
+                "fp": 26,
+                "fn": 37,
+                "tn": 2301
+              }
+            },
+            "category=gaming": {
+              "examples": 1357,
+              "positives": 27,
+              "base_rate": 0.0199,
+              "threshold": 0.167,
+              "precision": 0.2,
+              "recall": 0.1852,
+              "f1": 0.1923,
+              "false_positive_rate": 0.015,
+              "pr_auc": 0.1071,
+              "roc_auc": 0.5856,
+              "precision_at_50": 0.1,
+              "recall_at_50": 0.1852,
+              "brier": 0.0197,
+              "brier_climatology": 0.0195,
+              "brier_skill": -0.0096,
+              "ece": 0.0138,
+              "confusion": {
+                "tp": 5,
+                "fp": 20,
+                "fn": 22,
+                "tn": 1310
+              }
+            },
+            "category=technology": {
+              "examples": 1180,
+              "positives": 12,
+              "base_rate": 0.0102,
+              "threshold": 0.167,
+              "precision": 0.2326,
+              "recall": 0.8333,
+              "f1": 0.3636,
+              "false_positive_rate": 0.0283,
+              "pr_auc": 0.5053,
+              "roc_auc": 0.9683,
+              "precision_at_50": 0.2,
+              "recall_at_50": 0.8333,
+              "brier": 0.0077,
+              "brier_climatology": 0.0101,
+              "brier_skill": 0.2365,
+              "ece": 0.01,
+              "confusion": {
+                "tp": 10,
+                "fp": 33,
+                "fn": 2,
+                "tn": 1135
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.167,
+              "precision": 0.2946,
+              "recall": 0.3511,
+              "f1": 0.3204,
+              "false_positive_rate": 0.0164,
+              "pr_auc": 0.2398,
+              "roc_auc": 0.8106,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.2128,
+              "brier": 0.0164,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1245,
+              "ece": 0.0079,
+              "confusion": {
+                "tp": 33,
+                "fp": 79,
+                "fn": 61,
+                "tn": 4746
+              }
+            },
+            "granularity=day": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.167,
+              "precision": 0.2946,
+              "recall": 0.3511,
+              "f1": 0.3204,
+              "false_positive_rate": 0.0164,
+              "pr_auc": 0.2398,
+              "roc_auc": 0.8106,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.2128,
+              "brier": 0.0164,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1245,
+              "ece": 0.0079,
+              "confusion": {
+                "tp": 33,
+                "fp": 79,
+                "fn": 61,
+                "tn": 4746
+              }
+            },
+            "history=established": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.167,
+              "precision": 0.2946,
+              "recall": 0.3511,
+              "f1": 0.3204,
+              "false_positive_rate": 0.0164,
+              "pr_auc": 0.2398,
+              "roc_auc": 0.8106,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.2128,
+              "brier": 0.0164,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1245,
+              "ece": 0.0079,
+              "confusion": {
+                "tp": 33,
+                "fp": 79,
+                "fn": 61,
+                "tn": 4746
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": false,
+          "failed_checks": [
+            "beats_logistic_brier"
+          ],
+          "reasons": [
+            "failed: beats_logistic_brier"
+          ],
+          "metrics": {
+            "examples": 4919,
+            "positives": 94,
+            "base_rate": 0.0191,
+            "brier": 0.0159,
+            "brier_climatology": 0.0187,
+            "brier_skill": 0.1535,
+            "pr_auc": 0.254,
+            "roc_auc": 0.8232,
+            "ece": 0.0064,
+            "precision": 0.4,
+            "recall": 0.2979,
+            "false_positive_rate": 0.0087,
+            "precision_at_50": 0.42,
+            "recall_at_50": 0.2234,
+            "train_pr_auc": 0.36716562988058293,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0029,
+              "lower": -0.0055,
+              "upper": -0.0006
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0005,
+              "lower": -0.0014,
+              "upper": 0.0004
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2382,
+              "positives": 55,
+              "base_rate": 0.0231,
+              "threshold": 0.2,
+              "precision": 0.4634,
+              "recall": 0.3455,
+              "f1": 0.3958,
+              "false_positive_rate": 0.0095,
+              "pr_auc": 0.324,
+              "roc_auc": 0.8737,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.3636,
+              "brier": 0.0183,
+              "brier_climatology": 0.0226,
+              "brier_skill": 0.1899,
+              "ece": 0.0094,
+              "confusion": {
+                "tp": 19,
+                "fp": 22,
+                "fn": 36,
+                "tn": 2305
+              }
+            },
+            "category=gaming": {
+              "examples": 1357,
+              "positives": 27,
+              "base_rate": 0.0199,
+              "threshold": 0.2,
+              "precision": 0.5,
+              "recall": 0.0741,
+              "f1": 0.129,
+              "false_positive_rate": 0.0015,
+              "pr_auc": 0.1445,
+              "roc_auc": 0.6049,
+              "precision_at_50": 0.14,
+              "recall_at_50": 0.2593,
+              "brier": 0.0186,
+              "brier_climatology": 0.0195,
+              "brier_skill": 0.0437,
+              "ece": 0.0103,
+              "confusion": {
+                "tp": 2,
+                "fp": 2,
+                "fn": 25,
+                "tn": 1328
+              }
+            },
+            "category=technology": {
+              "examples": 1180,
+              "positives": 12,
+              "base_rate": 0.0102,
+              "threshold": 0.2,
+              "precision": 0.28,
+              "recall": 0.5833,
+              "f1": 0.3784,
+              "false_positive_rate": 0.0154,
+              "pr_auc": 0.3484,
+              "roc_auc": 0.9873,
+              "precision_at_50": 0.22,
+              "recall_at_50": 0.9167,
+              "brier": 0.0078,
+              "brier_climatology": 0.0101,
+              "brier_skill": 0.2239,
+              "ece": 0.01,
+              "confusion": {
+                "tp": 7,
+                "fp": 18,
+                "fn": 5,
+                "tn": 1150
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.2,
+              "precision": 0.4,
+              "recall": 0.2979,
+              "f1": 0.3415,
+              "false_positive_rate": 0.0087,
+              "pr_auc": 0.254,
+              "roc_auc": 0.8232,
+              "precision_at_50": 0.42,
+              "recall_at_50": 0.2234,
+              "brier": 0.0159,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1535,
+              "ece": 0.0064,
+              "confusion": {
+                "tp": 28,
+                "fp": 42,
+                "fn": 66,
+                "tn": 4783
+              }
+            },
+            "granularity=day": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.2,
+              "precision": 0.4,
+              "recall": 0.2979,
+              "f1": 0.3415,
+              "false_positive_rate": 0.0087,
+              "pr_auc": 0.254,
+              "roc_auc": 0.8232,
+              "precision_at_50": 0.42,
+              "recall_at_50": 0.2234,
+              "brier": 0.0159,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1535,
+              "ece": 0.0064,
+              "confusion": {
+                "tp": 28,
+                "fp": 42,
+                "fn": 66,
+                "tn": 4783
+              }
+            },
+            "history=established": {
+              "examples": 4919,
+              "positives": 94,
+              "base_rate": 0.0191,
+              "threshold": 0.2,
+              "precision": 0.4,
+              "recall": 0.2979,
+              "f1": 0.3415,
+              "false_positive_rate": 0.0087,
+              "pr_auc": 0.254,
+              "roc_auc": 0.8232,
+              "precision_at_50": 0.42,
+              "recall_at_50": 0.2234,
+              "brier": 0.0159,
+              "brier_climatology": 0.0187,
+              "brier_skill": 0.1535,
+              "ece": 0.0064,
+              "confusion": {
+                "tp": 28,
+                "fp": 42,
+                "fn": 66,
+                "tn": 4783
+              }
+            }
+          }
+        }
+      ],
+      "rolling_origin": [
+        {
+          "fold": 0,
+          "rows": 4781,
+          "positives": 108,
+          "pr_auc": 0.1634,
+          "roc_auc": 0.8504
+        },
+        {
+          "fold": 1,
+          "rows": 4832,
+          "positives": 78,
+          "pr_auc": 0.2535,
+          "roc_auc": 0.8986
+        },
+        {
+          "fold": 2,
+          "rows": 4806,
+          "positives": 93,
+          "pr_auc": 0.2817,
+          "roc_auc": 0.8589
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/day/24h/continuation",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8698,
+          "validation": 2744,
+          "calibration": 3674,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 215,
+        "validation": 122,
+        "calibration": 112,
+        "test": 167,
+        "train_positives": 181,
+        "validation_positives": 96,
+        "calibration_positives": 87,
+        "test_positives": 135
+      },
+      "selected": null,
+      "report_notes": [
+        "insufficient training data: 215 rows, 181 positives (need 300 / 20)"
+      ],
+      "candidates": []
+    },
+    {
+      "scope": "youtube_search_interest/day/24h/trajectory",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8698,
+          "validation": 2744,
+          "calibration": 3674,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 8698,
+        "validation": 2744,
+        "calibration": 3674,
+        "test": 5086
+      },
+      "selected": "lightgbm_regressor",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "persistence",
+          "type": "persistence",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 5086,
+            "mae": 0.1018,
+            "rmse": 0.1576,
+            "scaled_mae": 1.0,
+            "interval_coverage": 0.8105,
+            "interval_width": 0.3164
+          },
+          "comparisons": {},
+          "slices": null
+        },
+        {
+          "name": "seasonal_naive",
+          "type": "seasonal_naive",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 5086,
+            "mae": 0.112,
+            "rmse": 0.1887,
+            "scaled_mae": 1.0992,
+            "interval_coverage": 0.8114,
+            "interval_width": 0.3341
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.0101,
+              "lower": 0.0041,
+              "upper": 0.017
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "damped_trend",
+          "type": "damped_trend",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 5086,
+            "mae": 0.117,
+            "rmse": 0.1754,
+            "scaled_mae": 1.1492,
+            "interval_coverage": 0.813,
+            "interval_width": 0.3698
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.0152,
+              "lower": 0.0137,
+              "upper": 0.017
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "lightgbm_regressor",
+          "type": "lightgbm_regressor",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 5086,
+            "mae": 0.0838,
+            "rmse": 0.134,
+            "scaled_mae": 0.8232,
+            "interval_coverage": 0.8053,
+            "interval_width": 0.2462
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": -0.018,
+              "lower": -0.0213,
+              "upper": -0.0148
+            }
+          },
+          "slices": null
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/breakout",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8507,
+          "validation": 2556,
+          "calibration": 3489,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 8079,
+        "validation": 2391,
+        "calibration": 3261,
+        "test": 4564,
+        "train_positives": 228,
+        "validation_positives": 110,
+        "calibration_positives": 124,
+        "test_positives": 151
+      },
+      "selected": "lightgbm",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 4564,
+            "positives": 151,
+            "base_rate": 0.0331,
+            "brier": 0.032,
+            "brier_climatology": 0.032,
+            "brier_skill": -0.0008,
+            "pr_auc": 0.0424,
+            "roc_auc": 0.5,
+            "ece": 0.0049,
+            "precision": 0.0331,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.0,
+            "recall_at_50": 0.0,
+            "train_pr_auc": 0.03032979028860738,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 2189,
+              "positives": 85,
+              "base_rate": 0.0388,
+              "threshold": 0.038,
+              "precision": 0.0388,
+              "recall": 1.0,
+              "f1": 0.0748,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0339,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0373,
+              "brier_climatology": 0.0373,
+              "brier_skill": -0.0,
+              "ece": 0.0008,
+              "confusion": {
+                "tp": 85,
+                "fp": 2104,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 1279,
+              "positives": 42,
+              "base_rate": 0.0328,
+              "threshold": 0.038,
+              "precision": 0.0328,
+              "recall": 1.0,
+              "f1": 0.0636,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.1309,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.14,
+              "recall_at_50": 0.1667,
+              "brier": 0.0318,
+              "brier_climatology": 0.0318,
+              "brier_skill": -0.0008,
+              "ece": 0.0052,
+              "confusion": {
+                "tp": 42,
+                "fp": 1237,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 1096,
+              "positives": 24,
+              "base_rate": 0.0219,
+              "threshold": 0.038,
+              "precision": 0.0219,
+              "recall": 1.0,
+              "f1": 0.0429,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0741,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.14,
+              "recall_at_50": 0.2917,
+              "brier": 0.0217,
+              "brier_climatology": 0.0214,
+              "brier_skill": -0.0121,
+              "ece": 0.0161,
+              "confusion": {
+                "tp": 24,
+                "fp": 1072,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.038,
+              "precision": 0.0331,
+              "recall": 1.0,
+              "f1": 0.0641,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0424,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.032,
+              "brier_climatology": 0.032,
+              "brier_skill": -0.0008,
+              "ece": 0.0049,
+              "confusion": {
+                "tp": 151,
+                "fp": 4413,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=day": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.038,
+              "precision": 0.0331,
+              "recall": 1.0,
+              "f1": 0.0641,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0424,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.032,
+              "brier_climatology": 0.032,
+              "brier_skill": -0.0008,
+              "ece": 0.0049,
+              "confusion": {
+                "tp": 151,
+                "fp": 4413,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.038,
+              "precision": 0.0331,
+              "recall": 1.0,
+              "f1": 0.0641,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0424,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.032,
+              "brier_climatology": 0.032,
+              "brier_skill": -0.0008,
+              "ece": 0.0049,
+              "confusion": {
+                "tp": 151,
+                "fp": 4413,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 4564,
+            "positives": 151,
+            "base_rate": 0.0331,
+            "brier": 0.029,
+            "brier_climatology": 0.032,
+            "brier_skill": 0.0934,
+            "pr_auc": 0.2412,
+            "roc_auc": 0.7578,
+            "ece": 0.0127,
+            "precision": 0.3511,
+            "recall": 0.3046,
+            "false_positive_rate": 0.0193,
+            "precision_at_50": 0.56,
+            "recall_at_50": 0.1854,
+            "train_pr_auc": 0.34512051570277863,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.003,
+              "lower": -0.0066,
+              "upper": -0.0002
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2189,
+              "positives": 85,
+              "base_rate": 0.0388,
+              "threshold": 0.23,
+              "precision": 0.3793,
+              "recall": 0.2588,
+              "f1": 0.3077,
+              "false_positive_rate": 0.0171,
+              "pr_auc": 0.2355,
+              "roc_auc": 0.8248,
+              "precision_at_50": 0.36,
+              "recall_at_50": 0.2118,
+              "brier": 0.034,
+              "brier_climatology": 0.0373,
+              "brier_skill": 0.0881,
+              "ece": 0.0222,
+              "confusion": {
+                "tp": 22,
+                "fp": 36,
+                "fn": 63,
+                "tn": 2068
+              }
+            },
+            "category=gaming": {
+              "examples": 1279,
+              "positives": 42,
+              "base_rate": 0.0328,
+              "threshold": 0.23,
+              "precision": 0.2,
+              "recall": 0.119,
+              "f1": 0.1493,
+              "false_positive_rate": 0.0162,
+              "pr_auc": 0.1401,
+              "roc_auc": 0.5125,
+              "precision_at_50": 0.14,
+              "recall_at_50": 0.1667,
+              "brier": 0.0326,
+              "brier_climatology": 0.0318,
+              "brier_skill": -0.0278,
+              "ece": 0.0148,
+              "confusion": {
+                "tp": 5,
+                "fp": 20,
+                "fn": 37,
+                "tn": 1217
+              }
+            },
+            "category=technology": {
+              "examples": 1096,
+              "positives": 24,
+              "base_rate": 0.0219,
+              "threshold": 0.23,
+              "precision": 0.3958,
+              "recall": 0.7917,
+              "f1": 0.5278,
+              "false_positive_rate": 0.0271,
+              "pr_auc": 0.5581,
+              "roc_auc": 0.977,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.8333,
+              "brier": 0.0147,
+              "brier_climatology": 0.0214,
+              "brier_skill": 0.3133,
+              "ece": 0.0188,
+              "confusion": {
+                "tp": 19,
+                "fp": 29,
+                "fn": 5,
+                "tn": 1043
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.23,
+              "precision": 0.3511,
+              "recall": 0.3046,
+              "f1": 0.3262,
+              "false_positive_rate": 0.0193,
+              "pr_auc": 0.2412,
+              "roc_auc": 0.7578,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.1854,
+              "brier": 0.029,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.0934,
+              "ece": 0.0127,
+              "confusion": {
+                "tp": 46,
+                "fp": 85,
+                "fn": 105,
+                "tn": 4328
+              }
+            },
+            "granularity=day": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.23,
+              "precision": 0.3511,
+              "recall": 0.3046,
+              "f1": 0.3262,
+              "false_positive_rate": 0.0193,
+              "pr_auc": 0.2412,
+              "roc_auc": 0.7578,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.1854,
+              "brier": 0.029,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.0934,
+              "ece": 0.0127,
+              "confusion": {
+                "tp": 46,
+                "fp": 85,
+                "fn": 105,
+                "tn": 4328
+              }
+            },
+            "history=established": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.23,
+              "precision": 0.3511,
+              "recall": 0.3046,
+              "f1": 0.3262,
+              "false_positive_rate": 0.0193,
+              "pr_auc": 0.2412,
+              "roc_auc": 0.7578,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.1854,
+              "brier": 0.029,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.0934,
+              "ece": 0.0127,
+              "confusion": {
+                "tp": 46,
+                "fp": 85,
+                "fn": 105,
+                "tn": 4328
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 4564,
+            "positives": 151,
+            "base_rate": 0.0331,
+            "brier": 0.0261,
+            "brier_climatology": 0.032,
+            "brier_skill": 0.1853,
+            "pr_auc": 0.3296,
+            "roc_auc": 0.7956,
+            "ece": 0.008,
+            "precision": 0.437,
+            "recall": 0.3444,
+            "false_positive_rate": 0.0152,
+            "precision_at_50": 0.6,
+            "recall_at_50": 0.1987,
+            "train_pr_auc": 0.5717339893083017,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.006,
+              "lower": -0.0103,
+              "upper": -0.0023
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0029,
+              "lower": -0.0054,
+              "upper": -0.0004
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2189,
+              "positives": 85,
+              "base_rate": 0.0388,
+              "threshold": 0.257,
+              "precision": 0.473,
+              "recall": 0.4118,
+              "f1": 0.4403,
+              "false_positive_rate": 0.0185,
+              "pr_auc": 0.4126,
+              "roc_auc": 0.8,
+              "precision_at_50": 0.6,
+              "recall_at_50": 0.3529,
+              "brier": 0.029,
+              "brier_climatology": 0.0373,
+              "brier_skill": 0.224,
+              "ece": 0.0116,
+              "confusion": {
+                "tp": 35,
+                "fp": 39,
+                "fn": 50,
+                "tn": 2065
+              }
+            },
+            "category=gaming": {
+              "examples": 1279,
+              "positives": 42,
+              "base_rate": 0.0328,
+              "threshold": 0.257,
+              "precision": 0.4286,
+              "recall": 0.0714,
+              "f1": 0.1224,
+              "false_positive_rate": 0.0032,
+              "pr_auc": 0.1407,
+              "roc_auc": 0.6124,
+              "precision_at_50": 0.2,
+              "recall_at_50": 0.2381,
+              "brier": 0.0304,
+              "brier_climatology": 0.0318,
+              "brier_skill": 0.0419,
+              "ece": 0.0139,
+              "confusion": {
+                "tp": 3,
+                "fp": 4,
+                "fn": 39,
+                "tn": 1233
+              }
+            },
+            "category=technology": {
+              "examples": 1096,
+              "positives": 24,
+              "base_rate": 0.0219,
+              "threshold": 0.257,
+              "precision": 0.3684,
+              "recall": 0.5833,
+              "f1": 0.4516,
+              "false_positive_rate": 0.0224,
+              "pr_auc": 0.5022,
+              "roc_auc": 0.9828,
+              "precision_at_50": 0.42,
+              "recall_at_50": 0.875,
+              "brier": 0.0152,
+              "brier_climatology": 0.0214,
+              "brier_skill": 0.2916,
+              "ece": 0.0191,
+              "confusion": {
+                "tp": 14,
+                "fp": 24,
+                "fn": 10,
+                "tn": 1048
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.257,
+              "precision": 0.437,
+              "recall": 0.3444,
+              "f1": 0.3852,
+              "false_positive_rate": 0.0152,
+              "pr_auc": 0.3296,
+              "roc_auc": 0.7956,
+              "precision_at_50": 0.6,
+              "recall_at_50": 0.1987,
+              "brier": 0.0261,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.1853,
+              "ece": 0.008,
+              "confusion": {
+                "tp": 52,
+                "fp": 67,
+                "fn": 99,
+                "tn": 4346
+              }
+            },
+            "granularity=day": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.257,
+              "precision": 0.437,
+              "recall": 0.3444,
+              "f1": 0.3852,
+              "false_positive_rate": 0.0152,
+              "pr_auc": 0.3296,
+              "roc_auc": 0.7956,
+              "precision_at_50": 0.6,
+              "recall_at_50": 0.1987,
+              "brier": 0.0261,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.1853,
+              "ece": 0.008,
+              "confusion": {
+                "tp": 52,
+                "fp": 67,
+                "fn": 99,
+                "tn": 4346
+              }
+            },
+            "history=established": {
+              "examples": 4564,
+              "positives": 151,
+              "base_rate": 0.0331,
+              "threshold": 0.257,
+              "precision": 0.437,
+              "recall": 0.3444,
+              "f1": 0.3852,
+              "false_positive_rate": 0.0152,
+              "pr_auc": 0.3296,
+              "roc_auc": 0.7956,
+              "precision_at_50": 0.6,
+              "recall_at_50": 0.1987,
+              "brier": 0.0261,
+              "brier_climatology": 0.032,
+              "brier_skill": 0.1853,
+              "ece": 0.008,
+              "confusion": {
+                "tp": 52,
+                "fp": 67,
+                "fn": 99,
+                "tn": 4346
+              }
+            }
+          }
+        }
+      ],
+      "rolling_origin": [
+        {
+          "fold": 0,
+          "rows": 4659,
+          "positives": 195,
+          "pr_auc": 0.2219,
+          "roc_auc": 0.8319
+        },
+        {
+          "fold": 1,
+          "rows": 4685,
+          "positives": 157,
+          "pr_auc": 0.3267,
+          "roc_auc": 0.9034
+        },
+        {
+          "fold": 2,
+          "rows": 4564,
+          "positives": 151,
+          "pr_auc": 0.2865,
+          "roc_auc": 0.817
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/continuation",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8507,
+          "validation": 2556,
+          "calibration": 3489,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 201,
+        "validation": 100,
+        "calibration": 109,
+        "test": 153,
+        "train_positives": 159,
+        "validation_positives": 63,
+        "calibration_positives": 80,
+        "test_positives": 115
+      },
+      "selected": null,
+      "report_notes": [
+        "insufficient training data: 201 rows, 159 positives (need 300 / 20)"
+      ],
+      "candidates": []
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/trajectory",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 8507,
+          "validation": 2556,
+          "calibration": 3489,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-01-07T22:48:00+00:00",
+          "calibration": "2027-02-08T14:24:00+00:00",
+          "test": "2027-03-22T19:12:00+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "rows": {
+        "train": 8280,
+        "validation": 2491,
+        "calibration": 3370,
+        "test": 4717
+      },
+      "selected": "lightgbm_regressor",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "persistence",
+          "type": "persistence",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 4717,
+            "mae": 0.1144,
+            "rmse": 0.181,
+            "scaled_mae": 1.0,
+            "interval_coverage": 0.8067,
+            "interval_width": 0.3437
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": 0.0022,
+              "lower": -0.0021,
+              "upper": 0.0061
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "seasonal_naive",
+          "type": "seasonal_naive",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 4717,
+            "mae": 0.1121,
+            "rmse": 0.1898,
+            "scaled_mae": 0.9803,
+            "interval_coverage": 0.8077,
+            "interval_width": 0.3341
+          },
+          "comparisons": {},
+          "slices": null
+        },
+        {
+          "name": "damped_trend",
+          "type": "damped_trend",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 4717,
+            "mae": 0.1565,
+            "rmse": 0.2323,
+            "scaled_mae": 1.3687,
+            "interval_coverage": 0.8045,
+            "interval_width": 0.4887
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": 0.0444,
+              "lower": 0.0379,
+              "upper": 0.051
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "lightgbm_regressor",
+          "type": "lightgbm_regressor",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 4717,
+            "mae": 0.093,
+            "rmse": 0.156,
+            "scaled_mae": 0.8129,
+            "interval_coverage": 0.8016,
+            "interval_width": 0.2642
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": -0.0191,
+              "lower": -0.0231,
+              "upper": -0.0154
+            }
+          },
+          "slices": null
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/peak",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 11536,
+          "validation": 3489,
+          "calibration": 0,
+          "test": 5086
+        },
+        "boundaries": {
+          "start": "2026-10-05T00:00:00+00:00",
+          "validation": "2027-02-08T14:24:00+00:00",
+          "calibration": "2027-03-22T19:12:00+00:00",
+          "test": "2027-03-22T19:12:00.018230+00:00",
+          "end": "2027-05-04T00:00:00+00:00"
+        },
+        "unseen_groups": 8
+      },
+      "peak_models": [
+        {
+          "model_id": "fm_analog_peak_window_day_72h_fc351e8e20",
+          "status": "validated",
+          "metrics": {
+            "examples": 4717,
+            "censoring_rate": 0.5238,
+            "not_estimable_rate": 0.5961,
+            "identified_peaks": 2246,
+            "median_abs_error_hours": 0.0,
+            "interval_coverage": 0.9911,
+            "analogs_stored": 6000
+          }
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/breakout",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 15168,
+          "validation": 3840,
+          "calibration": 5760,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 14531,
+        "validation": 3698,
+        "calibration": 5597,
+        "test": 9310,
+        "train_positives": 142,
+        "validation_positives": 24,
+        "calibration_positives": 38,
+        "test_positives": 58
+      },
+      "selected": "logistic_regression",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 9310,
+            "positives": 58,
+            "base_rate": 0.0062,
+            "brier": 0.0062,
+            "brier_climatology": 0.0062,
+            "brier_skill": -0.0001,
+            "pr_auc": 0.0055,
+            "roc_auc": 0.5,
+            "ece": 0.0006,
+            "precision": null,
+            "recall": 0.0,
+            "false_positive_rate": 0.0,
+            "precision_at_50": 0.0,
+            "recall_at_50": 0.0,
+            "train_pr_auc": 0.011207329898404707,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 4012,
+              "positives": 34,
+              "base_rate": 0.0085,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0066,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0084,
+              "brier_climatology": 0.0084,
+              "brier_skill": -0.0003,
+              "ece": 0.0017,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 34,
+                "tn": 3978
+              }
+            },
+            "category=gaming": {
+              "examples": 2666,
+              "positives": 11,
+              "base_rate": 0.0041,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0036,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0041,
+              "brier_climatology": 0.0041,
+              "brier_skill": -0.0017,
+              "ece": 0.0027,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 11,
+                "tn": 2655
+              }
+            },
+            "category=technology": {
+              "examples": 2632,
+              "positives": 13,
+              "base_rate": 0.0049,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0068,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0049,
+              "brier_climatology": 0.0049,
+              "brier_skill": -0.0007,
+              "ece": 0.0019,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 13,
+                "tn": 2619
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0055,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0062,
+              "brier_climatology": 0.0062,
+              "brier_skill": -0.0001,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 58,
+                "tn": 9252
+              }
+            },
+            "granularity=hour": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0055,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0062,
+              "brier_climatology": 0.0062,
+              "brier_skill": -0.0001,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 58,
+                "tn": 9252
+              }
+            },
+            "history=established": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.5,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.0055,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0062,
+              "brier_climatology": 0.0062,
+              "brier_skill": -0.0001,
+              "ece": 0.0006,
+              "confusion": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 58,
+                "tn": 9252
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 9310,
+            "positives": 58,
+            "base_rate": 0.0062,
+            "brier": 0.0054,
+            "brier_climatology": 0.0062,
+            "brier_skill": 0.1283,
+            "pr_auc": 0.2413,
+            "roc_auc": 0.9166,
+            "ece": 0.0011,
+            "precision": 0.3556,
+            "recall": 0.2759,
+            "false_positive_rate": 0.0031,
+            "precision_at_50": 0.34,
+            "recall_at_50": 0.2931,
+            "train_pr_auc": 0.4376083036666084,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0008,
+              "lower": -0.0013,
+              "upper": -0.0003
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 4012,
+              "positives": 34,
+              "base_rate": 0.0085,
+              "threshold": 0.172,
+              "precision": 0.5,
+              "recall": 0.3235,
+              "f1": 0.3929,
+              "false_positive_rate": 0.0028,
+              "pr_auc": 0.3212,
+              "roc_auc": 0.9431,
+              "precision_at_50": 0.32,
+              "recall_at_50": 0.4706,
+              "brier": 0.007,
+              "brier_climatology": 0.0084,
+              "brier_skill": 0.1645,
+              "ece": 0.002,
+              "confusion": {
+                "tp": 11,
+                "fp": 11,
+                "fn": 23,
+                "tn": 3967
+              }
+            },
+            "category=gaming": {
+              "examples": 2666,
+              "positives": 11,
+              "base_rate": 0.0041,
+              "threshold": 0.172,
+              "precision": 0.2667,
+              "recall": 0.3636,
+              "f1": 0.3077,
+              "false_positive_rate": 0.0041,
+              "pr_auc": 0.2869,
+              "roc_auc": 0.8743,
+              "precision_at_50": 0.12,
+              "recall_at_50": 0.5455,
+              "brier": 0.0035,
+              "brier_climatology": 0.0041,
+              "brier_skill": 0.1435,
+              "ece": 0.0032,
+              "confusion": {
+                "tp": 4,
+                "fp": 11,
+                "fn": 7,
+                "tn": 2644
+              }
+            },
+            "category=technology": {
+              "examples": 2632,
+              "positives": 13,
+              "base_rate": 0.0049,
+              "threshold": 0.172,
+              "precision": 0.125,
+              "recall": 0.0769,
+              "f1": 0.0952,
+              "false_positive_rate": 0.0027,
+              "pr_auc": 0.1329,
+              "roc_auc": 0.8802,
+              "precision_at_50": 0.12,
+              "recall_at_50": 0.4615,
+              "brier": 0.0048,
+              "brier_climatology": 0.0049,
+              "brier_skill": 0.0186,
+              "ece": 0.0019,
+              "confusion": {
+                "tp": 1,
+                "fp": 7,
+                "fn": 12,
+                "tn": 2612
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.172,
+              "precision": 0.3556,
+              "recall": 0.2759,
+              "f1": 0.3107,
+              "false_positive_rate": 0.0031,
+              "pr_auc": 0.2413,
+              "roc_auc": 0.9166,
+              "precision_at_50": 0.34,
+              "recall_at_50": 0.2931,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1283,
+              "ece": 0.0011,
+              "confusion": {
+                "tp": 16,
+                "fp": 29,
+                "fn": 42,
+                "tn": 9223
+              }
+            },
+            "granularity=hour": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.172,
+              "precision": 0.3556,
+              "recall": 0.2759,
+              "f1": 0.3107,
+              "false_positive_rate": 0.0031,
+              "pr_auc": 0.2413,
+              "roc_auc": 0.9166,
+              "precision_at_50": 0.34,
+              "recall_at_50": 0.2931,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1283,
+              "ece": 0.0011,
+              "confusion": {
+                "tp": 16,
+                "fp": 29,
+                "fn": 42,
+                "tn": 9223
+              }
+            },
+            "history=established": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.172,
+              "precision": 0.3556,
+              "recall": 0.2759,
+              "f1": 0.3107,
+              "false_positive_rate": 0.0031,
+              "pr_auc": 0.2413,
+              "roc_auc": 0.9166,
+              "precision_at_50": 0.34,
+              "recall_at_50": 0.2931,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1283,
+              "ece": 0.0011,
+              "confusion": {
+                "tp": 16,
+                "fp": 29,
+                "fn": 42,
+                "tn": 9223
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": false,
+          "failed_checks": [
+            "beats_logistic_brier"
+          ],
+          "reasons": [
+            "failed: beats_logistic_brier"
+          ],
+          "metrics": {
+            "examples": 9310,
+            "positives": 58,
+            "base_rate": 0.0062,
+            "brier": 0.0054,
+            "brier_climatology": 0.0062,
+            "brier_skill": 0.1344,
+            "pr_auc": 0.2783,
+            "roc_auc": 0.9175,
+            "ece": 0.0022,
+            "precision": 0.4667,
+            "recall": 0.3621,
+            "false_positive_rate": 0.0026,
+            "precision_at_50": 0.44,
+            "recall_at_50": 0.3793,
+            "train_pr_auc": 0.3792865164855931,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0008,
+              "lower": -0.0013,
+              "upper": -0.0003
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0,
+              "lower": -0.0005,
+              "upper": 0.0004
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 4012,
+              "positives": 34,
+              "base_rate": 0.0085,
+              "threshold": 0.196,
+              "precision": 0.5185,
+              "recall": 0.4118,
+              "f1": 0.459,
+              "false_positive_rate": 0.0033,
+              "pr_auc": 0.3314,
+              "roc_auc": 0.8991,
+              "precision_at_50": 0.34,
+              "recall_at_50": 0.5,
+              "brier": 0.0072,
+              "brier_climatology": 0.0084,
+              "brier_skill": 0.1484,
+              "ece": 0.004,
+              "confusion": {
+                "tp": 14,
+                "fp": 13,
+                "fn": 20,
+                "tn": 3965
+              }
+            },
+            "category=gaming": {
+              "examples": 2666,
+              "positives": 11,
+              "base_rate": 0.0041,
+              "threshold": 0.196,
+              "precision": 0.1667,
+              "recall": 0.0909,
+              "f1": 0.1176,
+              "false_positive_rate": 0.0019,
+              "pr_auc": 0.1769,
+              "roc_auc": 0.9028,
+              "precision_at_50": 0.08,
+              "recall_at_50": 0.3636,
+              "brier": 0.0039,
+              "brier_climatology": 0.0041,
+              "brier_skill": 0.0436,
+              "ece": 0.0012,
+              "confusion": {
+                "tp": 1,
+                "fp": 5,
+                "fn": 10,
+                "tn": 2650
+              }
+            },
+            "category=technology": {
+              "examples": 2632,
+              "positives": 13,
+              "base_rate": 0.0049,
+              "threshold": 0.196,
+              "precision": 0.5,
+              "recall": 0.4615,
+              "f1": 0.48,
+              "false_positive_rate": 0.0023,
+              "pr_auc": 0.3922,
+              "roc_auc": 0.9758,
+              "precision_at_50": 0.18,
+              "recall_at_50": 0.6923,
+              "brier": 0.0041,
+              "brier_climatology": 0.0049,
+              "brier_skill": 0.1725,
+              "ece": 0.0029,
+              "confusion": {
+                "tp": 6,
+                "fp": 6,
+                "fn": 7,
+                "tn": 2613
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.196,
+              "precision": 0.4667,
+              "recall": 0.3621,
+              "f1": 0.4078,
+              "false_positive_rate": 0.0026,
+              "pr_auc": 0.2783,
+              "roc_auc": 0.9175,
+              "precision_at_50": 0.44,
+              "recall_at_50": 0.3793,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1344,
+              "ece": 0.0022,
+              "confusion": {
+                "tp": 21,
+                "fp": 24,
+                "fn": 37,
+                "tn": 9228
+              }
+            },
+            "granularity=hour": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.196,
+              "precision": 0.4667,
+              "recall": 0.3621,
+              "f1": 0.4078,
+              "false_positive_rate": 0.0026,
+              "pr_auc": 0.2783,
+              "roc_auc": 0.9175,
+              "precision_at_50": 0.44,
+              "recall_at_50": 0.3793,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1344,
+              "ece": 0.0022,
+              "confusion": {
+                "tp": 21,
+                "fp": 24,
+                "fn": 37,
+                "tn": 9228
+              }
+            },
+            "history=established": {
+              "examples": 9310,
+              "positives": 58,
+              "base_rate": 0.0062,
+              "threshold": 0.196,
+              "precision": 0.4667,
+              "recall": 0.3621,
+              "f1": 0.4078,
+              "false_positive_rate": 0.0026,
+              "pr_auc": 0.2783,
+              "roc_auc": 0.9175,
+              "precision_at_50": 0.44,
+              "recall_at_50": 0.3793,
+              "brier": 0.0054,
+              "brier_climatology": 0.0062,
+              "brier_skill": 0.1344,
+              "ece": 0.0022,
+              "confusion": {
+                "tp": 21,
+                "fp": 24,
+                "fn": 37,
+                "tn": 9228
+              }
+            }
+          }
+        }
+      ],
+      "rolling_origin": [
+        {
+          "fold": 0,
+          "rows": 8973,
+          "positives": 81,
+          "pr_auc": 0.3464,
+          "roc_auc": 0.9301
+        },
+        {
+          "fold": 1,
+          "rows": 9082,
+          "positives": 55,
+          "pr_auc": 0.2894,
+          "roc_auc": 0.9367
+        },
+        {
+          "fold": 2,
+          "rows": 9079,
+          "positives": 58,
+          "pr_auc": 0.2936,
+          "roc_auc": 0.9307
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/continuation",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 15168,
+          "validation": 3840,
+          "calibration": 5760,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 499,
+        "validation": 110,
+        "calibration": 123,
+        "test": 203,
+        "train_positives": 399,
+        "validation_positives": 96,
+        "calibration_positives": 90,
+        "test_positives": 144
+      },
+      "selected": "logistic_regression",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 203,
+            "positives": 144,
+            "base_rate": 0.7094,
+            "brier": 0.2067,
+            "brier_climatology": 0.2062,
+            "brier_skill": -0.0024,
+            "pr_auc": 0.7858,
+            "roc_auc": 0.5,
+            "ece": 0.0223,
+            "precision": 0.7094,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.78,
+            "recall_at_50": 0.2708,
+            "train_pr_auc": 0.8064107518675871,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 115,
+              "positives": 78,
+              "base_rate": 0.6783,
+              "threshold": 0.5,
+              "precision": 0.6783,
+              "recall": 1.0,
+              "f1": 0.8083,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8198,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.78,
+              "recall_at_50": 0.5,
+              "brier": 0.2211,
+              "brier_climatology": 0.2182,
+              "brier_skill": -0.0131,
+              "ece": 0.0534,
+              "confusion": {
+                "tp": 78,
+                "fp": 37,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 72,
+              "positives": 62,
+              "base_rate": 0.8611,
+              "threshold": 0.5,
+              "precision": 0.8611,
+              "recall": 1.0,
+              "f1": 0.9254,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8258,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.84,
+              "recall_at_50": 0.6774,
+              "brier": 0.1363,
+              "brier_climatology": 0.1196,
+              "brier_skill": -0.14,
+              "ece": 0.1294,
+              "confusion": {
+                "tp": 62,
+                "fp": 10,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 16,
+              "positives": 4,
+              "base_rate": 0.25,
+              "threshold": 0.5,
+              "precision": 0.25,
+              "recall": 1.0,
+              "f1": 0.4,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8875,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.25,
+              "recall_at_50": 1.0,
+              "brier": 0.4195,
+              "brier_climatology": 0.1875,
+              "brier_skill": -1.2376,
+              "ece": 0.4817,
+              "confusion": {
+                "tp": 4,
+                "fp": 12,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.5,
+              "precision": 0.7094,
+              "recall": 1.0,
+              "f1": 0.83,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.7858,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.78,
+              "recall_at_50": 0.2708,
+              "brier": 0.2067,
+              "brier_climatology": 0.2062,
+              "brier_skill": -0.0024,
+              "ece": 0.0223,
+              "confusion": {
+                "tp": 144,
+                "fp": 59,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=hour": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.5,
+              "precision": 0.7094,
+              "recall": 1.0,
+              "f1": 0.83,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.7858,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.78,
+              "recall_at_50": 0.2708,
+              "brier": 0.2067,
+              "brier_climatology": 0.2062,
+              "brier_skill": -0.0024,
+              "ece": 0.0223,
+              "confusion": {
+                "tp": 144,
+                "fp": 59,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.5,
+              "precision": 0.7094,
+              "recall": 1.0,
+              "f1": 0.83,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.7858,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.78,
+              "recall_at_50": 0.2708,
+              "brier": 0.2067,
+              "brier_climatology": 0.2062,
+              "brier_skill": -0.0024,
+              "ece": 0.0223,
+              "confusion": {
+                "tp": 144,
+                "fp": 59,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 203,
+            "positives": 144,
+            "base_rate": 0.7094,
+            "brier": 0.0971,
+            "brier_climatology": 0.2062,
+            "brier_skill": 0.5289,
+            "pr_auc": 0.9599,
+            "roc_auc": 0.9178,
+            "ece": 0.0369,
+            "precision": 0.8824,
+            "recall": 0.9375,
+            "false_positive_rate": 0.3051,
+            "precision_at_50": 0.98,
+            "recall_at_50": 0.3403,
+            "train_pr_auc": 0.9851036012613947,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.1095,
+              "lower": -0.147,
+              "upper": -0.0794
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 115,
+              "positives": 78,
+              "base_rate": 0.6783,
+              "threshold": 0.476,
+              "precision": 0.8554,
+              "recall": 0.9103,
+              "f1": 0.882,
+              "false_positive_rate": 0.3243,
+              "pr_auc": 0.9551,
+              "roc_auc": 0.912,
+              "precision_at_50": 0.96,
+              "recall_at_50": 0.6154,
+              "brier": 0.1101,
+              "brier_climatology": 0.2182,
+              "brier_skill": 0.4956,
+              "ece": 0.0408,
+              "confusion": {
+                "tp": 71,
+                "fp": 12,
+                "fn": 7,
+                "tn": 25
+              }
+            },
+            "category=gaming": {
+              "examples": 72,
+              "positives": 62,
+              "base_rate": 0.8611,
+              "threshold": 0.476,
+              "precision": 0.9231,
+              "recall": 0.9677,
+              "f1": 0.9449,
+              "false_positive_rate": 0.5,
+              "pr_auc": 0.9754,
+              "roc_auc": 0.8887,
+              "precision_at_50": 0.96,
+              "recall_at_50": 0.7742,
+              "brier": 0.0707,
+              "brier_climatology": 0.1196,
+              "brier_skill": 0.4087,
+              "ece": 0.0761,
+              "confusion": {
+                "tp": 60,
+                "fp": 5,
+                "fn": 2,
+                "tn": 5
+              }
+            },
+            "category=technology": {
+              "examples": 16,
+              "positives": 4,
+              "base_rate": 0.25,
+              "threshold": 0.476,
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8889,
+              "false_positive_rate": 0.0833,
+              "pr_auc": 0.8875,
+              "roc_auc": 0.9583,
+              "precision_at_50": 0.25,
+              "recall_at_50": 1.0,
+              "brier": 0.123,
+              "brier_climatology": 0.1875,
+              "brier_skill": 0.3442,
+              "ece": 0.2844,
+              "confusion": {
+                "tp": 4,
+                "fp": 1,
+                "fn": 0,
+                "tn": 11
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.476,
+              "precision": 0.8824,
+              "recall": 0.9375,
+              "f1": 0.9091,
+              "false_positive_rate": 0.3051,
+              "pr_auc": 0.9599,
+              "roc_auc": 0.9178,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0971,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5289,
+              "ece": 0.0369,
+              "confusion": {
+                "tp": 135,
+                "fp": 18,
+                "fn": 9,
+                "tn": 41
+              }
+            },
+            "granularity=hour": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.476,
+              "precision": 0.8824,
+              "recall": 0.9375,
+              "f1": 0.9091,
+              "false_positive_rate": 0.3051,
+              "pr_auc": 0.9599,
+              "roc_auc": 0.9178,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0971,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5289,
+              "ece": 0.0369,
+              "confusion": {
+                "tp": 135,
+                "fp": 18,
+                "fn": 9,
+                "tn": 41
+              }
+            },
+            "history=established": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.476,
+              "precision": 0.8824,
+              "recall": 0.9375,
+              "f1": 0.9091,
+              "false_positive_rate": 0.3051,
+              "pr_auc": 0.9599,
+              "roc_auc": 0.9178,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0971,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5289,
+              "ece": 0.0369,
+              "confusion": {
+                "tp": 135,
+                "fp": 18,
+                "fn": 9,
+                "tn": 41
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": false,
+          "failed_checks": [
+            "beats_logistic_brier"
+          ],
+          "reasons": [
+            "failed: beats_logistic_brier"
+          ],
+          "metrics": {
+            "examples": 203,
+            "positives": 144,
+            "base_rate": 0.7094,
+            "brier": 0.0902,
+            "brier_climatology": 0.2062,
+            "brier_skill": 0.5626,
+            "pr_auc": 0.963,
+            "roc_auc": 0.9307,
+            "ece": 0.0662,
+            "precision": 0.8598,
+            "recall": 0.9792,
+            "false_positive_rate": 0.3898,
+            "precision_at_50": 0.98,
+            "recall_at_50": 0.3403,
+            "train_pr_auc": 0.9936502377221627,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.1165,
+              "lower": -0.1522,
+              "upper": -0.089
+            },
+            "brier_vs_logistic": {
+              "difference": -0.007,
+              "lower": -0.018,
+              "upper": 0.0049
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 115,
+              "positives": 78,
+              "base_rate": 0.6783,
+              "threshold": 0.338,
+              "precision": 0.8152,
+              "recall": 0.9615,
+              "f1": 0.8824,
+              "false_positive_rate": 0.4595,
+              "pr_auc": 0.9691,
+              "roc_auc": 0.9307,
+              "precision_at_50": 1.0,
+              "recall_at_50": 0.641,
+              "brier": 0.1017,
+              "brier_climatology": 0.2182,
+              "brier_skill": 0.5338,
+              "ece": 0.0882,
+              "confusion": {
+                "tp": 75,
+                "fp": 17,
+                "fn": 3,
+                "tn": 20
+              }
+            },
+            "category=gaming": {
+              "examples": 72,
+              "positives": 62,
+              "base_rate": 0.8611,
+              "threshold": 0.338,
+              "precision": 0.9254,
+              "recall": 1.0,
+              "f1": 0.9612,
+              "false_positive_rate": 0.5,
+              "pr_auc": 0.9575,
+              "roc_auc": 0.871,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.7903,
+              "brier": 0.0708,
+              "brier_climatology": 0.1196,
+              "brier_skill": 0.4083,
+              "ece": 0.0674,
+              "confusion": {
+                "tp": 62,
+                "fp": 5,
+                "fn": 0,
+                "tn": 5
+              }
+            },
+            "category=technology": {
+              "examples": 16,
+              "positives": 4,
+              "base_rate": 0.25,
+              "threshold": 0.338,
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8889,
+              "false_positive_rate": 0.0833,
+              "pr_auc": 0.6792,
+              "roc_auc": 0.9167,
+              "precision_at_50": 0.25,
+              "recall_at_50": 1.0,
+              "brier": 0.0944,
+              "brier_climatology": 0.1875,
+              "brier_skill": 0.4964,
+              "ece": 0.2571,
+              "confusion": {
+                "tp": 4,
+                "fp": 1,
+                "fn": 0,
+                "tn": 11
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.338,
+              "precision": 0.8598,
+              "recall": 0.9792,
+              "f1": 0.9156,
+              "false_positive_rate": 0.3898,
+              "pr_auc": 0.963,
+              "roc_auc": 0.9307,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0902,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5626,
+              "ece": 0.0662,
+              "confusion": {
+                "tp": 141,
+                "fp": 23,
+                "fn": 3,
+                "tn": 36
+              }
+            },
+            "granularity=hour": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.338,
+              "precision": 0.8598,
+              "recall": 0.9792,
+              "f1": 0.9156,
+              "false_positive_rate": 0.3898,
+              "pr_auc": 0.963,
+              "roc_auc": 0.9307,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0902,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5626,
+              "ece": 0.0662,
+              "confusion": {
+                "tp": 141,
+                "fp": 23,
+                "fn": 3,
+                "tn": 36
+              }
+            },
+            "history=established": {
+              "examples": 203,
+              "positives": 144,
+              "base_rate": 0.7094,
+              "threshold": 0.338,
+              "precision": 0.8598,
+              "recall": 0.9792,
+              "f1": 0.9156,
+              "false_positive_rate": 0.3898,
+              "pr_auc": 0.963,
+              "roc_auc": 0.9307,
+              "precision_at_50": 0.98,
+              "recall_at_50": 0.3403,
+              "brier": 0.0902,
+              "brier_climatology": 0.2062,
+              "brier_skill": 0.5626,
+              "ece": 0.0662,
+              "confusion": {
+                "tp": 141,
+                "fp": 23,
+                "fn": 3,
+                "tn": 36
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/trajectory",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 15168,
+          "validation": 3840,
+          "calibration": 5760,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 14829,
+        "validation": 3747,
+        "calibration": 5654,
+        "test": 9397
+      },
+      "selected": "lightgbm_regressor",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "persistence",
+          "type": "persistence",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 9397,
+            "mae": 0.1924,
+            "rmse": 0.2498,
+            "scaled_mae": 1.0,
+            "interval_coverage": 0.814,
+            "interval_width": 0.6544
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": 0.069,
+              "lower": 0.059,
+              "upper": 0.0792
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "seasonal_naive",
+          "type": "seasonal_naive",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 9397,
+            "mae": 0.1234,
+            "rmse": 0.1779,
+            "scaled_mae": 0.6414,
+            "interval_coverage": 0.8158,
+            "interval_width": 0.41
+          },
+          "comparisons": {},
+          "slices": null
+        },
+        {
+          "name": "damped_trend",
+          "type": "damped_trend",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 9397,
+            "mae": 0.2629,
+            "rmse": 0.3567,
+            "scaled_mae": 1.3667,
+            "interval_coverage": 0.8087,
+            "interval_width": 0.8899
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": 0.1395,
+              "lower": 0.1254,
+              "upper": 0.1549
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "lightgbm_regressor",
+          "type": "lightgbm_regressor",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 9397,
+            "mae": 0.0827,
+            "rmse": 0.115,
+            "scaled_mae": 0.4302,
+            "interval_coverage": 0.8209,
+            "interval_width": 0.2759
+          },
+          "comparisons": {
+            "mae_vs_seasonal_naive": {
+              "difference": -0.0406,
+              "lower": -0.0436,
+              "upper": -0.0378
+            }
+          },
+          "slices": null
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/24h/breakout",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 14592,
+          "validation": 3264,
+          "calibration": 5184,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 14117,
+        "validation": 3174,
+        "calibration": 5067,
+        "test": 8689,
+        "train_positives": 469,
+        "validation_positives": 80,
+        "calibration_positives": 128,
+        "test_positives": 211
+      },
+      "selected": "lightgbm",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 8689,
+            "positives": 211,
+            "base_rate": 0.0243,
+            "brier": 0.0237,
+            "brier_climatology": 0.0237,
+            "brier_skill": -0.0,
+            "pr_auc": 0.0218,
+            "roc_auc": 0.5,
+            "ece": 0.001,
+            "precision": 0.0243,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.0,
+            "recall_at_50": 0.0,
+            "train_pr_auc": 0.03930537347735621,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 3736,
+              "positives": 124,
+              "base_rate": 0.0332,
+              "threshold": 0.025,
+              "precision": 0.0332,
+              "recall": 1.0,
+              "f1": 0.0642,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0272,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0322,
+              "brier_climatology": 0.0321,
+              "brier_skill": -0.002,
+              "ece": 0.0079,
+              "confusion": {
+                "tp": 124,
+                "fp": 3612,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 2489,
+              "positives": 43,
+              "base_rate": 0.0173,
+              "threshold": 0.025,
+              "precision": 0.0173,
+              "recall": 1.0,
+              "f1": 0.034,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0139,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.017,
+              "brier_climatology": 0.017,
+              "brier_skill": -0.0038,
+              "ece": 0.008,
+              "confusion": {
+                "tp": 43,
+                "fp": 2446,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 2464,
+              "positives": 44,
+              "base_rate": 0.0179,
+              "threshold": 0.025,
+              "precision": 0.0179,
+              "recall": 1.0,
+              "f1": 0.0351,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0212,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0176,
+              "brier_climatology": 0.0175,
+              "brier_skill": -0.0031,
+              "ece": 0.0074,
+              "confusion": {
+                "tp": 44,
+                "fp": 2420,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.025,
+              "precision": 0.0243,
+              "recall": 1.0,
+              "f1": 0.0474,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0218,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0237,
+              "brier_climatology": 0.0237,
+              "brier_skill": -0.0,
+              "ece": 0.001,
+              "confusion": {
+                "tp": 211,
+                "fp": 8478,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=hour": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.025,
+              "precision": 0.0243,
+              "recall": 1.0,
+              "f1": 0.0474,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0218,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0237,
+              "brier_climatology": 0.0237,
+              "brier_skill": -0.0,
+              "ece": 0.001,
+              "confusion": {
+                "tp": 211,
+                "fp": 8478,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.025,
+              "precision": 0.0243,
+              "recall": 1.0,
+              "f1": 0.0474,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0218,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0237,
+              "brier_climatology": 0.0237,
+              "brier_skill": -0.0,
+              "ece": 0.001,
+              "confusion": {
+                "tp": 211,
+                "fp": 8478,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 8689,
+            "positives": 211,
+            "base_rate": 0.0243,
+            "brier": 0.0216,
+            "brier_climatology": 0.0237,
+            "brier_skill": 0.088,
+            "pr_auc": 0.1949,
+            "roc_auc": 0.7667,
+            "ece": 0.0071,
+            "precision": 0.2563,
+            "recall": 0.3365,
+            "false_positive_rate": 0.0243,
+            "precision_at_50": 0.46,
+            "recall_at_50": 0.109,
+            "train_pr_auc": 0.3551175612555983,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0021,
+              "lower": -0.0042,
+              "upper": -0.0001
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 3736,
+              "positives": 124,
+              "base_rate": 0.0332,
+              "threshold": 0.128,
+              "precision": 0.3224,
+              "recall": 0.3952,
+              "f1": 0.3551,
+              "false_positive_rate": 0.0285,
+              "pr_auc": 0.2668,
+              "roc_auc": 0.7954,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.1855,
+              "brier": 0.0279,
+              "brier_climatology": 0.0321,
+              "brier_skill": 0.1313,
+              "ece": 0.0091,
+              "confusion": {
+                "tp": 49,
+                "fp": 103,
+                "fn": 75,
+                "tn": 3509
+              }
+            },
+            "category=gaming": {
+              "examples": 2489,
+              "positives": 43,
+              "base_rate": 0.0173,
+              "threshold": 0.128,
+              "precision": 0.0952,
+              "recall": 0.186,
+              "f1": 0.126,
+              "false_positive_rate": 0.0311,
+              "pr_auc": 0.0842,
+              "roc_auc": 0.59,
+              "precision_at_50": 0.16,
+              "recall_at_50": 0.186,
+              "brier": 0.0184,
+              "brier_climatology": 0.017,
+              "brier_skill": -0.0815,
+              "ece": 0.0123,
+              "confusion": {
+                "tp": 8,
+                "fp": 76,
+                "fn": 35,
+                "tn": 2370
+              }
+            },
+            "category=technology": {
+              "examples": 2464,
+              "positives": 44,
+              "base_rate": 0.0179,
+              "threshold": 0.128,
+              "precision": 0.3415,
+              "recall": 0.3182,
+              "f1": 0.3294,
+              "false_positive_rate": 0.0112,
+              "pr_auc": 0.2442,
+              "roc_auc": 0.8425,
+              "precision_at_50": 0.32,
+              "recall_at_50": 0.3636,
+              "brier": 0.0154,
+              "brier_climatology": 0.0175,
+              "brier_skill": 0.1229,
+              "ece": 0.0028,
+              "confusion": {
+                "tp": 14,
+                "fp": 27,
+                "fn": 30,
+                "tn": 2393
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.128,
+              "precision": 0.2563,
+              "recall": 0.3365,
+              "f1": 0.291,
+              "false_positive_rate": 0.0243,
+              "pr_auc": 0.1949,
+              "roc_auc": 0.7667,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.109,
+              "brier": 0.0216,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.088,
+              "ece": 0.0071,
+              "confusion": {
+                "tp": 71,
+                "fp": 206,
+                "fn": 140,
+                "tn": 8272
+              }
+            },
+            "granularity=hour": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.128,
+              "precision": 0.2563,
+              "recall": 0.3365,
+              "f1": 0.291,
+              "false_positive_rate": 0.0243,
+              "pr_auc": 0.1949,
+              "roc_auc": 0.7667,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.109,
+              "brier": 0.0216,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.088,
+              "ece": 0.0071,
+              "confusion": {
+                "tp": 71,
+                "fp": 206,
+                "fn": 140,
+                "tn": 8272
+              }
+            },
+            "history=established": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.128,
+              "precision": 0.2563,
+              "recall": 0.3365,
+              "f1": 0.291,
+              "false_positive_rate": 0.0243,
+              "pr_auc": 0.1949,
+              "roc_auc": 0.7667,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.109,
+              "brier": 0.0216,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.088,
+              "ece": 0.0071,
+              "confusion": {
+                "tp": 71,
+                "fp": 206,
+                "fn": 140,
+                "tn": 8272
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 8689,
+            "positives": 211,
+            "base_rate": 0.0243,
+            "brier": 0.0197,
+            "brier_climatology": 0.0237,
+            "brier_skill": 0.1692,
+            "pr_auc": 0.2962,
+            "roc_auc": 0.7997,
+            "ece": 0.0029,
+            "precision": 0.5,
+            "recall": 0.2986,
+            "false_positive_rate": 0.0074,
+            "precision_at_50": 0.5,
+            "recall_at_50": 0.1185,
+            "train_pr_auc": 0.4257895980600611,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.004,
+              "lower": -0.0069,
+              "upper": -0.0015
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0019,
+              "lower": -0.0029,
+              "upper": -0.001
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 3736,
+              "positives": 124,
+              "base_rate": 0.0332,
+              "threshold": 0.214,
+              "precision": 0.5063,
+              "recall": 0.3226,
+              "f1": 0.3941,
+              "false_positive_rate": 0.0108,
+              "pr_auc": 0.3537,
+              "roc_auc": 0.8327,
+              "precision_at_50": 0.58,
+              "recall_at_50": 0.2339,
+              "brier": 0.0262,
+              "brier_climatology": 0.0321,
+              "brier_skill": 0.1845,
+              "ece": 0.0098,
+              "confusion": {
+                "tp": 40,
+                "fp": 39,
+                "fn": 84,
+                "tn": 3573
+              }
+            },
+            "category=gaming": {
+              "examples": 2489,
+              "positives": 43,
+              "base_rate": 0.0173,
+              "threshold": 0.214,
+              "precision": 0.2143,
+              "recall": 0.0698,
+              "f1": 0.1053,
+              "false_positive_rate": 0.0045,
+              "pr_auc": 0.0516,
+              "roc_auc": 0.5692,
+              "precision_at_50": 0.1,
+              "recall_at_50": 0.1163,
+              "brier": 0.0173,
+              "brier_climatology": 0.017,
+              "brier_skill": -0.0165,
+              "ece": 0.003,
+              "confusion": {
+                "tp": 3,
+                "fp": 11,
+                "fn": 40,
+                "tn": 2435
+              }
+            },
+            "category=technology": {
+              "examples": 2464,
+              "positives": 44,
+              "base_rate": 0.0179,
+              "threshold": 0.214,
+              "precision": 0.6061,
+              "recall": 0.4545,
+              "f1": 0.5195,
+              "false_positive_rate": 0.0054,
+              "pr_auc": 0.4483,
+              "roc_auc": 0.9019,
+              "precision_at_50": 0.44,
+              "recall_at_50": 0.5,
+              "brier": 0.0123,
+              "brier_climatology": 0.0175,
+              "brier_skill": 0.2982,
+              "ece": 0.005,
+              "confusion": {
+                "tp": 20,
+                "fp": 13,
+                "fn": 24,
+                "tn": 2407
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.214,
+              "precision": 0.5,
+              "recall": 0.2986,
+              "f1": 0.3739,
+              "false_positive_rate": 0.0074,
+              "pr_auc": 0.2962,
+              "roc_auc": 0.7997,
+              "precision_at_50": 0.5,
+              "recall_at_50": 0.1185,
+              "brier": 0.0197,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.1692,
+              "ece": 0.0029,
+              "confusion": {
+                "tp": 63,
+                "fp": 63,
+                "fn": 148,
+                "tn": 8415
+              }
+            },
+            "granularity=hour": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.214,
+              "precision": 0.5,
+              "recall": 0.2986,
+              "f1": 0.3739,
+              "false_positive_rate": 0.0074,
+              "pr_auc": 0.2962,
+              "roc_auc": 0.7997,
+              "precision_at_50": 0.5,
+              "recall_at_50": 0.1185,
+              "brier": 0.0197,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.1692,
+              "ece": 0.0029,
+              "confusion": {
+                "tp": 63,
+                "fp": 63,
+                "fn": 148,
+                "tn": 8415
+              }
+            },
+            "history=established": {
+              "examples": 8689,
+              "positives": 211,
+              "base_rate": 0.0243,
+              "threshold": 0.214,
+              "precision": 0.5,
+              "recall": 0.2986,
+              "f1": 0.3739,
+              "false_positive_rate": 0.0074,
+              "pr_auc": 0.2962,
+              "roc_auc": 0.7997,
+              "precision_at_50": 0.5,
+              "recall_at_50": 0.1185,
+              "brier": 0.0197,
+              "brier_climatology": 0.0237,
+              "brier_skill": 0.1692,
+              "ece": 0.0029,
+              "confusion": {
+                "tp": 63,
+                "fp": 63,
+                "fn": 148,
+                "tn": 8415
+              }
+            }
+          }
+        }
+      ],
+      "rolling_origin": [
+        {
+          "fold": 0,
+          "rows": 9044,
+          "positives": 286,
+          "pr_auc": 0.2929,
+          "roc_auc": 0.8411
+        },
+        {
+          "fold": 1,
+          "rows": 9164,
+          "positives": 195,
+          "pr_auc": 0.3007,
+          "roc_auc": 0.8516
+        },
+        {
+          "fold": 2,
+          "rows": 8689,
+          "positives": 211,
+          "pr_auc": 0.2563,
+          "roc_auc": 0.8107
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/24h/continuation",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 14592,
+          "validation": 3264,
+          "calibration": 5184,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 473,
+        "validation": 90,
+        "calibration": 117,
+        "test": 189,
+        "train_positives": 380,
+        "validation_positives": 68,
+        "calibration_positives": 85,
+        "test_positives": 137
+      },
+      "selected": null,
+      "report_notes": [
+        "no candidate met the acceptance criteria; baseline-only forecasts"
+      ],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 189,
+            "positives": 137,
+            "base_rate": 0.7249,
+            "brier": 0.1994,
+            "brier_climatology": 0.1994,
+            "brier_skill": -0.0,
+            "pr_auc": 0.8042,
+            "roc_auc": 0.5,
+            "ece": 0.0016,
+            "precision": 0.7249,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.8,
+            "recall_at_50": 0.292,
+            "train_pr_auc": 0.8131067232014301,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 112,
+              "positives": 73,
+              "base_rate": 0.6518,
+              "threshold": 0.726,
+              "precision": 0.6518,
+              "recall": 1.0,
+              "f1": 0.7892,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8241,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8,
+              "recall_at_50": 0.5479,
+              "brier": 0.2325,
+              "brier_climatology": 0.227,
+              "brier_skill": -0.0246,
+              "ece": 0.0747,
+              "confusion": {
+                "tp": 73,
+                "fp": 39,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 62,
+              "positives": 51,
+              "base_rate": 0.8226,
+              "threshold": 0.726,
+              "precision": 0.8226,
+              "recall": 1.0,
+              "f1": 0.9027,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.7557,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8,
+              "recall_at_50": 0.7843,
+              "brier": 0.1552,
+              "brier_climatology": 0.1459,
+              "brier_skill": -0.0633,
+              "ece": 0.0961,
+              "confusion": {
+                "tp": 51,
+                "fp": 11,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 15,
+              "positives": 13,
+              "base_rate": 0.8667,
+              "threshold": 0.726,
+              "precision": 0.8667,
+              "recall": 1.0,
+              "f1": 0.9286,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.9446,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8667,
+              "recall_at_50": 1.0,
+              "brier": 0.1352,
+              "brier_climatology": 0.1156,
+              "brier_skill": -0.17,
+              "ece": 0.1402,
+              "confusion": {
+                "tp": 13,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.726,
+              "precision": 0.7249,
+              "recall": 1.0,
+              "f1": 0.8405,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8042,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8,
+              "recall_at_50": 0.292,
+              "brier": 0.1994,
+              "brier_climatology": 0.1994,
+              "brier_skill": -0.0,
+              "ece": 0.0016,
+              "confusion": {
+                "tp": 137,
+                "fp": 52,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=hour": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.726,
+              "precision": 0.7249,
+              "recall": 1.0,
+              "f1": 0.8405,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8042,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8,
+              "recall_at_50": 0.292,
+              "brier": 0.1994,
+              "brier_climatology": 0.1994,
+              "brier_skill": -0.0,
+              "ece": 0.0016,
+              "confusion": {
+                "tp": 137,
+                "fp": 52,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.726,
+              "precision": 0.7249,
+              "recall": 1.0,
+              "f1": 0.8405,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8042,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.8,
+              "recall_at_50": 0.292,
+              "brier": 0.1994,
+              "brier_climatology": 0.1994,
+              "brier_skill": -0.0,
+              "ece": 0.0016,
+              "confusion": {
+                "tp": 137,
+                "fp": 52,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": false,
+          "failed_checks": [
+            "enough_test_examples"
+          ],
+          "reasons": [
+            "failed: enough_test_examples"
+          ],
+          "metrics": {
+            "examples": 189,
+            "positives": 137,
+            "base_rate": 0.7249,
+            "brier": 0.1684,
+            "brier_climatology": 0.1994,
+            "brier_skill": 0.1556,
+            "pr_auc": 0.8894,
+            "roc_auc": 0.7607,
+            "ece": 0.0545,
+            "precision": 0.7486,
+            "recall": 1.0,
+            "false_positive_rate": 0.8846,
+            "precision_at_50": 0.96,
+            "recall_at_50": 0.3504,
+            "train_pr_auc": 0.9549868950478535,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.031,
+              "lower": -0.0541,
+              "upper": -0.0118
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 112,
+              "positives": 73,
+              "base_rate": 0.6518,
+              "threshold": 0.262,
+              "precision": 0.6822,
+              "recall": 1.0,
+              "f1": 0.8111,
+              "false_positive_rate": 0.8718,
+              "pr_auc": 0.843,
+              "roc_auc": 0.7334,
+              "precision_at_50": 0.84,
+              "recall_at_50": 0.5753,
+              "brier": 0.1963,
+              "brier_climatology": 0.227,
+              "brier_skill": 0.1351,
+              "ece": 0.0666,
+              "confusion": {
+                "tp": 73,
+                "fp": 34,
+                "fn": 0,
+                "tn": 5
+              }
+            },
+            "category=gaming": {
+              "examples": 62,
+              "positives": 51,
+              "base_rate": 0.8226,
+              "threshold": 0.262,
+              "precision": 0.8361,
+              "recall": 1.0,
+              "f1": 0.9107,
+              "false_positive_rate": 0.9091,
+              "pr_auc": 0.9268,
+              "roc_auc": 0.7576,
+              "precision_at_50": 0.86,
+              "recall_at_50": 0.8431,
+              "brier": 0.1323,
+              "brier_climatology": 0.1459,
+              "brier_skill": 0.0932,
+              "ece": 0.094,
+              "confusion": {
+                "tp": 51,
+                "fp": 10,
+                "fn": 0,
+                "tn": 1
+              }
+            },
+            "category=technology": {
+              "examples": 15,
+              "positives": 13,
+              "base_rate": 0.8667,
+              "threshold": 0.262,
+              "precision": 0.8667,
+              "recall": 1.0,
+              "f1": 0.9286,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.9822,
+              "roc_auc": 0.8846,
+              "precision_at_50": 0.8667,
+              "recall_at_50": 1.0,
+              "brier": 0.1091,
+              "brier_climatology": 0.1156,
+              "brier_skill": 0.0556,
+              "ece": 0.2307,
+              "confusion": {
+                "tp": 13,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.262,
+              "precision": 0.7486,
+              "recall": 1.0,
+              "f1": 0.8562,
+              "false_positive_rate": 0.8846,
+              "pr_auc": 0.8894,
+              "roc_auc": 0.7607,
+              "precision_at_50": 0.96,
+              "recall_at_50": 0.3504,
+              "brier": 0.1684,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.1556,
+              "ece": 0.0545,
+              "confusion": {
+                "tp": 137,
+                "fp": 46,
+                "fn": 0,
+                "tn": 6
+              }
+            },
+            "granularity=hour": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.262,
+              "precision": 0.7486,
+              "recall": 1.0,
+              "f1": 0.8562,
+              "false_positive_rate": 0.8846,
+              "pr_auc": 0.8894,
+              "roc_auc": 0.7607,
+              "precision_at_50": 0.96,
+              "recall_at_50": 0.3504,
+              "brier": 0.1684,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.1556,
+              "ece": 0.0545,
+              "confusion": {
+                "tp": 137,
+                "fp": 46,
+                "fn": 0,
+                "tn": 6
+              }
+            },
+            "history=established": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.262,
+              "precision": 0.7486,
+              "recall": 1.0,
+              "f1": 0.8562,
+              "false_positive_rate": 0.8846,
+              "pr_auc": 0.8894,
+              "roc_auc": 0.7607,
+              "precision_at_50": 0.96,
+              "recall_at_50": 0.3504,
+              "brier": 0.1684,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.1556,
+              "ece": 0.0545,
+              "confusion": {
+                "tp": 137,
+                "fp": 46,
+                "fn": 0,
+                "tn": 6
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": false,
+          "failed_checks": [
+            "beats_logistic_brier",
+            "enough_test_examples"
+          ],
+          "reasons": [
+            "failed: enough_test_examples",
+            "failed: beats_logistic_brier"
+          ],
+          "metrics": {
+            "examples": 189,
+            "positives": 137,
+            "base_rate": 0.7249,
+            "brier": 0.1567,
+            "brier_climatology": 0.1994,
+            "brier_skill": 0.2143,
+            "pr_auc": 0.8975,
+            "roc_auc": 0.7927,
+            "ece": 0.0586,
+            "precision": 0.8333,
+            "recall": 0.8394,
+            "false_positive_rate": 0.4423,
+            "precision_at_50": 0.92,
+            "recall_at_50": 0.3358,
+            "train_pr_auc": 0.9883008240128632,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0427,
+              "lower": -0.0679,
+              "upper": -0.0246
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0117,
+              "lower": -0.0266,
+              "upper": 0.0019
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 112,
+              "positives": 73,
+              "base_rate": 0.6518,
+              "threshold": 0.543,
+              "precision": 0.7733,
+              "recall": 0.7945,
+              "f1": 0.7838,
+              "false_positive_rate": 0.4359,
+              "pr_auc": 0.84,
+              "roc_auc": 0.7612,
+              "precision_at_50": 0.86,
+              "recall_at_50": 0.589,
+              "brier": 0.1806,
+              "brier_climatology": 0.227,
+              "brier_skill": 0.2042,
+              "ece": 0.076,
+              "confusion": {
+                "tp": 58,
+                "fp": 17,
+                "fn": 15,
+                "tn": 22
+              }
+            },
+            "category=gaming": {
+              "examples": 62,
+              "positives": 51,
+              "base_rate": 0.8226,
+              "threshold": 0.543,
+              "precision": 0.8868,
+              "recall": 0.9216,
+              "f1": 0.9038,
+              "false_positive_rate": 0.5455,
+              "pr_auc": 0.9362,
+              "roc_auc": 0.8164,
+              "precision_at_50": 0.88,
+              "recall_at_50": 0.8627,
+              "brier": 0.1162,
+              "brier_climatology": 0.1459,
+              "brier_skill": 0.2038,
+              "ece": 0.1024,
+              "confusion": {
+                "tp": 47,
+                "fp": 6,
+                "fn": 4,
+                "tn": 5
+              }
+            },
+            "category=technology": {
+              "examples": 15,
+              "positives": 13,
+              "base_rate": 0.8667,
+              "threshold": 0.543,
+              "precision": 1.0,
+              "recall": 0.7692,
+              "f1": 0.8696,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.9897,
+              "roc_auc": 0.9231,
+              "precision_at_50": 0.8667,
+              "recall_at_50": 1.0,
+              "brier": 0.1457,
+              "brier_climatology": 0.1156,
+              "brier_skill": -0.2604,
+              "ece": 0.2453,
+              "confusion": {
+                "tp": 10,
+                "fp": 0,
+                "fn": 3,
+                "tn": 2
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.543,
+              "precision": 0.8333,
+              "recall": 0.8394,
+              "f1": 0.8364,
+              "false_positive_rate": 0.4423,
+              "pr_auc": 0.8975,
+              "roc_auc": 0.7927,
+              "precision_at_50": 0.92,
+              "recall_at_50": 0.3358,
+              "brier": 0.1567,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.2143,
+              "ece": 0.0586,
+              "confusion": {
+                "tp": 115,
+                "fp": 23,
+                "fn": 22,
+                "tn": 29
+              }
+            },
+            "granularity=hour": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.543,
+              "precision": 0.8333,
+              "recall": 0.8394,
+              "f1": 0.8364,
+              "false_positive_rate": 0.4423,
+              "pr_auc": 0.8975,
+              "roc_auc": 0.7927,
+              "precision_at_50": 0.92,
+              "recall_at_50": 0.3358,
+              "brier": 0.1567,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.2143,
+              "ece": 0.0586,
+              "confusion": {
+                "tp": 115,
+                "fp": 23,
+                "fn": 22,
+                "tn": 29
+              }
+            },
+            "history=established": {
+              "examples": 189,
+              "positives": 137,
+              "base_rate": 0.7249,
+              "threshold": 0.543,
+              "precision": 0.8333,
+              "recall": 0.8394,
+              "f1": 0.8364,
+              "false_positive_rate": 0.4423,
+              "pr_auc": 0.8975,
+              "roc_auc": 0.7927,
+              "precision_at_50": 0.92,
+              "recall_at_50": 0.3358,
+              "brier": 0.1567,
+              "brier_climatology": 0.1994,
+              "brier_skill": 0.2143,
+              "ece": 0.0586,
+              "confusion": {
+                "tp": 115,
+                "fp": 23,
+                "fn": 22,
+                "tn": 29
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/24h/trajectory",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 14592,
+          "validation": 3264,
+          "calibration": 5184,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 14348,
+        "validation": 3208,
+        "calibration": 5116,
+        "test": 8740
+      },
+      "selected": "lightgbm_regressor",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "persistence",
+          "type": "persistence",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 8740,
+            "mae": 0.1242,
+            "rmse": 0.1782,
+            "scaled_mae": 1.0,
+            "interval_coverage": 0.8174,
+            "interval_width": 0.4153
+          },
+          "comparisons": {},
+          "slices": null
+        },
+        {
+          "name": "seasonal_naive",
+          "type": "seasonal_naive",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 8740,
+            "mae": 0.1423,
+            "rmse": 0.208,
+            "scaled_mae": 1.1454,
+            "interval_coverage": 0.817,
+            "interval_width": 0.4636
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.0181,
+              "lower": 0.0143,
+              "upper": 0.0219
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "damped_trend",
+          "type": "damped_trend",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 8740,
+            "mae": 0.339,
+            "rmse": 0.471,
+            "scaled_mae": 2.7294,
+            "interval_coverage": 0.8225,
+            "interval_width": 1.2449
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.2148,
+              "lower": 0.2018,
+              "upper": 0.2286
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "lightgbm_regressor",
+          "type": "lightgbm_regressor",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 8740,
+            "mae": 0.0968,
+            "rmse": 0.1399,
+            "scaled_mae": 0.7789,
+            "interval_coverage": 0.8066,
+            "interval_width": 0.3002
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": -0.0275,
+              "lower": -0.0317,
+              "upper": -0.0233
+            }
+          },
+          "slices": null
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/breakout",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 13056,
+          "validation": 1728,
+          "calibration": 3648,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 12651,
+        "validation": 1678,
+        "calibration": 3569,
+        "test": 6811,
+        "train_positives": 1102,
+        "validation_positives": 116,
+        "calibration_positives": 268,
+        "test_positives": 450
+      },
+      "selected": "lightgbm",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 6811,
+            "positives": 450,
+            "base_rate": 0.0661,
+            "brier": 0.0618,
+            "brier_climatology": 0.0617,
+            "brier_skill": -0.0013,
+            "pr_auc": 0.0593,
+            "roc_auc": 0.5,
+            "ece": 0.009,
+            "precision": 0.0661,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.0,
+            "recall_at_50": 0.0,
+            "train_pr_auc": 0.1013479105531344,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 2919,
+              "positives": 271,
+              "base_rate": 0.0928,
+              "threshold": 0.075,
+              "precision": 0.0928,
+              "recall": 1.0,
+              "f1": 0.1699,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0771,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0845,
+              "brier_climatology": 0.0842,
+              "brier_skill": -0.0037,
+              "ece": 0.0177,
+              "confusion": {
+                "tp": 271,
+                "fp": 2648,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 1961,
+              "positives": 109,
+              "base_rate": 0.0556,
+              "threshold": 0.075,
+              "precision": 0.0556,
+              "recall": 1.0,
+              "f1": 0.1053,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0441,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0529,
+              "brier_climatology": 0.0525,
+              "brier_skill": -0.0072,
+              "ece": 0.0195,
+              "confusion": {
+                "tp": 109,
+                "fp": 1852,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 1931,
+              "positives": 70,
+              "base_rate": 0.0363,
+              "threshold": 0.075,
+              "precision": 0.0363,
+              "recall": 1.0,
+              "f1": 0.07,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0416,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0364,
+              "brier_climatology": 0.0349,
+              "brier_skill": -0.0432,
+              "ece": 0.0388,
+              "confusion": {
+                "tp": 70,
+                "fp": 1861,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.075,
+              "precision": 0.0661,
+              "recall": 1.0,
+              "f1": 0.1239,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0593,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0618,
+              "brier_climatology": 0.0617,
+              "brier_skill": -0.0013,
+              "ece": 0.009,
+              "confusion": {
+                "tp": 450,
+                "fp": 6361,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=hour": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.075,
+              "precision": 0.0661,
+              "recall": 1.0,
+              "f1": 0.1239,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0593,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0618,
+              "brier_climatology": 0.0617,
+              "brier_skill": -0.0013,
+              "ece": 0.009,
+              "confusion": {
+                "tp": 450,
+                "fp": 6361,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.075,
+              "precision": 0.0661,
+              "recall": 1.0,
+              "f1": 0.1239,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.0593,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.0,
+              "recall_at_50": 0.0,
+              "brier": 0.0618,
+              "brier_climatology": 0.0617,
+              "brier_skill": -0.0013,
+              "ece": 0.009,
+              "confusion": {
+                "tp": 450,
+                "fp": 6361,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 6811,
+            "positives": 450,
+            "base_rate": 0.0661,
+            "brier": 0.0569,
+            "brier_climatology": 0.0617,
+            "brier_skill": 0.0781,
+            "pr_auc": 0.2335,
+            "roc_auc": 0.7249,
+            "ece": 0.0121,
+            "precision": 0.2518,
+            "recall": 0.3889,
+            "false_positive_rate": 0.0817,
+            "precision_at_50": 0.4,
+            "recall_at_50": 0.0444,
+            "train_pr_auc": 0.300484947191301,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0049,
+              "lower": -0.0097,
+              "upper": -0.0003
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2919,
+              "positives": 271,
+              "base_rate": 0.0928,
+              "threshold": 0.143,
+              "precision": 0.3896,
+              "recall": 0.4686,
+              "f1": 0.4255,
+              "false_positive_rate": 0.0752,
+              "pr_auc": 0.3647,
+              "roc_auc": 0.7563,
+              "precision_at_50": 0.62,
+              "recall_at_50": 0.1144,
+              "brier": 0.0711,
+              "brier_climatology": 0.0842,
+              "brier_skill": 0.1563,
+              "ece": 0.023,
+              "confusion": {
+                "tp": 127,
+                "fp": 199,
+                "fn": 144,
+                "tn": 2449
+              }
+            },
+            "category=gaming": {
+              "examples": 1961,
+              "positives": 109,
+              "base_rate": 0.0556,
+              "threshold": 0.143,
+              "precision": 0.0643,
+              "recall": 0.1468,
+              "f1": 0.0894,
+              "false_positive_rate": 0.1258,
+              "pr_auc": 0.0654,
+              "roc_auc": 0.5458,
+              "precision_at_50": 0.12,
+              "recall_at_50": 0.055,
+              "brier": 0.0605,
+              "brier_climatology": 0.0525,
+              "brier_skill": -0.1516,
+              "ece": 0.0424,
+              "confusion": {
+                "tp": 16,
+                "fp": 233,
+                "fn": 93,
+                "tn": 1619
+              }
+            },
+            "category=technology": {
+              "examples": 1931,
+              "positives": 70,
+              "base_rate": 0.0363,
+              "threshold": 0.143,
+              "precision": 0.2667,
+              "recall": 0.4571,
+              "f1": 0.3368,
+              "false_positive_rate": 0.0473,
+              "pr_auc": 0.2436,
+              "roc_auc": 0.8087,
+              "precision_at_50": 0.38,
+              "recall_at_50": 0.2714,
+              "brier": 0.0318,
+              "brier_climatology": 0.0349,
+              "brier_skill": 0.0885,
+              "ece": 0.0163,
+              "confusion": {
+                "tp": 32,
+                "fp": 88,
+                "fn": 38,
+                "tn": 1773
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.143,
+              "precision": 0.2518,
+              "recall": 0.3889,
+              "f1": 0.3057,
+              "false_positive_rate": 0.0817,
+              "pr_auc": 0.2335,
+              "roc_auc": 0.7249,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.0444,
+              "brier": 0.0569,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.0781,
+              "ece": 0.0121,
+              "confusion": {
+                "tp": 175,
+                "fp": 520,
+                "fn": 275,
+                "tn": 5841
+              }
+            },
+            "granularity=hour": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.143,
+              "precision": 0.2518,
+              "recall": 0.3889,
+              "f1": 0.3057,
+              "false_positive_rate": 0.0817,
+              "pr_auc": 0.2335,
+              "roc_auc": 0.7249,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.0444,
+              "brier": 0.0569,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.0781,
+              "ece": 0.0121,
+              "confusion": {
+                "tp": 175,
+                "fp": 520,
+                "fn": 275,
+                "tn": 5841
+              }
+            },
+            "history=established": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.143,
+              "precision": 0.2518,
+              "recall": 0.3889,
+              "f1": 0.3057,
+              "false_positive_rate": 0.0817,
+              "pr_auc": 0.2335,
+              "roc_auc": 0.7249,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.0444,
+              "brier": 0.0569,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.0781,
+              "ece": 0.0121,
+              "confusion": {
+                "tp": 175,
+                "fp": 520,
+                "fn": 275,
+                "tn": 5841
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 6811,
+            "positives": 450,
+            "base_rate": 0.0661,
+            "brier": 0.0543,
+            "brier_climatology": 0.0617,
+            "brier_skill": 0.1192,
+            "pr_auc": 0.2784,
+            "roc_auc": 0.7438,
+            "ece": 0.0068,
+            "precision": 0.3975,
+            "recall": 0.2844,
+            "false_positive_rate": 0.0305,
+            "precision_at_50": 0.66,
+            "recall_at_50": 0.0733,
+            "train_pr_auc": 0.345222975198993,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0074,
+              "lower": -0.0125,
+              "upper": -0.0032
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0025,
+              "lower": -0.0048,
+              "upper": -0.0001
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 2919,
+              "positives": 271,
+              "base_rate": 0.0928,
+              "threshold": 0.167,
+              "precision": 0.5235,
+              "recall": 0.3284,
+              "f1": 0.4036,
+              "false_positive_rate": 0.0306,
+              "pr_auc": 0.3823,
+              "roc_auc": 0.7501,
+              "precision_at_50": 0.76,
+              "recall_at_50": 0.1402,
+              "brier": 0.0711,
+              "brier_climatology": 0.0842,
+              "brier_skill": 0.1559,
+              "ece": 0.019,
+              "confusion": {
+                "tp": 89,
+                "fp": 81,
+                "fn": 182,
+                "tn": 2567
+              }
+            },
+            "category=gaming": {
+              "examples": 1961,
+              "positives": 109,
+              "base_rate": 0.0556,
+              "threshold": 0.167,
+              "precision": 0.18,
+              "recall": 0.0826,
+              "f1": 0.1132,
+              "false_positive_rate": 0.0221,
+              "pr_auc": 0.0916,
+              "roc_auc": 0.6007,
+              "precision_at_50": 0.18,
+              "recall_at_50": 0.0826,
+              "brier": 0.0524,
+              "brier_climatology": 0.0525,
+              "brier_skill": 0.0026,
+              "ece": 0.0061,
+              "confusion": {
+                "tp": 9,
+                "fp": 41,
+                "fn": 100,
+                "tn": 1811
+              }
+            },
+            "category=technology": {
+              "examples": 1931,
+              "positives": 70,
+              "base_rate": 0.0363,
+              "threshold": 0.167,
+              "precision": 0.2941,
+              "recall": 0.4286,
+              "f1": 0.3488,
+              "false_positive_rate": 0.0387,
+              "pr_auc": 0.2966,
+              "roc_auc": 0.8632,
+              "precision_at_50": 0.5,
+              "recall_at_50": 0.3571,
+              "brier": 0.0311,
+              "brier_climatology": 0.0349,
+              "brier_skill": 0.1111,
+              "ece": 0.0258,
+              "confusion": {
+                "tp": 30,
+                "fp": 72,
+                "fn": 40,
+                "tn": 1789
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.167,
+              "precision": 0.3975,
+              "recall": 0.2844,
+              "f1": 0.3316,
+              "false_positive_rate": 0.0305,
+              "pr_auc": 0.2784,
+              "roc_auc": 0.7438,
+              "precision_at_50": 0.66,
+              "recall_at_50": 0.0733,
+              "brier": 0.0543,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.1192,
+              "ece": 0.0068,
+              "confusion": {
+                "tp": 128,
+                "fp": 194,
+                "fn": 322,
+                "tn": 6167
+              }
+            },
+            "granularity=hour": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.167,
+              "precision": 0.3975,
+              "recall": 0.2844,
+              "f1": 0.3316,
+              "false_positive_rate": 0.0305,
+              "pr_auc": 0.2784,
+              "roc_auc": 0.7438,
+              "precision_at_50": 0.66,
+              "recall_at_50": 0.0733,
+              "brier": 0.0543,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.1192,
+              "ece": 0.0068,
+              "confusion": {
+                "tp": 128,
+                "fp": 194,
+                "fn": 322,
+                "tn": 6167
+              }
+            },
+            "history=established": {
+              "examples": 6811,
+              "positives": 450,
+              "base_rate": 0.0661,
+              "threshold": 0.167,
+              "precision": 0.3975,
+              "recall": 0.2844,
+              "f1": 0.3316,
+              "false_positive_rate": 0.0305,
+              "pr_auc": 0.2784,
+              "roc_auc": 0.7438,
+              "precision_at_50": 0.66,
+              "recall_at_50": 0.0733,
+              "brier": 0.0543,
+              "brier_climatology": 0.0617,
+              "brier_skill": 0.1192,
+              "ece": 0.0068,
+              "confusion": {
+                "tp": 128,
+                "fp": 194,
+                "fn": 322,
+                "tn": 6167
+              }
+            }
+          }
+        }
+      ],
+      "rolling_origin": [
+        {
+          "fold": 0,
+          "rows": 9045,
+          "positives": 780,
+          "pr_auc": 0.3291,
+          "roc_auc": 0.7601
+        },
+        {
+          "fold": 1,
+          "rows": 9164,
+          "positives": 611,
+          "pr_auc": 0.3239,
+          "roc_auc": 0.7519
+        },
+        {
+          "fold": 2,
+          "rows": 6811,
+          "positives": 450,
+          "pr_auc": 0.3155,
+          "roc_auc": 0.7654
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/continuation",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 13056,
+          "validation": 1728,
+          "calibration": 3648,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 405,
+        "validation": 50,
+        "calibration": 79,
+        "test": 149,
+        "train_positives": 214,
+        "validation_positives": 25,
+        "calibration_positives": 31,
+        "test_positives": 61
+      },
+      "selected": null,
+      "report_notes": [
+        "no candidate met the acceptance criteria; baseline-only forecasts"
+      ],
+      "candidates": [
+        {
+          "name": "climatology",
+          "type": "climatology",
+          "validated": false,
+          "failed_checks": [
+            "reference_only"
+          ],
+          "reasons": [
+            "climatology is the reference, not a deployable forecast"
+          ],
+          "metrics": {
+            "examples": 149,
+            "positives": 61,
+            "base_rate": 0.4094,
+            "brier": 0.2421,
+            "brier_climatology": 0.2418,
+            "brier_skill": -0.0012,
+            "pr_auc": 0.5411,
+            "roc_auc": 0.5,
+            "ece": 0.017,
+            "precision": 0.4094,
+            "recall": 1.0,
+            "false_positive_rate": 1.0,
+            "precision_at_50": 0.46,
+            "recall_at_50": 0.377,
+            "train_pr_auc": 0.5443256430735953,
+            "calibration_status": "NOT_APPLICABLE"
+          },
+          "comparisons": {},
+          "slices": {
+            "category=ai": {
+              "examples": 97,
+              "positives": 33,
+              "base_rate": 0.3402,
+              "threshold": 0.392,
+              "precision": 0.3402,
+              "recall": 1.0,
+              "f1": 0.5077,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.5405,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.4,
+              "recall_at_50": 0.6061,
+              "brier": 0.2272,
+              "brier_climatology": 0.2245,
+              "brier_skill": -0.0121,
+              "ece": 0.0522,
+              "confusion": {
+                "tp": 33,
+                "fp": 64,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=gaming": {
+              "examples": 40,
+              "positives": 20,
+              "base_rate": 0.5,
+              "threshold": 0.392,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.445,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.5,
+              "recall_at_50": 1.0,
+              "brier": 0.2616,
+              "brier_climatology": 0.25,
+              "brier_skill": -0.0463,
+              "ece": 0.1076,
+              "confusion": {
+                "tp": 20,
+                "fp": 20,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "category=technology": {
+              "examples": 12,
+              "positives": 8,
+              "base_rate": 0.6667,
+              "threshold": 0.392,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.8867,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.6667,
+              "recall_at_50": 1.0,
+              "brier": 0.2974,
+              "brier_climatology": 0.2222,
+              "brier_skill": -0.3385,
+              "ece": 0.2743,
+              "confusion": {
+                "tp": 8,
+                "fp": 4,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.392,
+              "precision": 0.4094,
+              "recall": 1.0,
+              "f1": 0.581,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.5411,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.377,
+              "brier": 0.2421,
+              "brier_climatology": 0.2418,
+              "brier_skill": -0.0012,
+              "ece": 0.017,
+              "confusion": {
+                "tp": 61,
+                "fp": 88,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "granularity=hour": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.392,
+              "precision": 0.4094,
+              "recall": 1.0,
+              "f1": 0.581,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.5411,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.377,
+              "brier": 0.2421,
+              "brier_climatology": 0.2418,
+              "brier_skill": -0.0012,
+              "ece": 0.017,
+              "confusion": {
+                "tp": 61,
+                "fp": 88,
+                "fn": 0,
+                "tn": 0
+              }
+            },
+            "history=established": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.392,
+              "precision": 0.4094,
+              "recall": 1.0,
+              "f1": 0.581,
+              "false_positive_rate": 1.0,
+              "pr_auc": 0.5411,
+              "roc_auc": 0.5,
+              "precision_at_50": 0.46,
+              "recall_at_50": 0.377,
+              "brier": 0.2421,
+              "brier_climatology": 0.2418,
+              "brier_skill": -0.0012,
+              "ece": 0.017,
+              "confusion": {
+                "tp": 61,
+                "fp": 88,
+                "fn": 0,
+                "tn": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "type": "logistic_regression",
+          "validated": false,
+          "failed_checks": [
+            "beats_climatology",
+            "ece_within_limit",
+            "enough_test_examples"
+          ],
+          "reasons": [
+            "failed: enough_test_examples",
+            "failed: ece_within_limit",
+            "failed: beats_climatology"
+          ],
+          "metrics": {
+            "examples": 149,
+            "positives": 61,
+            "base_rate": 0.4094,
+            "brier": 0.2321,
+            "brier_climatology": 0.2418,
+            "brier_skill": 0.0402,
+            "pr_auc": 0.5842,
+            "roc_auc": 0.6531,
+            "ece": 0.122,
+            "precision": 0.5625,
+            "recall": 0.4426,
+            "false_positive_rate": 0.2386,
+            "precision_at_50": 0.56,
+            "recall_at_50": 0.459,
+            "train_pr_auc": 0.7624284213736313,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.01,
+              "lower": -0.0464,
+              "upper": 0.0284
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 97,
+              "positives": 33,
+              "base_rate": 0.3402,
+              "threshold": 0.378,
+              "precision": 0.6061,
+              "recall": 0.6061,
+              "f1": 0.6061,
+              "false_positive_rate": 0.2031,
+              "pr_auc": 0.7163,
+              "roc_auc": 0.8073,
+              "precision_at_50": 0.54,
+              "recall_at_50": 0.8182,
+              "brier": 0.169,
+              "brier_climatology": 0.2245,
+              "brier_skill": 0.247,
+              "ece": 0.0761,
+              "confusion": {
+                "tp": 20,
+                "fp": 13,
+                "fn": 13,
+                "tn": 51
+              }
+            },
+            "category=gaming": {
+              "examples": 40,
+              "positives": 20,
+              "base_rate": 0.5,
+              "threshold": 0.378,
+              "precision": 0.3333,
+              "recall": 0.2,
+              "f1": 0.25,
+              "false_positive_rate": 0.4,
+              "pr_auc": 0.3888,
+              "roc_auc": 0.2775,
+              "precision_at_50": 0.5,
+              "recall_at_50": 1.0,
+              "brier": 0.3525,
+              "brier_climatology": 0.25,
+              "brier_skill": -0.4101,
+              "ece": 0.3174,
+              "confusion": {
+                "tp": 4,
+                "fp": 8,
+                "fn": 16,
+                "tn": 12
+              }
+            },
+            "category=technology": {
+              "examples": 12,
+              "positives": 8,
+              "base_rate": 0.6667,
+              "threshold": 0.378,
+              "precision": 1.0,
+              "recall": 0.375,
+              "f1": 0.5455,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.886,
+              "roc_auc": 0.75,
+              "precision_at_50": 0.6667,
+              "recall_at_50": 1.0,
+              "brier": 0.3402,
+              "brier_climatology": 0.2222,
+              "brier_skill": -0.531,
+              "ece": 0.3725,
+              "confusion": {
+                "tp": 3,
+                "fp": 0,
+                "fn": 5,
+                "tn": 4
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.378,
+              "precision": 0.5625,
+              "recall": 0.4426,
+              "f1": 0.4954,
+              "false_positive_rate": 0.2386,
+              "pr_auc": 0.5842,
+              "roc_auc": 0.6531,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.459,
+              "brier": 0.2321,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0402,
+              "ece": 0.122,
+              "confusion": {
+                "tp": 27,
+                "fp": 21,
+                "fn": 34,
+                "tn": 67
+              }
+            },
+            "granularity=hour": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.378,
+              "precision": 0.5625,
+              "recall": 0.4426,
+              "f1": 0.4954,
+              "false_positive_rate": 0.2386,
+              "pr_auc": 0.5842,
+              "roc_auc": 0.6531,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.459,
+              "brier": 0.2321,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0402,
+              "ece": 0.122,
+              "confusion": {
+                "tp": 27,
+                "fp": 21,
+                "fn": 34,
+                "tn": 67
+              }
+            },
+            "history=established": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.378,
+              "precision": 0.5625,
+              "recall": 0.4426,
+              "f1": 0.4954,
+              "false_positive_rate": 0.2386,
+              "pr_auc": 0.5842,
+              "roc_auc": 0.6531,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.459,
+              "brier": 0.2321,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0402,
+              "ece": 0.122,
+              "confusion": {
+                "tp": 27,
+                "fp": 21,
+                "fn": 34,
+                "tn": 67
+              }
+            }
+          }
+        },
+        {
+          "name": "lightgbm",
+          "type": "lightgbm_classifier",
+          "validated": false,
+          "failed_checks": [
+            "beats_climatology",
+            "beats_logistic_brier",
+            "ece_within_limit",
+            "enough_test_examples",
+            "not_overfitted"
+          ],
+          "reasons": [
+            "note: in-sample PR-AUC exceeds held-out PR-AUC by 0.38 (diagnostic)",
+            "failed: enough_test_examples",
+            "failed: ece_within_limit",
+            "failed: beats_climatology",
+            "failed: beats_logistic_brier",
+            "failed: not_overfitted"
+          ],
+          "metrics": {
+            "examples": 149,
+            "positives": 61,
+            "base_rate": 0.4094,
+            "brier": 0.2221,
+            "brier_climatology": 0.2418,
+            "brier_skill": 0.0812,
+            "pr_auc": 0.6215,
+            "roc_auc": 0.7096,
+            "ece": 0.121,
+            "precision": 0.5556,
+            "recall": 0.4918,
+            "false_positive_rate": 0.2727,
+            "precision_at_50": 0.58,
+            "recall_at_50": 0.4754,
+            "train_pr_auc": 0.9999348964651611,
+            "calibration_status": "CALIBRATED"
+          },
+          "comparisons": {
+            "brier_vs_climatology": {
+              "difference": -0.0199,
+              "lower": -0.0394,
+              "upper": 0.0044
+            },
+            "brier_vs_logistic": {
+              "difference": -0.0099,
+              "lower": -0.0336,
+              "upper": 0.0141
+            }
+          },
+          "slices": {
+            "category=ai": {
+              "examples": 97,
+              "positives": 33,
+              "base_rate": 0.3402,
+              "threshold": 0.353,
+              "precision": 0.5484,
+              "recall": 0.5152,
+              "f1": 0.5312,
+              "false_positive_rate": 0.2188,
+              "pr_auc": 0.6313,
+              "roc_auc": 0.7926,
+              "precision_at_50": 0.56,
+              "recall_at_50": 0.8485,
+              "brier": 0.1882,
+              "brier_climatology": 0.2245,
+              "brier_skill": 0.1617,
+              "ece": 0.1352,
+              "confusion": {
+                "tp": 17,
+                "fp": 14,
+                "fn": 16,
+                "tn": 50
+              }
+            },
+            "category=gaming": {
+              "examples": 40,
+              "positives": 20,
+              "base_rate": 0.5,
+              "threshold": 0.353,
+              "precision": 0.4444,
+              "recall": 0.4,
+              "f1": 0.4211,
+              "false_positive_rate": 0.5,
+              "pr_auc": 0.503,
+              "roc_auc": 0.44,
+              "precision_at_50": 0.5,
+              "recall_at_50": 1.0,
+              "brier": 0.2967,
+              "brier_climatology": 0.25,
+              "brier_skill": -0.1869,
+              "ece": 0.2164,
+              "confusion": {
+                "tp": 8,
+                "fp": 10,
+                "fn": 12,
+                "tn": 10
+              }
+            },
+            "category=technology": {
+              "examples": 12,
+              "positives": 8,
+              "base_rate": 0.6667,
+              "threshold": 0.353,
+              "precision": 1.0,
+              "recall": 0.625,
+              "f1": 0.7692,
+              "false_positive_rate": 0.0,
+              "pr_auc": 0.9503,
+              "roc_auc": 0.875,
+              "precision_at_50": 0.6667,
+              "recall_at_50": 1.0,
+              "brier": 0.2482,
+              "brier_climatology": 0.2222,
+              "brier_skill": -0.1169,
+              "ece": 0.2687,
+              "confusion": {
+                "tp": 5,
+                "fp": 0,
+                "fn": 3,
+                "tn": 4
+              }
+            },
+            "provider=synthetic_forecast_trends": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.353,
+              "precision": 0.5556,
+              "recall": 0.4918,
+              "f1": 0.5217,
+              "false_positive_rate": 0.2727,
+              "pr_auc": 0.6215,
+              "roc_auc": 0.7096,
+              "precision_at_50": 0.58,
+              "recall_at_50": 0.4754,
+              "brier": 0.2221,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0812,
+              "ece": 0.121,
+              "confusion": {
+                "tp": 30,
+                "fp": 24,
+                "fn": 31,
+                "tn": 64
+              }
+            },
+            "granularity=hour": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.353,
+              "precision": 0.5556,
+              "recall": 0.4918,
+              "f1": 0.5217,
+              "false_positive_rate": 0.2727,
+              "pr_auc": 0.6215,
+              "roc_auc": 0.7096,
+              "precision_at_50": 0.58,
+              "recall_at_50": 0.4754,
+              "brier": 0.2221,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0812,
+              "ece": 0.121,
+              "confusion": {
+                "tp": 30,
+                "fp": 24,
+                "fn": 31,
+                "tn": 64
+              }
+            },
+            "history=established": {
+              "examples": 149,
+              "positives": 61,
+              "base_rate": 0.4094,
+              "threshold": 0.353,
+              "precision": 0.5556,
+              "recall": 0.4918,
+              "f1": 0.5217,
+              "false_positive_rate": 0.2727,
+              "pr_auc": 0.6215,
+              "roc_auc": 0.7096,
+              "precision_at_50": 0.58,
+              "recall_at_50": 0.4754,
+              "brier": 0.2221,
+              "brier_climatology": 0.2418,
+              "brier_skill": 0.0812,
+              "ece": 0.121,
+              "confusion": {
+                "tp": 30,
+                "fp": 24,
+                "fn": 31,
+                "tn": 64
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/trajectory",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 13056,
+          "validation": 1728,
+          "calibration": 3648,
+          "test": 9596
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-05T22:30:00+00:00",
+          "calibration": "2026-10-13T06:00:00+00:00",
+          "test": "2026-10-23T00:00:00+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "rows": {
+        "train": 12839,
+        "validation": 1696,
+        "calibration": 3596,
+        "test": 6845
+      },
+      "selected": "lightgbm_regressor",
+      "report_notes": [],
+      "candidates": [
+        {
+          "name": "persistence",
+          "type": "persistence",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 6845,
+            "mae": 0.1506,
+            "rmse": 0.2238,
+            "scaled_mae": 1.0,
+            "interval_coverage": 0.8276,
+            "interval_width": 0.5026
+          },
+          "comparisons": {},
+          "slices": null
+        },
+        {
+          "name": "seasonal_naive",
+          "type": "seasonal_naive",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 6845,
+            "mae": 0.1602,
+            "rmse": 0.2395,
+            "scaled_mae": 1.0635,
+            "interval_coverage": 0.8339,
+            "interval_width": 0.5416
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.0096,
+              "lower": 0.0059,
+              "upper": 0.0135
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "damped_trend",
+          "type": "damped_trend",
+          "validated": false,
+          "failed_checks": [
+            "beats_reference_baseline"
+          ],
+          "reasons": [
+            "failed: beats_reference_baseline"
+          ],
+          "metrics": {
+            "examples": 6845,
+            "mae": 0.4916,
+            "rmse": 0.6433,
+            "scaled_mae": 3.2637,
+            "interval_coverage": 0.8142,
+            "interval_width": 1.9198
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": 0.341,
+              "lower": 0.3239,
+              "upper": 0.3594
+            }
+          },
+          "slices": null
+        },
+        {
+          "name": "lightgbm_regressor",
+          "type": "lightgbm_regressor",
+          "validated": true,
+          "failed_checks": [],
+          "reasons": [],
+          "metrics": {
+            "examples": 6845,
+            "mae": 0.1381,
+            "rmse": 0.2023,
+            "scaled_mae": 0.9168,
+            "interval_coverage": 0.7866,
+            "interval_width": 0.4125
+          },
+          "comparisons": {
+            "mae_vs_persistence": {
+              "difference": -0.0125,
+              "lower": -0.0215,
+              "upper": -0.0038
+            }
+          },
+          "slices": null
+        }
+      ]
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/peak",
+      "notes": [],
+      "split": {
+        "rows": {
+          "train": 18624,
+          "validation": 3648,
+          "calibration": 0,
+          "test": 9356
+        },
+        "boundaries": {
+          "start": "2026-09-14T00:00:00+00:00",
+          "validation": "2026-10-13T06:00:00+00:00",
+          "calibration": "2026-10-23T00:00:00+00:00",
+          "test": "2026-10-23T00:00:00.004212+00:00",
+          "end": "2026-11-01T18:00:00+00:00"
+        },
+        "unseen_groups": 16
+      },
+      "peak_models": [
+        {
+          "model_id": "fm_analog_peak_window_hour_72h_69641ec394",
+          "status": "validated",
+          "metrics": {
+            "examples": 6720,
+            "censoring_rate": 0.0774,
+            "not_estimable_rate": 0.004,
+            "identified_peaks": 6200,
+            "median_abs_error_hours": 20.0,
+            "interval_coverage": 0.792,
+            "analogs_stored": 6000
+          }
+        }
+      ]
+    }
+  ],
+  "promotions": [
+    {
+      "scope": "youtube_search_interest/day/24h/breakout",
+      "promoted": "fm_logistic_breakout_day_24h_17e94b8787",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/day/24h/trajectory",
+      "promoted": "fm_lightgbm_trajectory_day_24h_dd90e8d2a1",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/breakout",
+      "promoted": "fm_lightgbm_breakout_day_72h_dfcc331365",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/trajectory",
+      "promoted": "fm_lightgbm_trajectory_day_72h_d87f9fcdcd",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/day/72h/peak",
+      "promoted": "fm_analog_peak_window_day_72h_fc351e8e20"
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/breakout",
+      "promoted": "fm_logistic_breakout_hour_6h_593d5f3619",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/continuation",
+      "promoted": "fm_logistic_breakout_hour_6h_46cda12c85",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/6h/trajectory",
+      "promoted": "fm_lightgbm_trajectory_hour_6h_305bba7507",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/24h/breakout",
+      "promoted": "fm_lightgbm_breakout_hour_24h_55ee095550",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/24h/trajectory",
+      "promoted": "fm_lightgbm_trajectory_hour_24h_58ca6acdcf",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/breakout",
+      "promoted": "fm_lightgbm_breakout_hour_72h_6cbfe40db8",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/trajectory",
+      "promoted": "fm_lightgbm_trajectory_hour_72h_f4d54900a0",
+      "replaced": null
+    },
+    {
+      "scope": "youtube_search_interest/hour/72h/peak",
+      "promoted": "fm_analog_peak_window_hour_72h_69641ec394"
+    }
+  ],
+  "models": {
+    "experimental": 17,
+    "validated": 8,
+    "champion": 13,
+    "challenger": 0,
+    "retired": 0
+  },
+  "heldout_corpus": {
+    "seed": 6007,
+    "series": 180,
+    "rows": 35969,
+    "leakage_audit": {
+      "checked": 4,
+      "mismatches": 0,
+      "details": []
+    },
+    "champions": [
+      {
+        "scope": "youtube_search_interest/day/24h/breakout",
+        "model": "logistic_breakout",
+        "test_rows": 2388,
+        "test_positives": 38,
+        "metrics": {
+          "examples": 2388,
+          "positives": 38,
+          "base_rate": 0.0159,
+          "brier": 0.0167,
+          "brier_climatology": 0.0157,
+          "brier_skill": -0.0659,
+          "pr_auc": 0.1077,
+          "roc_auc": 0.7393,
+          "ece": 0.0111,
+          "precision": 0.1905,
+          "recall": 0.2105,
+          "false_positive_rate": 0.0145,
+          "precision_at_50": 0.2,
+          "recall_at_50": 0.2632,
+          "lead_time": {
+            "episodes": 14,
+            "flagged_share": 0.3571,
+            "mean_lead_hours": 14.4
+          }
+        },
+        "stability_mean_abs_change": 0.01132
+      },
+      {
+        "scope": "youtube_search_interest/day/72h/breakout",
+        "model": "lightgbm_breakout",
+        "test_rows": 2172,
+        "test_positives": 55,
+        "metrics": {
+          "examples": 2172,
+          "positives": 55,
+          "base_rate": 0.0253,
+          "brier": 0.024,
+          "brier_climatology": 0.0247,
+          "brier_skill": 0.0293,
+          "pr_auc": 0.1232,
+          "roc_auc": 0.6842,
+          "ece": 0.0077,
+          "precision": 0.3077,
+          "recall": 0.1455,
+          "false_positive_rate": 0.0085,
+          "precision_at_50": 0.24,
+          "recall_at_50": 0.2182,
+          "lead_time": {
+            "episodes": 14,
+            "flagged_share": 0.2857,
+            "mean_lead_hours": 30.0
+          }
+        },
+        "stability_mean_abs_change": 0.01218
+      },
+      {
+        "scope": "youtube_search_interest/hour/6h/breakout",
+        "model": "logistic_breakout",
+        "test_rows": 4585,
+        "test_positives": 44,
+        "metrics": {
+          "examples": 4585,
+          "positives": 44,
+          "base_rate": 0.0096,
+          "brier": 0.0084,
+          "brier_climatology": 0.0095,
+          "brier_skill": 0.1186,
+          "pr_auc": 0.2948,
+          "roc_auc": 0.931,
+          "ece": 0.005,
+          "precision": 0.3684,
+          "recall": 0.3182,
+          "false_positive_rate": 0.0053,
+          "precision_at_50": 0.3,
+          "recall_at_50": 0.3409,
+          "lead_time": {
+            "episodes": 33,
+            "flagged_share": 0.3939,
+            "mean_lead_hours": 0.92
+          }
+        },
+        "stability_mean_abs_change": 0.01032
+      },
+      {
+        "scope": "youtube_search_interest/hour/6h/continuation",
+        "model": "logistic_breakout",
+        "test_rows": 163,
+        "test_positives": 128,
+        "metrics": {
+          "examples": 163,
+          "positives": 128,
+          "base_rate": 0.7853,
+          "brier": 0.1212,
+          "brier_climatology": 0.1686,
+          "brier_skill": 0.2815,
+          "pr_auc": 0.9378,
+          "roc_auc": 0.8141,
+          "ece": 0.0741,
+          "precision": 0.8521,
+          "recall": 0.9453,
+          "false_positive_rate": 0.6,
+          "precision_at_50": 0.96,
+          "recall_at_50": 0.375,
+          "lead_time": {
+            "episodes": 24,
+            "flagged_share": 1.0,
+            "mean_lead_hours": 25.5
+          }
+        },
+        "stability_mean_abs_change": 0.10582
+      },
+      {
+        "scope": "youtube_search_interest/hour/24h/breakout",
+        "model": "lightgbm_breakout",
+        "test_rows": 4293,
+        "test_positives": 137,
+        "metrics": {
+          "examples": 4293,
+          "positives": 137,
+          "base_rate": 0.0319,
+          "brier": 0.0261,
+          "brier_climatology": 0.0309,
+          "brier_skill": 0.1565,
+          "pr_auc": 0.307,
+          "roc_auc": 0.7696,
+          "ece": 0.0097,
+          "precision": 0.4634,
+          "recall": 0.2774,
+          "false_positive_rate": 0.0106,
+          "precision_at_50": 0.52,
+          "recall_at_50": 0.1898,
+          "lead_time": {
+            "episodes": 33,
+            "flagged_share": 0.6061,
+            "mean_lead_hours": 18.9
+          }
+        },
+        "stability_mean_abs_change": 0.01701
+      },
+      {
+        "scope": "youtube_search_interest/hour/72h/breakout",
+        "model": "lightgbm_breakout",
+        "test_rows": 3356,
+        "test_positives": 308,
+        "metrics": {
+          "examples": 3356,
+          "positives": 308,
+          "base_rate": 0.0918,
+          "brier": 0.0733,
+          "brier_climatology": 0.0834,
+          "brier_skill": 0.1205,
+          "pr_auc": 0.3246,
+          "roc_auc": 0.7065,
+          "ece": 0.0264,
+          "precision": 0.5166,
+          "recall": 0.2532,
+          "false_positive_rate": 0.024,
+          "precision_at_50": 0.76,
+          "recall_at_50": 0.1234,
+          "lead_time": {
+            "episodes": 40,
+            "flagged_share": 0.65,
+            "mean_lead_hours": 30.69
+          }
+        },
+        "stability_mean_abs_change": 0.03627
+      }
+    ]
+  }
+}
