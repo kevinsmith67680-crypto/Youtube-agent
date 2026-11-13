@@ -96,4 +96,4 @@ TREND_AGENT_BENCH_DATABASE_URL=postgresql+psycopg://trend_agent:trend_agent_dev@
 ```
 
 The script **resets** the database and refuses names without `test`/`bench`. Results and
-hardware are in [phase3_report.md](phase3_report.md#g-test-results-and-performance).
+hardware are in [phase3_report.md](phase3_report.md#4-performance-benchmarks).

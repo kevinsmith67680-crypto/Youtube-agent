@@ -112,7 +112,7 @@ jobs `(status, scheduled_at, priority)`, expired leases (partial), observations 
 `(series_id, period_start)`, `(query_id, period_start)`, `(provider_name, collected_at)`,
 `(measurement_category, region)`, `normalization_key`, `target_id`, and a partial index on
 `expires_at`. No partitioning or TimescaleDB: the benchmark shows no need at the target
-scale (see [phase3_report.md](phase3_report.md#g-test-results-and-performance)).
+scale (see [phase3_report.md](phase3_report.md#4-performance-benchmarks)).
 
 ## Phase 1 / Phase 2 code changed
 
