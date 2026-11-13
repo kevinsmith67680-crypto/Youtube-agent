@@ -113,6 +113,15 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 6 (forecasting)
+    "opportunity_windows",
+    "peak_estimates",
+    "forecast_trajectories",
+    "forecast_predictions",
+    "forecast_evaluations",
+    "forecast_model_events",
+    "forecast_models",
+    "forecast_training_runs",
     # Phase 5 (content analysis)
     "content_opportunities",
     "content_gaps",

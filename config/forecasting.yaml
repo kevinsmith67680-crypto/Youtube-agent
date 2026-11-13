@@ -1,0 +1,96 @@
+# Phase 6: predictive trend forecasting and opportunity-window estimation.
+# Every value has an in-code default (src/trend_agent/forecasting/config.py); this file is
+# the documented operating point and is hashed into every dataset, model and forecast.
+version: 1
+config_version: forecasting-v1
+
+horizons_hours: [6, 24, 72]      # a horizon is offered only for series whose granularity
+                                 # divides it (daily data never gets a 6-hour forecast)
+cadence_hours: {hour: 6, day: 24}  # prediction-time grid for training examples
+availability_mode: publication   # provider publication time, else collected/ingested time
+
+targets:                         # independent label definitions (see docs/forecast_targets.md)
+  baseline_window_hours: {hour: 168, day: 672}   # 7 days hourly, 28 days daily
+  min_baseline_observations: {hour: 48, day: 10}
+  breakout_relative: 0.5         # +50 % over the trailing baseline ...
+  breakout_absolute_index: 10    # ... and +10 points on 0-100 indices ...
+  breakout_noise_k: 2.0          # ... and 2 robust SDs of the baseline window
+  breakout_persistence: {hour: 3, day: 1}
+  continuation_tail_fraction: 0.25
+  min_label_coverage: 0.75
+  peak_window_hours: 72
+  peak_boundary_tolerance: 0.97
+  trajectory_offset: 1.0
+
+eligibility:
+  min_history_hours: {hour: 168, day: 672}
+  max_missing_rate: 0.3
+  max_staleness_hours: {hour: 24, day: 96}
+
+splits:
+  train_fraction: 0.6
+  calibration_fraction: 0.2      # remainder = untouched test period (after embargoes)
+  unseen_group_fraction: 0.2     # topic groups never seen in training
+  rolling_folds: 3
+  embargo_extra_hours: 48         # embargo = horizon + this (publication lags)
+  seed: 20261113
+
+lightgbm:
+  max_rounds: 400
+  early_stopping_rounds: 30
+  min_training_examples: 300
+  min_training_positives: 20
+
+calibration:
+  min_positives: 25
+  min_negatives: 25
+  isotonic_min_examples: 600
+  isotonic_min_positives: 60
+  bins: 10
+
+uncertainty:
+  interval_level: 0.8
+  ood_limited_share: 0.05
+  ood_reject_share: 0.2
+
+promotion:                       # explicit acceptance criteria for VALIDATED / CHAMPION
+  min_test_examples: 200
+  min_test_positives: 20
+  min_brier_skill: 0.02
+  max_ece: 0.08
+  bootstrap_samples: 400
+  ci_level: 0.9
+  precision_at_k: 50
+  max_precision_drop: 0.05
+  max_overfit_gap: 0.25
+
+windows:                         # hypothetical planning assumptions, not guarantees
+  profiles:
+    QUICK_REACTION: {hours: 2, description: "short reaction video"}
+    STANDARD_TUTORIAL: {hours: 8, description: "tutorial"}
+    DEEP_DIVE: {hours: 24, description: "long-form analysis"}
+  elevated_probability: 0.6
+  too_late_probability: 0.25
+  urgent_peak_hours: 24
+  long_window_hours: 72
+  min_analogs: 25
+  analog_k: 60
+
+drift:
+  psi_warn: 0.1
+  psi_alert: 0.25
+  min_recent_predictions: 50
+  min_matured_labels: 100
+  brier_degradation: 0.03
+  base_rate_change: 0.5
+  retrain_min_alert_features: 3
+
+corpus:                          # SYNTHETIC experimental corpus (never production training)
+  hourly_series: 240
+  daily_series: 120
+  hourly_days: 56
+  daily_days: 240
+  seed: 6006
+
+category_allocation: {ai: 0.45, technology: 0.25, gaming: 0.30}
+artifact_dir: var/forecast_models

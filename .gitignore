@@ -30,3 +30,6 @@ htmlcov/
 .idea/
 .vscode/
 .DS_Store
+
+# Phase 6 model artifacts (local registry storage)
+var/
