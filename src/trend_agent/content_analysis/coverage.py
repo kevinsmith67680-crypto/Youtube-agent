@@ -62,7 +62,9 @@ def cell(
             evidence_id=video.evidence_id,
         )
 
-    full = f"{video.title} {video.description or ''} {video.transcript or ''}"
+    # Instruction-like descriptions are excluded from coverage evidence (title only).
+    description = "" if video.injection_flags else (video.description or "")
+    full = f"{video.title} {description} {video.transcript or ''}"
     for name in denied_names:
         if contains_sequence(tokens(full), tokens(name)):
             return make(
@@ -83,7 +85,7 @@ def cell(
             return make(CoverageStatus.PARTIALLY_COVERED, "transcript mentions it briefly", hits)
         return make(CoverageStatus.NOT_EVIDENCED, "not found in the authorised transcript")
     title_hits = _hits(video.title, req.cues)
-    desc_hits = _hits(video.description or "", req.cues)
+    desc_hits = _hits(description, req.cues)
     if title_hits or len(desc_hits) >= 2:
         return make(
             CoverageStatus.COVERED,

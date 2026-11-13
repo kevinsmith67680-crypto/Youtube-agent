@@ -150,7 +150,10 @@ def assess(
 ) -> RelevanceAssessment:
     rc = config.relevance
     w = dict(rc.weights)
-    title, desc = video.title, video.description or ""
+    title = video.title
+    # A description carrying instruction-like text is not used as relevance evidence:
+    # whatever else it says, it cannot raise the video's relevance (title only).
+    desc = "" if video.injection_flags else (video.description or "")
     body = video.transcript if video.tier is EvidenceTier.B_CAPTIONS and video.transcript else desc
     full = f"{title}. {body}"
     facts = entities.primary
@@ -220,7 +223,10 @@ def assess(
     if lang_ok is None:
         limitations.append("video language not reported")
     if video.injection_flags:
-        limitations.append("description contains instruction-like text (treated as data)")
+        limitations.append(
+            "description contains instruction-like text: treated as data and not used for "
+            "relevance or coverage"
+        )
     explanation = _explain(match, facts, versions, fmt, title_cues or any_cues, title_share, intent)
     return RelevanceAssessment(
         video_id=video.video_id,
