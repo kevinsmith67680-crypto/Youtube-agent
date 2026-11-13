@@ -113,6 +113,14 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 5 (content analysis)
+    "content_opportunities",
+    "content_gaps",
+    "requirement_coverage",
+    "video_result_analyses",
+    "information_requirements",
+    "search_intent_analyses",
+    "content_analysis_runs",
     # Verification layer
     "verification_claims",
     "verification_attempts",

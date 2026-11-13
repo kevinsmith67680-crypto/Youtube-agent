@@ -88,6 +88,14 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "rejected_records",
         "channels",
         "video_search_results",
+        # Phase 5 (revision 0006)
+        "content_analysis_runs",
+        "search_intent_analyses",
+        "information_requirements",
+        "video_result_analyses",
+        "requirement_coverage",
+        "content_gaps",
+        "content_opportunities",
         # Verification layer (revision 0005)
         "evidence_records",
         "evidence_bundles",
@@ -129,7 +137,7 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "discovery_evidence",
         "keyword_status_history",
     } <= tables
-    assert version == "0005"
+    assert version == "0006"
     command.check(cfg)  # raises if the ORM models and migrations have drifted
 
 

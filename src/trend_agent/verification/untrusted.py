@@ -85,9 +85,10 @@ _SIGNALS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "credential_access",
         re.compile(
-            r"\b(api[ _-]?key|password|secret[ _-]?key|client[ _-]?secret|access[ _-]?token|"
-            r"credentials?|\.env\b|ssh key|private key)\b",
-            re.IGNORECASE,
+            r"\b(send|share|paste|post|reveal|give|enter|print|dump|leak|steal|exfiltrate|read|"
+            r"cat)\b.{0,40}\b(api[ _-]?keys?|passwords?|secret[ _-]?keys?|client[ _-]?secrets?|"
+            r"access[ _-]?tokens?|credentials?|\.env\b|ssh keys?|private keys?)\b",
+            re.IGNORECASE | re.DOTALL,
         ),
     ),
     (

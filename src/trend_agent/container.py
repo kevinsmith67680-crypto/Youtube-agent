@@ -34,6 +34,10 @@ from trend_agent.utils.time import Clock, utc_now
 from trend_agent.verification.config import LoadedVerificationConfig, load_verification_config
 
 if TYPE_CHECKING:
+    from trend_agent.content_analysis.config import LoadedContentConfig
+    from trend_agent.content_analysis.llm_client import AnalysisLLM
+    from trend_agent.content_analysis.result_retrieval import ResultSource
+    from trend_agent.content_analysis.service import ContentAnalysisService
     from trend_agent.verification.service import VerificationService
 
 
@@ -51,8 +55,9 @@ class AppContainer:
     _monitoring_config: LoadedMonitoringConfig | None = None
     _detection_config: LoadedDetectionConfig | None = None
     _verification_config: LoadedVerificationConfig | None = None
+    _content_config: LoadedContentConfig | None = None
 
-    def ingestion(self) -> IngestionService:
+    def ingestion(self, *, clock: Clock | None = None) -> IngestionService:
         return IngestionService(
             registry=self.registry,
             session_factory=self.session_factory,
@@ -60,7 +65,7 @@ class AppContainer:
                 max_concurrency=self.settings.ingestion_max_concurrency,
                 fetch_timeout_seconds=self.settings.ingestion_fetch_timeout_seconds,
             ),
-            clock=self.clock,
+            clock=clock or self.clock,
         )
 
     def retention(self) -> RetentionService:
@@ -191,6 +196,40 @@ class AppContainer:
             loaded=self.verification_config(),
             signer=EvidenceSigner.from_settings(self.settings),
             clock=clock or self.clock,
+        )
+
+    def content_config(self) -> LoadedContentConfig:
+        from trend_agent.content_analysis.config import load_content_config
+
+        if self._content_config is None:
+            self._content_config = load_content_config(self.settings.discovery_config_dir)
+        return self._content_config
+
+    def content_analysis(
+        self,
+        *,
+        clock: Clock | None = None,
+        source: ResultSource | None = None,
+        llm: AnalysisLLM | None = None,
+        loaded: LoadedContentConfig | None = None,
+    ) -> ContentAnalysisService:
+        """Phase 5 search-intent and content-gap analysis.
+
+        Without a YouTube API key the service runs cache-only (stored results); without an
+        enabled LLM and key it runs in reduced-capability, deterministic-only mode.
+        """
+        from trend_agent.content_analysis.service import ContentAnalysisService, make_llm
+
+        loaded = loaded or self.content_config()
+        return ContentAnalysisService(
+            session_factory=self.session_factory,
+            loaded=loaded,
+            verification=self.verification(clock=clock),
+            source=source,
+            llm=llm if llm is not None else make_llm(self.settings, loaded),
+            clock=clock or self.clock,
+            ingestion=self.ingestion(clock=clock),
+            settings=self.settings,
         )
 
     async def aclose(self) -> None:

@@ -1020,6 +1020,9 @@ app.add_typer(_cli_detect.detect_app, name="detect")
 from trend_agent import cli_verify as _cli_verify  # noqa: E402
 
 app.add_typer(_cli_verify.verify_app, name="verify")
+from trend_agent import cli_analyze as _cli_analyze  # noqa: E402
+
+app.add_typer(_cli_analyze.analyze_app, name="analyze")
 
 
 def main() -> None:

@@ -1,0 +1,64 @@
+# Phase 5: AI search intent and content-gap analysis.
+# Every value has an in-code default (src/trend_agent/content_analysis/config.py); this file
+# documents the operating point and is hashed into every analysis run.
+version: 1
+config_version: content-analysis-v1
+
+retrieval:
+  max_results_per_variant: 25    # one search.list page per variant (bounded)
+  max_variants: 2                # canonical query + at most one variant
+  expand_when_relevant_below: 3  # fetch the variant only if the first set is thin
+  cache_ttl: PT24H               # reuse stored results (within the 30-day YouTube limit)
+  default_region: US
+  default_language: en
+  fetch_details: true            # videos.list for duration/language (1 unit per 50 videos)
+
+relevance:                       # uncalibrated relevance index (0-100)
+  relevant_threshold: 45
+  high_threshold: 70
+  weights: {entity: 0.35, intent: 0.25, title: 0.20, description: 0.10, keywords: 0.10}
+
+freshness:
+  recent_window: {ai: P60D, technology: P120D, gaming: P30D}
+
+gaps:
+  min_inspected: 8               # fewer inspected results -> INSUFFICIENT_EVIDENCE
+  adequate_relevant_current: 3   # this many relevant, current, matching results -> no gap
+  low_relevance_best_below: 60
+  version_mismatch_share: 0.6
+  outdated_share: 0.6
+  max_current_version_results_for_gap: 1
+  short_form_seconds: 75
+  format_gap_share: 0.7
+  language_gap_share: 0.7
+
+scoring:                         # versioned weights; the score is a ranking index
+  score_version: opportunity-score-1.0
+  weights:
+    demand_evidence: 0.25
+    intent_clarity: 0.10
+    content_gap_strength: 0.25
+    supply_relevance: 0.15
+    freshness_opportunity: 0.10
+    evidence_quality: 0.15
+  min_available_weight: 0.6      # less evidence -> score unavailable
+
+scheduling:
+  category_allocation: {ai: 0.45, technology: 0.25, gaming: 0.30}   # priorities, not demand
+  reanalyse_after: PT72H
+  daily_search_requests: 40      # of the YouTube search bucket (100/day by default)
+  daily_llm_tokens: 200000
+  max_concurrency: 2
+  max_per_run: 10
+  max_attempts: 2
+
+llm:
+  enabled: false                 # reduced-capability (deterministic) mode by default
+  provider: anthropic
+  model: claude-opus-5-5
+  max_tokens: 4000
+  timeout_seconds: 90
+  max_attempts: 2
+  server_side_fallbacks: true
+  input_usd_per_mtok: 4.0        # for cost reporting only
+  output_usd_per_mtok: 20.0

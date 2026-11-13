@@ -1,0 +1,232 @@
+# Phase 5 synthetic world (test fixtures only). Every product, company, game, season, item,
+# channel and video below is FICTIONAL; nothing here describes a real product. Real games
+# named in the specification (e.g. Fortnite) are replaced by the fictional "Skyforge
+# Arena" so the fixtures assert nothing false about real titles.
+now: 2026-11-13T12:00:00Z
+
+entities:
+  - {key: "ai_model:codeforge-2", name: "CodeForge 2", aliases: ["CodeForge-2", "Lumen CodeForge 2"], type: ai_model, category: ai, version: "2"}
+  - {key: "ai_model:codeforge-1", name: "CodeForge 1", type: ai_model, category: ai, version: "1"}
+  - {key: "company:lumen-ai", name: "Lumen AI", type: company, category: ai, origin: gazetteer}
+  - {key: "game:skyforge-arena", name: "Skyforge Arena", type: game, category: gaming, origin: gazetteer}
+  - {key: "game_event:skyforge-s8", name: "Skyforge Arena Season 8", aliases: ["Emberfall season"], type: game_event, category: gaming, version: "season 8"}
+  - {key: "game_item:ember-lantern", name: "Ember Lantern", type: game_item, category: gaming}
+  - {key: "software:pyxis-5", name: "Pyxis 5", type: framework, category: technology, version: "5"}
+  - {key: "software:pyxis-4", name: "Pyxis 4", type: framework, category: technology, version: "4"}
+  - {key: "software:quanta-notes-3", name: "Quanta Notes 3", type: software, category: technology, version: "3"}
+  - {key: "ai_model:orbit", name: "Orbit", aliases: ["Halcyon Orbit"], type: ai_model, category: ai}
+  - {key: "hardware:orbit-glasses", name: "Orbit", aliases: ["Orbit smart glasses", "Vantage Orbit"], type: hardware, category: technology}
+  - {key: "ai_product:helios-agent", name: "Helios Agent", type: ai_product, category: ai}
+  - {key: "hardware:nova-lens", name: "Nova Lens", type: hardware, category: technology}
+
+records:
+  - key: "off:codeforge2-launch"
+    kind: official_announcement
+    trust: official
+    publisher: Lumen AI
+    url: https://lumen.example/blog/codeforge-2
+    published_at: 2026-11-06T16:00:00Z
+    mentions: ["CodeForge 2", "Lumen AI"]
+    text: >-
+      Lumen AI releases CodeForge 2. CodeForge 2 is available today for Windows, macOS and
+      Linux. Sign in with a Lumen account and create an API key to start.
+  - key: "off:codeforge1-launch"
+    kind: official_announcement
+    trust: official
+    publisher: Lumen AI
+    url: https://lumen.example/blog/codeforge-1
+    published_at: 2025-06-02T16:00:00Z
+    mentions: ["CodeForge 1", "Lumen AI"]
+    text: "Lumen AI releases CodeForge 1. CodeForge 1 is available today."
+  - key: "off:skyforge-s8"
+    kind: official_announcement
+    trust: official
+    publisher: Ember Studios
+    url: https://ember.example/skyforge/season-8
+    published_at: 2026-11-08T17:00:00Z
+    mentions: ["Skyforge Arena", "Skyforge Arena Season 8", "Ember Lantern"]
+    text: >-
+      Skyforge Arena Season 8: Emberfall is live. The new season adds the Ember Lantern, a
+      reward hidden in the volcano region, and vaults the Aurora Glider. Season 8 runs until
+      January 20, 2027.
+  - key: "yt:void-scythe-leak"
+    kind: video_metadata
+    trust: user_generated
+    publisher: SkyforgeLeaks
+    url: https://video.example/watch?v=leak8
+    published_at: 2026-11-10T12:00:00Z
+    mentions: ["Skyforge Arena"]
+    text: "LEAKED: the Void Scythe mythic is coming to Skyforge Arena (maybe)."
+  - key: "off:pyxis5"
+    kind: official_announcement
+    trust: official
+    publisher: Pyxis Foundation
+    url: https://pyxis.example/blog/pyxis-5
+    published_at: 2026-10-28T10:00:00Z
+    mentions: ["Pyxis 5"]
+    text: >-
+      Pyxis 5 is released. Breaking changes: the router API was removed and replaced by
+      file-based routes, and the config format changed.
+  - key: "off:pyxis5-soft"
+    kind: official_announcement
+    trust: official
+    publisher: Pyxis Foundation
+    url: https://pyxis.example/blog/pyxis-5-rc
+    published_at: 2026-10-28T10:00:00Z
+    mentions: ["Pyxis 5"]
+    text: "Pyxis 5 is released with new templates and faster builds."
+  - key: "off:quanta3"
+    kind: official_announcement
+    trust: official
+    publisher: Quanta Software
+    url: https://quanta.example/notes-3
+    published_at: 2026-03-01T10:00:00Z
+    mentions: ["Quanta Notes 3"]
+    text: "Quanta Notes 3 is available today with linked notes and templates."
+  - key: "off:orbit-ai"
+    kind: official_announcement
+    trust: official
+    publisher: Halcyon AI
+    url: https://halcyon.example/orbit
+    published_at: 2026-09-01T10:00:00Z
+    text: "Halcyon AI releases Orbit, an open-weight model for agents."
+  - key: "off:orbit-glasses"
+    kind: official_announcement
+    trust: official
+    publisher: Vantage
+    url: https://vantage.example/orbit
+    published_at: 2026-10-01T10:00:00Z
+    text: "Vantage releases the Orbit smart glasses with a new companion app."
+  - key: "off:helios"
+    kind: official_announcement
+    trust: official
+    publisher: Helios Labs
+    url: https://helios.example/agent
+    published_at: 2026-10-20T10:00:00Z
+    mentions: ["Helios Agent"]
+    text: "Helios Labs releases Helios Agent, an agent framework, available today."
+  - key: "off:nova-lens"
+    kind: official_announcement
+    trust: official
+    publisher: Vantage
+    url: https://vantage.example/nova-lens
+    published_at: 2026-10-15T10:00:00Z
+    mentions: ["Nova Lens"]
+    text: "Vantage releases Nova Lens smart glasses, available today."
+
+targets:
+  codeforge:
+    query: "how to install codeforge 2"
+    query_id: 5101
+    topic_id: 511
+    topic: "CodeForge 2"
+    category: ai
+    intent: tutorial
+    entities: ["ai_model:codeforge-2"]
+    records: ["off:codeforge2-launch", "off:codeforge1-launch"]
+    stats: {classification: direct_search_surge, stage: confirmed, categories: [direct_youtube_search_interest],
+            severity: 78, relative_change: 1.6, observed: 80, expected: 31, confidence: statistically_supported}
+  skyforge:
+    query: "where to find the ember lantern skyforge arena season 8"
+    query_id: 5201
+    topic_id: 521
+    topic: "Skyforge Arena Season 8"
+    category: gaming
+    intent: item_location
+    entities: ["game_event:skyforge-s8", "game_item:ember-lantern"]
+    records: ["off:skyforge-s8"]
+    stats: {classification: direct_search_surge, stage: candidate, categories: [direct_youtube_search_interest],
+            severity: 64, relative_change: 0.9, observed: 57, expected: 30}
+  pyxis:
+    query: "how to migrate to pyxis 5"
+    query_id: 5301
+    topic_id: 531
+    topic: "Pyxis 5"
+    category: technology
+    intent: tutorial
+    entities: ["software:pyxis-5"]
+    records: ["off:pyxis5"]
+    stats: {classification: external_search_surge, stage: candidate, categories: [external_search_interest],
+            severity: 52, relative_change: 0.7, observed: 51, expected: 30}
+  pyxis_soft:
+    query: "how to migrate to pyxis 5"
+    query_id: 5302
+    topic_id: 531
+    topic: "Pyxis 5"
+    category: technology
+    intent: tutorial
+    entities: ["software:pyxis-5"]
+    records: ["off:pyxis5-soft"]
+    stats: {classification: external_search_surge, stage: candidate, categories: [external_search_interest],
+            severity: 52, relative_change: 0.7, observed: 51, expected: 30}
+  quanta:
+    query: "quanta notes 3 tutorial"
+    query_id: 5401
+    topic_id: 541
+    topic: "Quanta Notes 3"
+    category: technology
+    intent: tutorial
+    entities: ["software:quanta-notes-3"]
+    records: ["off:quanta3"]
+    stats: {classification: direct_search_surge, stage: candidate, categories: [direct_youtube_search_interest],
+            severity: 50, relative_change: 0.5, observed: 45, expected: 30}
+  orbit:
+    query: "orbit setup guide"
+    query_id: 5501
+    topic_id: null
+    category: null
+    intent: tutorial
+    entities: []
+    records: ["off:orbit-ai", "off:orbit-glasses"]
+    stats: null
+  helios:
+    query: "helios agent tutorial"
+    query_id: 5601
+    topic_id: 561
+    topic: "Helios Agent"
+    category: ai
+    intent: tutorial
+    entities: ["ai_product:helios-agent"]
+    records: ["off:helios"]
+    stats: {classification: direct_search_surge, stage: candidate, categories: [direct_youtube_search_interest],
+            severity: 55, relative_change: 0.8, observed: 50, expected: 28}
+  voidscythe:
+    query: "where to find the void scythe skyforge arena season 8"
+    query_id: 5701
+    topic_id: 521
+    topic: "Skyforge Arena Season 8"
+    category: gaming
+    intent: item_location
+    entities: ["game_event:skyforge-s8"]
+    records: ["off:skyforge-s8", "yt:void-scythe-leak"]
+    stats: {classification: proxy_attention_signal, stage: candidate, categories: [video_activity], severity: 48}
+  codeforge_api:
+    query: "codeforge 2 api tutorial"
+    query_id: 5801
+    topic_id: 511
+    topic: "CodeForge 2"
+    category: ai
+    intent: tutorial
+    entities: ["ai_model:codeforge-2"]
+    records: ["off:codeforge2-launch"]
+    stats: {classification: direct_search_surge, stage: candidate, categories: [direct_youtube_search_interest],
+            severity: 60, relative_change: 0.9, observed: 55, expected: 29}
+  nova:
+    query: "nova lens review"
+    query_id: 5901
+    topic_id: 591
+    topic: "Nova Lens"
+    category: technology
+    intent: review
+    entities: ["hardware:nova-lens"]
+    records: ["off:nova-lens"]
+    stats: {classification: proxy_attention_signal, stage: candidate, categories: [video_activity], severity: 58}
+  glimmer:
+    query: "glimmer shards farming"
+    query_id: 5999
+    topic_id: null
+    category: gaming
+    intent: game_guide
+    entities: []
+    records: []
+    stats: null
