@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import random
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -12,6 +13,7 @@ from trend_agent.config import Settings
 from trend_agent.db.repositories.monitoring import MonitoringRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
 from trend_agent.db.session import SessionFactory, transaction
+from trend_agent.logging import get_logger, log_event
 from trend_agent.monitoring.collectors import (
     REQUEST_BUCKET,
     Collector,
@@ -31,6 +33,8 @@ from trend_agent.providers.quota import QuotaStore
 from trend_agent.providers.registry import ProviderRegistry
 from trend_agent.schemas.scheduling import CollectorKind, DelayEstimate, PlanReport
 from trend_agent.utils.time import Clock
+
+_log = get_logger(__name__)
 
 
 def build_collectors(
@@ -82,6 +86,7 @@ class RunOnceReport:
     sync: SyncReport
     plan: PlanReport
     workers: list[WorkerReport]
+    detection: Any = None  # Phase 4 hook result (DetectionReport) when enabled
 
 
 @dataclass(frozen=True)
@@ -113,7 +118,11 @@ class MonitoringService:
         clock: Clock,
         include_synthetic: bool | None = None,
         extra_collectors: Iterable[Collector] = (),
+        after_collection: Callable[[], Any] | None = None,
     ) -> None:
+        # Phase 4 integration: called after a collection cycle stored observations (the
+        # detection service processes the series the executor queued in its outbox).
+        self.after_collection = after_collection
         self.loaded = loaded
         self.config = loaded.config
         self._factory = session_factory
@@ -171,7 +180,18 @@ class MonitoringService:
         sync = self.sync_targets()
         plan = self.plan()
         workers = await self.executor(worker_id).drain()
-        return RunOnceReport(sync, plan, workers)
+        detection = None
+        if self.after_collection is not None:
+            try:
+                detection = self.after_collection()
+            except Exception as exc:  # collection succeeded; detection retries from its queue
+                log_event(
+                    _log,
+                    "monitor.detection_hook_failed",
+                    logging.ERROR,
+                    error=f"{type(exc).__name__}: {exc}"[:300],
+                )
+        return RunOnceReport(sync, plan, workers, detection)
 
     # ------------------------------------------------------------------ read models
     def providers(self) -> list[ProviderOverview]:

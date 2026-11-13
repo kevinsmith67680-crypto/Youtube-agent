@@ -119,6 +119,7 @@ def _point(row: ObservationRow) -> StoredPoint:
         source_reference=row.source_reference,
         data_policy_id=row.data_policy_id,
         job_id=str(row.job_id) if row.job_id else None,
+        expires_at=row.expires_at,
     )
 
 

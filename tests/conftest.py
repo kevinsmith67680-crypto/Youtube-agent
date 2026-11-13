@@ -113,6 +113,16 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 4 (detection)
+    "surge_evidence",
+    "surge_event_transitions",
+    "surge_events",
+    "anomaly_results",
+    "detector_states",
+    "detection_queue",
+    "detection_runs",
+    "detection_evaluations",
+    "detection_calibrations",
     # Phase 3 (monitoring)
     "monitoring_job_attempts",
     "ts_observations",

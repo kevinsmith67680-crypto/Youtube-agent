@@ -202,6 +202,7 @@ class StoredPoint(BaseModel):
     source_reference: str
     data_policy_id: str
     job_id: str | None = None
+    expires_at: datetime | None = None  # policy expiry (derived records inherit it)
 
     @property
     def effective_category(self) -> MeasurementCategory:

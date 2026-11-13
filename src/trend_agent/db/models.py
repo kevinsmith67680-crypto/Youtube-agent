@@ -391,5 +391,6 @@ class RejectedRecordRow(Base):
 
 # Phase 2 tables live in their own module; importing it registers them on Base.metadata
 # wherever the Phase 1 models are imported (application, Alembic, tests).
+from trend_agent.db import detection_models as _detection_models  # noqa: E402,F401  (Phase 4 tables)
 from trend_agent.db import discovery_models as _discovery_models  # noqa: E402, F401
 from trend_agent.db import monitoring_models as _monitoring_models  # noqa: E402,F401  (Phase 3 tables)

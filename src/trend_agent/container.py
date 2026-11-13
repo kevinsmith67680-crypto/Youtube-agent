@@ -14,7 +14,9 @@ from sqlalchemy import Engine
 from trend_agent.config import Settings, get_settings
 from trend_agent.db.repositories import SqlQuotaStore
 from trend_agent.db.session import SessionFactory, create_session_factory, engine_from_settings
-from trend_agent.discovery.config import LoadedDiscoveryConfig, load_discovery_config
+from trend_agent.detection.config import LoadedDetectionConfig, load_detection_config
+from trend_agent.detection.service import DetectionService
+from trend_agent.discovery.config import ConfigError, LoadedDiscoveryConfig, load_discovery_config
 from trend_agent.discovery.providers.factory import register_discovery_providers
 from trend_agent.discovery.service import DiscoveryService
 from trend_agent.ingestion.retention import RetentionService
@@ -42,6 +44,7 @@ class AppContainer:
     http_client: httpx.AsyncClient | None = None
     _discovery_config: LoadedDiscoveryConfig | None = None
     _monitoring_config: LoadedMonitoringConfig | None = None
+    _detection_config: LoadedDetectionConfig | None = None
 
     def ingestion(self) -> IngestionService:
         return IngestionService(
@@ -107,13 +110,62 @@ class AppContainer:
         include_synthetic: bool | None = None,
         loaded: LoadedMonitoringConfig | None = None,
     ) -> MonitoringService:
-        """Phase 3 monitoring service (collectors are built from registered providers)."""
+        """Phase 3 monitoring service (collectors are built from registered providers).
+
+        When ``config/detection.yaml`` enables ``integration.run_after_collection``, a
+        collection cycle (``run_once``) ends by running Phase 4 detection on the series
+        the executor queued.
+        """
+        hook = None
+        try:
+            detection_loaded = self.detection_config()
+        except ConfigError:
+            detection_loaded = None
+        if (
+            detection_loaded is not None
+            and detection_loaded.config.integration.run_after_collection
+        ):
+            detection = self.detection(clock=clock, include_synthetic=include_synthetic)
+
+            def hook() -> object:
+                from trend_agent.schemas.detection import RunType
+
+                return detection.run(
+                    run_type=RunType.HOOK, from_queue=True, worker="after-collection"
+                )
+
         return MonitoringService(
             settings=self.settings,
             session_factory=self.session_factory,
             registry=self.registry,
             quota_store=self.quota_store,
             loaded=loaded or self.monitoring_config(),
+            clock=clock or self.clock,
+            include_synthetic=include_synthetic,
+            after_collection=hook,
+        )
+
+    def detection_config(self) -> LoadedDetectionConfig:
+        if self._detection_config is None:
+            self._detection_config = load_detection_config(self.settings.discovery_config_dir)
+        return self._detection_config
+
+    def detection(
+        self,
+        *,
+        clock: Clock | None = None,
+        include_synthetic: bool | None = None,
+        loaded: LoadedDetectionConfig | None = None,
+    ) -> DetectionService:
+        """Phase 4 detection service."""
+        try:
+            monitoring = self.monitoring_config()
+        except ConfigError:
+            monitoring = None
+        return DetectionService(
+            session_factory=self.session_factory,
+            loaded=loaded or self.detection_config(),
+            monitoring=monitoring,
             clock=clock or self.clock,
             include_synthetic=include_synthetic,
         )

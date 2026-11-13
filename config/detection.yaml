@@ -1,0 +1,171 @@
+# Phase 4 - statistical surge detection configuration.
+#
+# Every detector output stores `config_version` and the SHA-256 digest of this file, so a
+# result can always be traced to the exact rules that produced it. Change `config_version`
+# whenever thresholds change. Durations are ISO 8601 (P7D = 7 days, PT6H = 6 hours).
+#
+# Units: "index" = relative 0-100 interest index (never a number of searches);
+#        "count" = counted items per period (proxy/attention signals).
+version: 1
+config_version: detection-v1
+algorithm_version: detect-1.0.0
+# Thresholds below were chosen with `trend-agent detect calibrate --dataset synthetic`
+# (walk-forward, training split only; see docs/detection_evaluation.md). They are
+# SYNTHETIC-derived starting points, not optimal values for real data.
+threshold_version: thresholds-2026-11-13-synthetic
+
+enabled_detectors: [robust_anomaly, cusum, change_point, cold_start]
+
+preprocessing:
+  supported_granularities: [hour, day, week]
+  # How much history is loaded per series (periods); older values are not used.
+  max_history_periods: {hour: 2160, day: 730, week: 260}
+  # In the most recent `regularity_window` grid slots, at least this share must hold a
+  # usable value, otherwise the series is IRREGULAR_SAMPLING (sequential detectors stop).
+  regularity_window: {hour: 336, day: 56, week: 26}
+  min_recent_coverage: 0.5
+  # Scales whose values are not magnitudes cannot be tested for upward anomalies.
+  unsupported_scales: [presence, rank]
+
+baseline:
+  robust:
+    # Time window (periods) of PRIOR observations; the evaluated point is never included.
+    window_periods: {hour: 168, day: 28, week: 26}
+    min_samples: 14             # READY baseline
+    provisional_min_samples: 7  # PROVISIONAL (WATCH / CANDIDATE only); fewer -> cold start
+    epsilon: 1.0e-9
+    # Dispersion floors stop a near-zero MAD from producing huge z-scores. A floor-based
+    # dispersion is flagged as unstable and can never support a high-confidence alert.
+    dispersion_floor_abs: {index: 1.0, count: 1.0}
+    dispersion_floor_rel: 0.05  # fraction of the baseline median
+  seasonal:
+    enabled: true
+    # Cycle length in periods per granularity. Only granularities listed here can be
+    # seasonal (no hour-of-day profile is ever fitted to daily data).
+    cycle_periods: {hour: 24, day: 7}
+    window_cycles: 12           # history used to fit the profile (84 days for daily data)
+    min_cycles: 6               # at least 6 full cycles of history (and a significant effect)
+    min_per_phase: 5            # >= 5 valid values for every weekday / hour of day
+    level_cycles: 2             # current level = median of the last 2 deseasonalised cycles
+    significance_alpha: 0.01    # Kruskal-Wallis test of a phase effect on detrended values
+    min_dispersion_reduction: 0.10  # profile must cut residual dispersion by >= 10 %
+
+anomaly:
+  defaults:
+    watch_z: 3.0
+    alert_z: 4.0
+    min_absolute_effect: {index: 8.0, count: 3.0}
+    min_observed_level: {index: 10.0, count: 3.0}
+  # Applied in order; later matches override earlier ones. Match keys: provider,
+  # granularity, category (ai|technology|gaming), readiness (ready|provisional),
+  # scale_family (index|count), measurement (evidence category).
+  # Keep the most conservative rules last (provisional baselines win over everything).
+  overrides:
+    - name: hourly-data
+      match: {granularity: hour}
+      set: {watch_z: 3.5, alert_z: 5.0}
+    - name: count-signals
+      match: {scale_family: count}
+      set: {watch_z: 3.5, alert_z: 5.0}
+    - name: provisional-baseline
+      match: {readiness: provisional}
+      set: {watch_z: 4.0, alert_z: 6.0}
+  # Relative growth is only reported when the expected value is at least this large.
+  min_expected_for_relative: {index: 5.0, count: 2.0}
+  # Revised or late-arriving values older than this (periods behind the newest period) are
+  # evaluated and recorded but never open alerts.
+  late_alert_window_periods: 3
+
+cusum:
+  # k = delta/2 for a minimum meaningful upward drift of delta = 2 robust standard
+  # deviations (surges of interest here are large relative to noise). h is the smallest
+  # value whose empirical in-control ARL on synthetic null residuals (training split,
+  # autocorrelated, heavy-tailed) reaches target_arl0: k=1.0, h=6 -> ARL0 ~ 1,380 periods
+  # (the normal-theory Siegmund value, ~838,000, is far too optimistic for such data).
+  # target_arl0 comes from the false-alert budget: <= ~1 CUSUM false alarm per day over
+  # 1,000 daily series. See docs/detection_evaluation.md.
+  k: 1.0
+  h: 6.0
+  z_clip: 3.0             # one extreme value adds at most z_clip - k (cannot alarm alone)
+  max_gap_periods: 3      # longer gaps reset the statistic (recorded as gap_reset)
+  refractory_periods: 7   # after an alarm: reset to 0 and no new alarm for 7 periods
+  watch_fraction: 0.8     # statistic >= 0.8 h reports WATCH
+  target_arl0: 1000
+
+change_point:
+  method: bocpd            # Bayesian online change-point detection (Adams & MacKay 2007)
+  hazard_lambda: 100      # prior expected run length between changes (periods)
+  max_run_length: 200     # posterior truncated (renormalised) beyond this run length
+  prior: {kappa0: 1.0, alpha0: 1.0}
+  recent_window: 10       # a change counts as recent within the last 10 observations
+  min_post_points: 3      # ... and needs >= 3 observations after it (a lone spike is not a shift)
+  probability_threshold: 0.6
+  watch_probability: 0.35
+  min_shift_sigma: 1.0    # post-change mean must exceed pre-change mean by >= 1 sigma
+
+cold_start:
+  min_growth_points: 3
+  growth_ratio: 1.5             # last value >= 1.5x the first comparable value
+  strong_growth_points: 4
+  kendall_tau_min: 0.6          # measured monotone growth without corroboration
+  corroboration_window: P14D
+  min_independent_providers: 2  # discovery evidence from >= 2 independent providers
+  corroborating_evidence:
+    [official_announcement, code_release, search_suggestion, related_query,
+     video_title, community_discussion]
+  new_topic_novelty: [new_entity, new_version, new_event]
+
+severity:
+  version: severity-v1
+  weights: {statistical: 0.5, magnitude: 0.3, relative: 0.2}
+  # Detectors read the same data: their evidence is combined as
+  # 0.75 * strongest + 0.25 * mean, never summed as if independent.
+  statistical_combination: {max_weight: 0.75, mean_weight: 0.25}
+  references:
+    z_cap: 8.0
+    magnitude_ref: {index: 30.0, count: 20.0}
+    relative_cap: 4.0       # observed / expected = 4 scores 1.0 on the relative component
+    persistence_ref: 5      # periods
+  quality_multipliers:
+    sample: {complete: 1.0, low_volume: 0.7}
+    baseline: {ready: 1.0, provisional: 0.8, insufficient: 0.6}
+    freshness: {source_current: 1.0, no_new_observation: 1.0, provider_delayed: 0.9,
+                collection_delayed: 0.9, unknown_freshness: 0.85, source_unavailable: 0.8}
+    unstable_dispersion: 0.7
+
+multiple_testing:
+  # With calibrated p-values: Benjamini-Hochberg across the hypotheses of one detection run.
+  # This controls the FDR per run only; it is NOT an online FDR guarantee over time.
+  method: benjamini_hochberg   # or benjamini_yekutieli under arbitrary dependence
+  fdr_q: 0.05
+  # Without calibrated p-values (or in addition): an empirical alert-rate budget.
+  target_false_alerts_per_day: 2.0
+  max_new_alerts_per_day: 25   # hard cap on new CANDIDATE+ notifications (all categories)
+
+alert_policy:
+  confirm_min_periods: 2           # elevation must persist >= 2 consecutive periods ...
+  confirm_requires_calibration: true  # ... and be statistically supported (calibrated)
+  candidate_requires_effect: true  # min absolute effect + min observed level
+  cold_start_max_stage: candidate  # with corroboration; WATCH otherwise
+  reject_conflicting_values: true
+
+episodes:
+  cooldown_periods: 2      # after resolution, WATCH-level triggers are ignored this long
+  reopen_window: P7D       # a CANDIDATE+ trigger within 7 days reopens the same episode
+  resolve_z: 1.0           # back within 1 sigma of the pre-episode baseline ...
+  resolve_periods: 2       # ... for 2 consecutive periods -> RESOLVED
+  max_quiet_periods: 14    # no detector support for 14 periods -> RESOLVED (new normal)
+  stale_after_periods: 7   # no new observation for 7 periods -> RESOLVED (stale)
+  downgrade_hold_periods: 2
+
+integration:
+  run_after_collection: true   # Phase 3 executor triggers detection for new observations
+  notify_channel: trend_agent_detection
+  worker_fallback_seconds: 60  # worker re-checks the queue at least this often
+  include_synthetic: false     # production runs never process synthetic series
+
+calibration:
+  # Null scores above this quantile are stored (empirical p-values) and a generalised
+  # Pareto tail is fitted to them (extrapolated p-values beyond the largest null value).
+  null_tail_quantile: 0.95
+  min_null_scores: 2000

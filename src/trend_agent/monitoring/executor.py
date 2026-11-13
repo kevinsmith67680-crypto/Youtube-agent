@@ -27,6 +27,7 @@ from typing import Any
 from sqlalchemy.exc import SQLAlchemyError
 
 from trend_agent.db.repositories.collection_jobs import JobRepository
+from trend_agent.db.repositories.detection_runs import DEFAULT_CHANNEL, DetectionQueueRepository
 from trend_agent.db.repositories.monitoring import MonitoringRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
 from trend_agent.db.session import SessionFactory, transaction
@@ -148,6 +149,7 @@ class Executor:
         clock: Clock,
         worker_id: str | None = None,
         rng: random.Random | None = None,
+        detection_channel: str | None = DEFAULT_CHANNEL,
     ) -> None:
         self._factory = session_factory
         self._config = config
@@ -155,6 +157,8 @@ class Executor:
         self._clock = clock
         self.worker_id = worker_id or f"worker-{uuid.uuid4().hex[:8]}"
         self._rng = rng or random.Random()  # noqa: S311 - jitter, not security
+        # Phase 4 outbox: None disables queueing new observations for detection.
+        self._detection_channel = detection_channel
 
     # ------------------------------------------------------------------ claiming
     def claim(
@@ -380,6 +384,7 @@ class Executor:
         counts: Counter[str] = Counter()
         with transaction(self._factory) as session:
             ts = TimeSeriesRepository(session)
+            changed: dict[int, tuple[int | None, datetime]] = {}
             for draft in result.drafts:
                 written = ts.write(
                     draft,
@@ -390,6 +395,18 @@ class Executor:
                 counts[written.outcome.value] += 1
                 if draft.value is None:
                     counts["missing_values"] += 1
+                if written.outcome in (WriteOutcome.NEW, WriteOutcome.REVISED):
+                    held = changed.get(written.series_id)
+                    start = draft.period_start if held is None else min(held[1], draft.period_start)
+                    changed[written.series_id] = (draft.target_id, start)
+            if changed and self._detection_channel is not None:
+                # Transactional outbox for Phase 4: the series is queued for detection in
+                # the same transaction as its new/revised observations (NOTIFY on commit).
+                DetectionQueueRepository(session).mark(
+                    ((sid, tid, start) for sid, (tid, start) in changed.items()),
+                    now,
+                    channel=self._detection_channel or None,
+                )
             fresh = counts[WriteOutcome.NEW.value] + counts[WriteOutcome.REVISED.value]
             status = JobStatus.SUCCEEDED if fresh else JobStatus.NO_NEW_DATA
             jobs = JobRepository(session)

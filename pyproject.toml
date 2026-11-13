@@ -20,6 +20,9 @@ dependencies = [
     "pyyaml>=6.0,<7.0",
     # Untrusted RSS/Atom XML is parsed with defusedxml (entity-expansion safe).
     "defusedxml>=0.7,<1.0",
+    # Phase 4 statistics (robust baselines, change points, multiple-testing control).
+    "numpy>=2.0,<3.0",
+    "scipy>=1.13,<2.0",
     # Windows has no system IANA tz database; zoneinfo needs this there.
     "tzdata>=2024.1; sys_platform == 'win32'",
 ]
@@ -33,6 +36,7 @@ dev = [
     "mypy>=1.11",
     "types-PyYAML>=6.0",
     "types-defusedxml>=0.7",
+    "scipy-stubs>=1.13",
 ]
 
 [project.scripts]
