@@ -251,7 +251,9 @@ def evaluate(
             if row["sub_intent_ok"] is False:
                 problems.append("sub_intent")
             want = row["label_gap"]
-            if want == "abstain" and not row["abstained"]:
+            if row["abstained"] and want not in ("abstain", "blocked"):
+                problems.append(f"unexpected abstention (label {want})")
+            elif want == "abstain" and not row["abstained"]:
                 problems.append(f"expected abstention, got {row['predicted_status']}")
             elif want == "blocked" and not row["blocked"]:
                 problems.append("expected policy block")

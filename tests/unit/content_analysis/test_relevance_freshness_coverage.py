@@ -73,7 +73,5 @@ def test_supply_never_uses_view_counts_or_total_results() -> None:
     text = " ".join((sup.scope, *sup.statements))
     assert sup.scope.startswith("Of the")
     assert "views" not in text.lower()
-    assert (
-        sup.api_total_estimate is None
-        or "not a count" in type(sup).model_fields["api_total_estimate"].description
-    )
+    desc = type(sup).model_fields["api_total_estimate"].description or ""
+    assert "not a count" in desc

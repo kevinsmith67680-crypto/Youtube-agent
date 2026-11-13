@@ -24,7 +24,7 @@ freshness:
 gaps:
   min_inspected: 8               # fewer inspected results -> INSUFFICIENT_EVIDENCE
   adequate_relevant_current: 3   # this many relevant, current, matching results -> no gap
-  low_relevance_best_below: 60
+  low_relevance_best_below: 70  # must exceed relevance.relevant_threshold (validated)
   version_mismatch_share: 0.6
   outdated_share: 0.6
   max_current_version_results_for_gap: 1

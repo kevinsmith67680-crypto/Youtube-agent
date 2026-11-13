@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "youtube-trend-agent"
-version = "0.4.1"
-description = "YouTube Search Demand Intelligence Agent - Phases 1-4: data acquisition, discovery, monitoring, surge detection; evidence verification layer."
+version = "0.5.0"
+description = "YouTube Search Demand Intelligence Agent - Phases 1-5: data acquisition, discovery, monitoring, surge detection, search-intent and content-gap analysis; evidence verification layer."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }

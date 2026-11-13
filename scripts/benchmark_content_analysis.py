@@ -80,7 +80,7 @@ def queries(n: int) -> list[tuple[str, str]]:
 
 def pct(values: list[float], q: float) -> float:
     vals = sorted(values)
-    return vals[min(len(vals) - 1, int(round(q * (len(vals) - 1))))]
+    return vals[min(len(vals) - 1, round(q * (len(vals) - 1)))]
 
 
 def fixture_videos(query: str, n: int = 25) -> list[dict[str, Any]]:

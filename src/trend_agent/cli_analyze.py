@@ -236,6 +236,9 @@ def _plan_rows(plan: Any) -> list[dict[str, Any]]:
 @analyze_app.command("pending")
 def analyze_pending(
     limit: Annotated[int | None, typer.Option("--limit", "-n", min=1, max=500)] = None,
+    category: Annotated[
+        str | None, typer.Option("--category", "-c", help="ai | technology | gaming")
+    ] = None,
     include_synthetic: SyntheticOpt = False,
     force: ForceOpt = False,
     as_json: base.JsonOpt = False,
@@ -243,7 +246,9 @@ def analyze_pending(
     """Show what the next queue run would analyse, and why the rest is skipped."""
     container, svc = _service()
     try:
-        plan = svc.pending(include_synthetic=include_synthetic, limit=limit, force=force)
+        plan = svc.pending(
+            include_synthetic=include_synthetic, limit=limit, force=force, category=category
+        )
     finally:
         _close(container)
     rows = _plan_rows(plan)
@@ -278,6 +283,9 @@ def analyze_pending(
 @analyze_app.command("run")
 def analyze_run(
     limit: Annotated[int | None, typer.Option("--limit", "-n", min=1, max=500)] = None,
+    category: Annotated[
+        str | None, typer.Option("--category", "-c", help="ai | technology | gaming")
+    ] = None,
     include_synthetic: SyntheticOpt = False,
     force: ForceOpt = False,
     as_json: base.JsonOpt = False,
@@ -286,7 +294,9 @@ def analyze_run(
     container, svc = _service()
 
     async def go() -> Any:
-        return await svc.run(include_synthetic=include_synthetic, limit=limit, force=force)
+        return await svc.run(
+            include_synthetic=include_synthetic, limit=limit, force=force, category=category
+        )
 
     report = base._run(container, go)
     if as_json:
@@ -512,6 +522,13 @@ def analyze_opportunities(
     base.console.print(f"[dim]{NOTE}[/]")
 
 
+def _ident(arg: str | None, opt: str | None) -> str:
+    ident = opt or arg
+    if not ident:
+        raise base._fail("give an opportunity id (argument or --opportunity-id)", 2)
+    return ident
+
+
 def _lookup(svc: Any, ident: str) -> OpportunityReport:
     found = svc.opportunity(ident)
     if found is None and len(ident) < 36:
@@ -537,13 +554,19 @@ def _lookup(svc: Any, ident: str) -> OpportunityReport:
 
 @analyze_app.command("explain")
 def analyze_explain(
-    opportunity_id: Annotated[str, typer.Argument(help="Opportunity id (or unique prefix).")],
+    opportunity_id: Annotated[
+        str | None, typer.Argument(help="Opportunity id (or unique prefix).")
+    ] = None,
+    opportunity_opt: Annotated[
+        str | None, typer.Option("--opportunity-id", help="Same as the argument.")
+    ] = None,
     as_json: base.JsonOpt = False,
 ) -> None:
     """Full opportunity report: demand, coverage, gaps, score components and claims."""
+    ident = _ident(opportunity_id, opportunity_opt)
     container, svc = _service()
     try:
-        rep = _lookup(svc, opportunity_id)
+        rep = _lookup(svc, ident)
     finally:
         _close(container)
     if as_json:
@@ -558,13 +581,19 @@ def analyze_explain(
 
 @analyze_app.command("verify")
 def analyze_verify(
-    opportunity_id: Annotated[str, typer.Argument(help="Opportunity id (or unique prefix).")],
+    opportunity_id: Annotated[
+        str | None, typer.Argument(help="Opportunity id (or unique prefix).")
+    ] = None,
+    opportunity_opt: Annotated[
+        str | None, typer.Option("--opportunity-id", help="Same as the argument.")
+    ] = None,
     as_json: base.JsonOpt = False,
 ) -> None:
     """Re-check a stored report's claims against the evidence registry now (read-only)."""
+    ident = _ident(opportunity_id, opportunity_opt)
     container, svc = _service()
     try:
-        rep = _lookup(svc, opportunity_id)
+        rep = _lookup(svc, ident)
         out = svc.reverify(rep.opportunity_id)
     finally:
         _close(container)

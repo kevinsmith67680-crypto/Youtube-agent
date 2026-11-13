@@ -1,12 +1,13 @@
-# YouTube Trend Agent — Phases 1–4: Data Acquisition, Keyword Discovery, Historical Monitoring & Surge Detection (+ verification layer)
+# YouTube Trend Agent — Phases 1–5: Data Acquisition, Keyword Discovery, Historical Monitoring, Surge Detection & Content-Gap Analysis (+ verification layer)
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
-existing videos, and what videos to make. This repository contains **Phases 1–4 of 8**:
+existing videos, and what videos to make. This repository contains **Phases 1–5 of 8**:
 the typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
 controls (Phase 1), an autonomous **keyword discovery engine** for AI, technology and
 gaming (Phase 2), **historical monitoring** with time-series storage and scheduling
-(Phase 3), and a **statistical surge detection engine** (Phase 4).
+(Phase 3), a **statistical surge detection engine** (Phase 4), and **search-intent and
+content-gap analysis** (Phase 5).
 
 > **Read this first — what the data can and cannot tell you.**
 > YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
@@ -103,6 +104,32 @@ deterministic **verification gate** before it can be shown. Details:
 | Optional Claude adapter (structured output, refusal handling, server-side fallbacks) | Implemented; **not run against the live API here** (fake-client tests only) |
 | Adversarial evaluation (58 labelled fictional cases, dev + held-out) | 0 labelled unsupported claims published; held-out first run: precision 1.00, false rejection 0.10, contradiction recall 0.60 — **fictional data, real-world accuracy unknown** |
 
+## What Phase 5 adds — search intent & content-gap analysis
+
+For a query behind a Phase 4 surge event (or one an operator names), Phase 5 classifies
+the search intent, lists what searchers appear to need, inspects the YouTube results it
+may retrieve, and reports — with evidence and limitations — whether a **verifiable**
+content gap exists. Reports are research priorities, not forecasts; no titles, thumbnails
+or scripts are generated. Details: [docs/phase5_architecture.md](docs/phase5_architecture.md),
+[docs/search_intent_analysis.md](docs/search_intent_analysis.md),
+[docs/content_gap_detection.md](docs/content_gap_detection.md),
+[docs/evidence_verification.md](docs/evidence_verification.md),
+[docs/opportunity_scoring.md](docs/opportunity_scoring.md),
+[docs/phase5_evaluation.md](docs/phase5_evaluation.md),
+[docs/phase5_report.md](docs/phase5_report.md).
+
+| Area | Status |
+|---|---|
+| Phase 4 demand evidence preserved and labelled (confirmed direct / candidate / external / potential-proxy / cold start / watch / insufficient / manual); never recalculated or upgraded | Implemented |
+| Hierarchical intent classification (10 primaries; AI, technology, gaming sub-intents), entities and versions, ambiguity, policy blocking of cheats/exploits | Implemented (deterministic rules, English-only) |
+| Query decomposition into candidate information requirements (no invented product details or item locations) | Implemented |
+| Bounded YouTube retrieval through the Phase 1 ingestion service (quota, 24 h cache, 30-day retention); API order is not treated as ranking | Implemented; **not run against the live API here** (fake transport) |
+| Relevance, freshness (age alone never "outdated"), requirement coverage, scope-limited supply, ten gap types with abstention first | Implemented (metadata tier; captions disabled) |
+| Opportunity score (six components, versioned weights, missing ≠ zero, capped by demand basis; not a probability) | Implemented |
+| Application-side claim verification; prompt-injection defences; optional Claude assist with structured output | Implemented; LLM **off by default**, adapter tested with a fake client only |
+| Migration 0006 (7 tables), idempotent writes, retention, cost-aware queue, `trend-agent analyze …` | Implemented |
+| Labelled evaluation (32 fictional cases, chronological dev / calibration / held-out) | Held-out first run: gap precision 0.57, false-gap rate 0.50 (fixed afterwards; re-run is not held-out) — **fictional data, real-world accuracy unknown** |
+
 ## Architecture overview
 
 A modular monolith (`src/trend_agent/`):
@@ -122,8 +149,11 @@ comparability.py   decides whether two observations' values may be compared
 container.py composition root (dependency injection), cli*.py Typer CLI
 verification/  evidence registry, claim extraction/verification, entities, statistical
              authority, untrusted-content handling, permissions, generators, gate
+content_analysis/  Phase 5: intent, decomposition, retrieval, relevance, freshness,
+             coverage, supply, gaps, scoring, LLM assist, verification, queue, service
 config/      discovery.yaml, seeds/, sources/ (Phase 2); monitoring.yaml (Phase 3);
-             detection.yaml (Phase 4); verification.yaml + verification/ (fixtures)
+             detection.yaml (Phase 4); verification.yaml + verification/ (fixtures);
+             content_analysis.yaml + content_analysis/ (Phase 5 fixtures, eval splits)
 ```
 
 Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
@@ -261,7 +291,27 @@ trend-agent verify evaluate --split all     # labelled adversarial evaluation (o
 trend-agent verify recommend --target 42    # evidence -> draft (template by default) -> gate
 trend-agent verify check --target 42 --draft draft.json   # verify an externally written draft
 trend-agent verify runs | explain <run-id> | evidence [--id ev_...] | stats | schema
+
+# Phase 5: search intent & content-gap analysis (see docs/phase5_architecture.md)
+trend-agent analyze demo                    # SYNTHETIC scenarios A-J, offline (checked)
+trend-agent analyze evaluate --split all    # labelled evaluation, offline (also --sweep)
+trend-agent analyze query --query "AI coding agents" [--category ai] [--no-llm] [--dry-run]
+trend-agent analyze surge --event-id 12     # analyse the query behind a Phase 4 surge event
+trend-agent analyze pending [--category ai] # what the cost-aware queue would analyse, and why not the rest
+trend-agent analyze run --category gaming   # run the queue once (budgets, priorities, cache)
+trend-agent analyze results --query "AI coding agents"   # inspected results, relevance, freshness
+trend-agent analyze intent --query "AI coding agents"    # intent + information requirements only
+trend-agent analyze gaps --category gaming  # detected gaps (hypotheses) across analyses
+trend-agent analyze opportunities --limit 20
+trend-agent analyze explain --opportunity-id ID          # full report, score components, claims
+trend-agent analyze verify --opportunity-id ID           # re-check claims against the registry now
+trend-agent analyze status                  # usage vs budgets, capability mode, versions
 ```
+
+Without `TREND_AGENT_YOUTUBE_API_KEY`, `analyze` runs **cache-only** (stored results;
+analyses abstain when none exist). The LLM assist is off by default (`llm.enabled` in
+`config/content_analysis.yaml`, plus `TREND_AGENT_ANTHROPIC_API_KEY` and the `anthropic`
+package); without it, analyses are deterministic and say so.
 
 `discover run` fetches within budgets, quotas and poll intervals (`--force` ignores
 intervals, never quotas). Keyword listings hide synthetic data unless
@@ -341,3 +391,10 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/verification_layer.md](docs/verification_layer.md) — evidence registry, claim verification, statistical authority, entities, injection protection, abstention, gate, failure modes
 * [docs/verification_evaluation.md](docs/verification_evaluation.md) — labelled adversarial evaluation (fictional), metrics, held-out results
 * [docs/verification_report.md](docs/verification_report.md) — verification-layer report: changes, schemas, tests, risks, Phase 5 readiness
+* [docs/phase5_architecture.md](docs/phase5_architecture.md) — content-analysis modules, data flow, trust boundaries, schema, queue, retention, capability modes
+* [docs/search_intent_analysis.md](docs/search_intent_analysis.md) — intent taxonomy, entities, classification and decomposition methods
+* [docs/content_gap_detection.md](docs/content_gap_detection.md) — retrieval, evidence tiers, relevance, freshness, coverage, supply, gap rules
+* [docs/evidence_verification.md](docs/evidence_verification.md) — report claims, source checking, prompt-injection defences, controlled LLM
+* [docs/opportunity_scoring.md](docs/opportunity_scoring.md) — score components, weights, caps, statuses, limitations
+* [docs/phase5_evaluation.md](docs/phase5_evaluation.md) — labelled datasets (fictional), metrics, held-out results, benchmarks
+* [docs/phase5_report.md](docs/phase5_report.md) — Phase 5 report: implementation, validation, limitations, Phase 6 readiness

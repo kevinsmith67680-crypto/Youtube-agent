@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from tests.unit.content_analysis.helpers import LOADED
 from trend_agent.content_analysis.config import ANALYSIS_VERSION
@@ -12,9 +13,9 @@ CFG = LOADED.config
 TAG = LOADED.version_tag
 
 
-def item(key: str, cat: str, basis: DemandBasis, **kw: object) -> QueueItem:
-    return QueueItem(key=key, query=kw.pop("query", f"{key} tutorial"), category=cat,
-                     basis=basis, **kw)  # type: ignore[arg-type]  # fmt: skip
+def item(key: str, cat: str, basis: DemandBasis, **kw: Any) -> QueueItem:
+    query = str(kw.pop("query", f"{key} tutorial"))
+    return QueueItem(key=key, query=query, category=cat, basis=basis, **kw)
 
 
 def _plan(items: list[QueueItem], **kw: object) -> object:

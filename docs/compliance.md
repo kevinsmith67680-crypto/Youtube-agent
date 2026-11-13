@@ -177,6 +177,27 @@ Unresolved questions (need the operator / legal review before production):
 * **Signing key.** `TREND_AGENT_VERIFICATION_SIGNING_KEY` is required in production; keep
   it in a secret manager. The development key is public.
 
+## Content-gap analysis (Phase 5)
+
+* **Retrieval** uses only the official YouTube Data API through the Phase 1 ingestion
+  service (quota accounting, request budgets); no scraping, no anti-bot circumvention. At
+  most two `search.list` calls per analysis; the queue's daily search budget defaults to
+  40 of the 100/day search bucket. Without a key, analyses use stored results only.
+* **Captions/transcripts** are not fetched: the official API does not provide third-party
+  captions without authorisation. Evidence tier B is used only for transcripts explicitly
+  marked as authorised; by default every analysis is metadata-only and says so.
+* **Derived metrics**: view counts and other statistics are not used as demand or supply,
+  and `totalResults` is not treated as a count of competing videos (both disabled and
+  listed in `trend-agent analyze status`).
+* **Retention**: per-video analyses, coverage, gaps and opportunity reports contain or
+  derive from third-party titles/descriptions; each expires with the earliest YouTube
+  metadata expiry it used (≤ 30 days) and is removed by `trend-agent data retention
+  --purge`. Run rows keep no source text.
+* **Policy**: queries about cheats, exploits, account compromise or anti-cheat evasion
+  are blocked (`blocked_policy`) and never become opportunities.
+* **LLM**: off by default; when enabled, only titles/descriptions already stored are sent
+  to the provider, inside a delimited data block; no tools are offered.
+
 ## Default posture (conservative)
 
 | Control | Default |
@@ -193,6 +214,8 @@ Unresolved questions (need the operator / legal review before production):
 | YouTube derived metrics / statistics history | disabled (`compliance.*` false) |
 | Recommendation generator | deterministic template (no external calls); LLM adapter opt-in |
 | Synthetic evidence | cannot support claims outside synthetic runs |
+| Phase 5 captions, view counts as demand, `totalResults` as supply | disabled |
+| Phase 5 LLM assist | off (`llm.enabled: false`); deterministic analyses |
 
 ## Operator checklist before production use
 

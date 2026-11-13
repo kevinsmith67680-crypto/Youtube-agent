@@ -12,12 +12,13 @@ that existing videos fail to cover something.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from trend_agent.content_analysis.config import ContentAnalysisConfig
-from trend_agent.content_analysis.entity_verification import QueryEntities
+from trend_agent.content_analysis.entity_verification import QueryEntities, split_version
 from trend_agent.schemas.content_gap import (
     STRENGTH_RANK,
     ContentGap,
@@ -27,6 +28,7 @@ from trend_agent.schemas.content_gap import (
     SupplySummary,
 )
 from trend_agent.schemas.search_intent import (
+    EntityRef,
     IntentClassification,
     PrimaryIntent,
     QueryDecomposition,
@@ -83,6 +85,28 @@ class GapInputs:
     video_evidence: Mapping[str, str]
     observation_evidence: Sequence[str]
     entity_evidence: Sequence[str]
+
+
+def _version_number(version: str | None) -> float | None:
+    m = re.search(r"\d+(?:\.\d+)?", version or "")
+    return float(m.group(0)) if m else None
+
+
+def _older_than_confirmed(ref: EntityRef, entities: QueryEntities) -> bool:
+    """True for an unrecorded version that predates a confirmed version of the same
+    product family: earlier versions very likely exist; a newer, unrecorded one may not."""
+    mine = _version_number(ref.version)
+    if mine is None:
+        return False
+    family = set(split_version(ref.name, ref.version).family)
+    for f in entities.facts:
+        # Same family, or a partial mention of it ("notes 2" next to "Quanta Notes 3").
+        if f.ref.state != "confirmed" or not family or not family <= set(f.versioned.family):
+            continue
+        theirs = _version_number(f.versioned.version)
+        if theirs is not None and mine < theirs:
+            return True
+    return False
 
 
 def detect(inp: GapInputs, config: ContentAnalysisConfig) -> list[ContentGap]:
@@ -143,6 +167,8 @@ def detect(inp: GapInputs, config: ContentAnalysisConfig) -> list[ContentGap]:
         reasons.append(f"only {n} results were retrieved (at least {g.min_inspected} needed)")
     primary = inp.entities.primary
     for ref in inp.entities.refs:
+        if ref.state in ("unknown", "rumored") and _older_than_confirmed(ref, inp.entities):
+            continue  # an earlier version of a confirmed product (e.g. "X 2" next to "X 3")
         if ref.state == "removed":
             reasons.append(
                 f"a credible record states that '{ref.name}' was removed or vaulted; a guide "

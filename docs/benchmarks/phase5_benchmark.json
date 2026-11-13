@@ -1,0 +1,44 @@
+{
+  "python": "3.12.3",
+  "machine": "x86_64",
+  "memory": {
+    "intent_and_decomposition": {
+      "queries": 1000,
+      "seconds": 0.0778,
+      "per_query_ms": 0.0778
+    },
+    "dedupe": {
+      "inputs": 2000,
+      "distinct_original_queries": 656,
+      "unique_after_canonicalisation": 656,
+      "seconds": 0.0062
+    },
+    "analysis_latency": {
+      "analyses": 100,
+      "results_per_analysis": 25,
+      "p50_ms": 22.2,
+      "p95_ms": 34.38,
+      "max_ms": 98.46,
+      "mean_search_requests": 1,
+      "note": "deterministic mode, fixture source: excludes network and database time"
+    },
+    "queue_for_1000_keywords": {
+      "planning_seconds": 0.0719,
+      "selected_this_run": 10,
+      "max_per_run": 10,
+      "daily_search_requests_budget": 40,
+      "estimated_analyses_per_day": 40.0,
+      "days_to_analyse_all_once": 25.0,
+      "youtube_quota_units_per_analysis": 100,
+      "note": "search.list costs 100 units; 1,000 analyses need ~100,000 units, far above the default 10,000/day project quota - the queue prioritises instead of analysing every keyword daily"
+    }
+  },
+  "database": {
+    "analyses": 100,
+    "analysis_with_db_registration_p50_ms": 115.17,
+    "analysis_with_db_registration_p95_ms": 153.73,
+    "save_p50_ms": 32.7,
+    "save_p95_ms": 65.68,
+    "idempotent_resave_p50_ms": 1.8
+  }
+}

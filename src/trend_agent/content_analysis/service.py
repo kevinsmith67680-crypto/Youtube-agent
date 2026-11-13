@@ -666,15 +666,17 @@ class ContentAnalysisService:
 
     # ------------------------------------------------------------------ queue
     def candidates(
-        self, *, include_synthetic: bool = False, limit: int = 200
+        self, *, include_synthetic: bool = False, limit: int = 200, category: str | None = None
     ) -> list[scheduling.QueueItem]:
         """Open Phase 4 surge events, one item per monitoring target (strongest event)."""
         from trend_agent.content_analysis.demand import basis_for
+        from trend_agent.discovery.models import Category
 
+        cat = Category(category) if category else None
         with transaction(self._factory) as s:
             read_only(s)
             rows = SurgeEventRepository(s).events(
-                active=True, include_synthetic=include_synthetic, limit=limit
+                active=True, include_synthetic=include_synthetic, limit=limit, category=cat
             )
             queries = {
                 q.id: q.original_query
@@ -720,11 +722,16 @@ class ContentAnalysisService:
             return ContentAnalysisRepository(s).usage_since(_start_of_day(now))
 
     def pending(
-        self, *, include_synthetic: bool = False, limit: int | None = None, force: bool = False
+        self,
+        *,
+        include_synthetic: bool = False,
+        limit: int | None = None,
+        force: bool = False,
+        category: str | None = None,
     ) -> scheduling.QueuePlan:
         searches, tokens = self.usage_today()
         return scheduling.plan(
-            self.candidates(include_synthetic=include_synthetic),
+            self.candidates(include_synthetic=include_synthetic, category=category),
             self.config,
             now=self._clock(),
             analysis_version=ANALYSIS_VERSION,
@@ -737,9 +744,16 @@ class ContentAnalysisService:
         )
 
     async def run(
-        self, *, include_synthetic: bool = False, limit: int | None = None, force: bool = False
+        self,
+        *,
+        include_synthetic: bool = False,
+        limit: int | None = None,
+        force: bool = False,
+        category: str | None = None,
     ) -> QueueRunReport:
-        plan = self.pending(include_synthetic=include_synthetic, limit=limit, force=force)
+        plan = self.pending(
+            include_synthetic=include_synthetic, limit=limit, force=force, category=category
+        )
         report = QueueRunReport(plan)
         sem = asyncio.Semaphore(self.config.scheduling.max_concurrency)
 

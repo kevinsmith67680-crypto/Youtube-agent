@@ -55,6 +55,7 @@ def evidence_quality(
 ) -> tuple[float, EvidenceStrength, dict[str, Any]]:
     volume = min(1.0, supply.inspected / (2 * min_inspected)) if supply.inspected else 0.0
     tier = 0.0
+    best: EvidenceTier | None = None
     if tiers:
         best = max(
             tiers,
@@ -79,7 +80,7 @@ def evidence_quality(
         {
             "inspected": supply.inspected,
             "volume": round(volume, 3),
-            "best_tier": max(tiers, key=lambda t: t.value).value if tiers else None,
+            "best_tier": best.value if best is not None else None,
             "entity_state": entity_state,
             "claims_verified_share": claims_verified_share,
         },

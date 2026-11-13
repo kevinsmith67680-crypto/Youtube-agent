@@ -120,3 +120,15 @@ def test_metadata_only_specific_answer_gaps_are_weak_hypotheses() -> None:
         if g.gap_type is GapType.MISSING_SPECIFIC_ANSWER:
             assert g.verification_status is GapVerification.HYPOTHESIS
             assert any("titles and descriptions" in lim for lim in g.limitations)
+
+
+def test_an_older_unrecorded_version_does_not_force_abstention() -> None:
+    vids = [
+        v(f"q{i}", f"Quanta Notes 3 vs Quanta Notes 2 comparison {i}",
+          "Comparing Quanta Notes 3 and Quanta Notes 2 side by side.", p="2026-04-01")
+        for i in range(8)
+    ]  # fmt: skip
+    older = analyse("quanta", vids, query="quanta notes 3 vs quanta notes 2")
+    assert older.report.status is not OpportunityStatus.INSUFFICIENT_EVIDENCE
+    newer = analyse("quanta", vids, query="quanta notes 3 vs quanta notes 4")
+    assert newer.report.status is OpportunityStatus.INSUFFICIENT_EVIDENCE

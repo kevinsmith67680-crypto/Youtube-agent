@@ -161,7 +161,7 @@ def _svc(w: World, **kw: Any) -> Any:
 
 def _event(w: World) -> int:
     with transaction(w.factory) as s:
-        return int(
+        event = (
             s.execute(
                 sa.select(SurgeEventRow.id)
                 .where(SurgeEventRow.target_id == w.targets["A"])
@@ -170,6 +170,8 @@ def _event(w: World) -> int:
             .scalars()
             .first()
         )
+    assert event is not None, "the synthetic world produced no surge event"
+    return int(event)
 
 
 def test_surge_analysis_persists_once_and_preserves_demand(
@@ -379,11 +381,17 @@ def test_cli_analyze_commands(world: World, wired_cli: None) -> None:
     opps = json.loads(invoke("analyze", "opportunities", "--all", "--include-synthetic", "--json"))
     assert any(o["opportunity_id"] == opp for o in opps)
     assert "main uncertainty" in invoke("analyze", "explain", opp[:8])
-    verified = json.loads(invoke("analyze", "verify", opp, "--json"))
+    assert "main uncertainty" in invoke("analyze", "explain", "--opportunity-id", opp)
+    verified = json.loads(invoke("analyze", "verify", "--opportunity-id", opp, "--json"))
     assert verified["published_claims_still_valid"]
     status = json.loads(invoke("analyze", "status", "--json"))
     assert status["today"]["analyses"] >= 2
     assert "budgets" in status
     invoke("analyze", "pending", "--include-synthetic")
+    invoke("analyze", "pending", "--include-synthetic", "--category", "ai")
+    run = json.loads(invoke("analyze", "run", "--category", "gaming", "--include-synthetic",
+                            "--json"))  # fmt: skip
+    assert run["results"] == []  # the synthetic surge is an AI query
+    invoke("analyze", "explain", code=2)
     invoke("analyze", "explain", "00000000", code=1)
     invoke("analyze", "surge", "--event-id", event, code=2)  # synthetic without opt-in

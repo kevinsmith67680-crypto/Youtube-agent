@@ -95,7 +95,9 @@ class Gaps(_Strict):
     adequate_relevant_current: int = Field(
         default=3, ge=1, description="relevant, current, matching results that answer the need"
     )
-    low_relevance_best_below: float = 60.0
+    low_relevance_best_below: float = Field(
+        default=70.0, description="LOW_RELEVANCE when the best relevant result is below this"
+    )
     version_mismatch_share: float = Field(default=0.6, gt=0, le=1)
     outdated_share: float = Field(default=0.6, gt=0, le=1)
     max_current_version_results_for_gap: int = 1
@@ -227,6 +229,16 @@ class ContentAnalysisConfig(_Strict):
     scheduling: Scheduling = Scheduling()
     llm: LLMSettings = LLMSettings()
     policy: Policy = Policy()
+
+    @model_validator(mode="after")
+    def _consistent(self) -> ContentAnalysisConfig:
+        r = self.relevance
+        if r.high_threshold < r.relevant_threshold:
+            raise ValueError("relevance.high_threshold must be >= relevant_threshold")
+        if self.gaps.low_relevance_best_below <= r.relevant_threshold:
+            # Every relevant result scores >= relevant_threshold, so the rule could never fire.
+            raise ValueError("gaps.low_relevance_best_below must exceed relevant_threshold")
+        return self
 
 
 class LoadedContentConfig(BaseModel):
