@@ -1,0 +1,68 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "cl",
+  "pageInfo": {
+    "totalResults": 2,
+    "resultsPerPage": 2
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "c1",
+      "id": "UCaaaaaaaaaaaaaaaaaaaaaa",
+      "snippet": {
+        "title": "Channel A",
+        "description": "About A",
+        "customUrl": "@channela",
+        "publishedAt": "2015-05-01T00:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/chA/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/chA/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "country": "GB"
+      },
+      "statistics": {
+        "viewCount": "1000000",
+        "subscriberCount": "5000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "120"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "c2",
+      "id": "UCbbbbbbbbbbbbbbbbbbbbbb",
+      "snippet": {
+        "title": "Channel B",
+        "description": "",
+        "publishedAt": "2018-01-01T00:00:00.123Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/chB/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/chB/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        }
+      },
+      "statistics": {
+        "viewCount": "2000",
+        "subscriberCount": "0",
+        "hiddenSubscriberCount": true,
+        "videoCount": "3"
+      }
+    }
+  ]
+}

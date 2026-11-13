@@ -1,0 +1,184 @@
+# YouTube Trend Agent — Phase 1: Foundation & Data Acquisition
+
+An autonomous intelligence platform (in progress) for understanding **YouTube search
+demand**: what people search for, which searches are surging, which are under-served by
+existing videos, and what videos to make. This repository contains **Phase 1 of 8**: the
+typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
+controls that every later phase depends on.
+
+> **Read this first — what the data can and cannot tell you.**
+> YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
+> returns how often a keyword is searched, now or historically. This project therefore
+> labels every record with *what it actually measures* (`MeasurementType`):
+> `DIRECT_SEARCH_INTEREST` (YouTube-search-specific interest from a provider that really
+> measures it), `SEARCH_SUGGESTION` (discovery only), `VIDEO_ACTIVITY` (video supply /
+> attention, e.g. YouTube API metadata), `EXTERNAL_SEARCH_INTEREST` (e.g. Google *web*
+> search), and `UNKNOWN`. Video views are never converted into search counts, and no
+> search-volume data is ever fabricated.
+
+## What Phase 1 provides
+
+| Area | Status |
+|---|---|
+| YouTube Data API v3 provider (search, video details, channels, most-popular charts, categories) | Implemented; real authenticated requests when a key is configured |
+| Quota management (per-bucket, Pacific-midnight reset, safety margin, budgets, typed exhaustion) | Implemented |
+| Google Trends provider (official API is limited-access alpha) | Adapter + honest `NOT_CONFIGURED` / `ACCESS_RESTRICTED` status; no transport shipped (see [data sources](docs/data_sources.md)) |
+| Deterministic synthetic provider (12 scenarios) | Implemented, labelled `SYNTHETIC` |
+| Validation, quarantine, comparability checks | Implemented |
+| PostgreSQL schema + Alembic migrations | Implemented |
+| Retention / compliance controls (30-day expiry, statistics persistence off by default) | Implemented |
+| CLI (`trend-agent`) | Implemented |
+
+Not in scope for Phase 1 (by design): keyword discovery, scheduling, surge detection,
+forecasting, LLM analysis, recommendations, dashboard.
+
+## Architecture overview
+
+A modular monolith (`src/trend_agent/`):
+
+```
+providers/   provider protocols, registry, YouTube, Google Trends, mock, quota, retry
+schemas/     provider-neutral domain models and enums (the data contracts)
+ingestion/   validation, storage/retention policy, ingestion orchestration
+db/          SQLAlchemy models, session management, repositories (all SQL lives here)
+comparability.py   decides whether two observations' values may be compared
+container.py composition root (dependency injection), cli.py Typer CLI
+```
+
+Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
+-> ingestion run record -> summary`. See [docs/architecture.md](docs/architecture.md).
+
+## Prerequisites
+
+* Python **3.12+** (tested on 3.12 and 3.13)
+* Docker with Docker Compose (for the local PostgreSQL 16)
+* Optional: a YouTube Data API v3 key (for live YouTube calls)
+* Optional: [`uv`](https://docs.astral.sh/uv/) (faster installs; `pip` works too)
+
+## Installation
+
+```bash
+git clone <this repository> && cd Youtube-agent
+python3.12 -m venv .venv && source .venv/bin/activate      # or: uv venv --python 3.12
+pip install -e ".[dev]"                                      # or: uv pip install -e ".[dev]"
+cp .env.example .env                                         # then edit .env
+trend-agent --help
+```
+
+## Environment configuration
+
+All settings are environment variables prefixed `TREND_AGENT_` (or lines in a local
+`.env`, which is git-ignored). `.env.example` documents every variable and its default.
+The most important ones:
+
+| Variable | Purpose |
+|---|---|
+| `TREND_AGENT_DATABASE_URL` | PostgreSQL URL (default matches `docker-compose.yml`) |
+| `TREND_AGENT_YOUTUBE_API_KEY` | YouTube Data API v3 key. Without it, YouTube commands report `not_configured`. |
+| `TREND_AGENT_YOUTUBE_DAILY_UNIT_LIMIT` / `..._SEARCH_DAILY_CALL_LIMIT` | Your project's real quota (defaults: 10,000 units; 100 `search.list` calls) |
+| `TREND_AGENT_YOUTUBE_QUOTA_SAFETY_MARGIN_PCT` | Keep this % of each bucket unused (default 10) |
+| `TREND_AGENT_YOUTUBE_PERSIST_STATISTICS` | Store view/like/comment counts. **Default `false`** — read [docs/compliance.md](docs/compliance.md) first. |
+| `TREND_AGENT_GOOGLE_TRENDS_ACCESS_MODE` | `disabled` (default) or `official_alpha` |
+| `TREND_AGENT_GOOGLE_TRENDS_RETENTION_DAYS` | Empty = Trends data is never stored |
+
+Getting a YouTube key: Google Cloud Console → create/select a project → *APIs & Services*
+→ enable **YouTube Data API v3** → *Credentials* → *Create API key* → restrict the key to
+that API. The key is sent only in the `X-Goog-Api-Key` header, never in URLs or logs.
+
+## PostgreSQL setup
+
+```bash
+docker compose up -d            # PostgreSQL 16 on 127.0.0.1:5432 (UTC), plus a
+                                # separate `trend_agent_test` database for the test suite
+docker compose ps               # wait for "healthy"
+```
+
+Data persists in the `trend_agent_pgdata` volume (`docker compose down -v` deletes it).
+To use another server, set `TREND_AGENT_DATABASE_URL` (PostgreSQL **15+** required: the
+schema uses `UNIQUE NULLS NOT DISTINCT`).
+
+## Database migrations
+
+Run from the repository root (where `alembic.ini` lives):
+
+```bash
+trend-agent db upgrade          # == alembic upgrade head
+trend-agent db current          # current vs. latest revision
+alembic downgrade base          # drop everything (development only)
+```
+
+## CLI
+
+Logs are JSON on **stderr** (WARNING+ by default, `-v` for INFO); results go to stdout.
+Most commands accept `--json`.
+
+```bash
+trend-agent doctor [--live]                 # config (secrets redacted), DB, schema, providers
+                                            # --live spends 1 quota unit to validate the key
+trend-agent providers list                  # capabilities, measurement types, retention rules
+trend-agent trends status                   # Google Trends access + supported granularity
+
+trend-agent youtube search --query "artificial intelligence" --region GB --limit 20
+trend-agent youtube popular --region GB --limit 20 [--category 28]
+trend-agent youtube categories --region GB
+#   add --persist to store results (subject to retention policy)
+trend-agent youtube refresh                 # refresh metadata nearing 30-day expiry
+
+trend-agent ingest --provider mock --query "AI agents" [--scenario sudden_surge] [--days 90]
+trend-agent data inspect --query "AI agents"  # observations, provenance, comparability groups
+trend-agent data runs --rejections          # ingestion runs and quarantined records
+trend-agent data retention [--purge]        # expired third-party data
+
+trend-agent quota status                    # local quota estimate per bucket
+```
+
+Mock scenarios: `stable`, `gradual_growth`, `sudden_surge`, `declining`, `sparse`,
+`missing_data`, `out_of_order`, `duplicates`, `mixed_normalization`, `invalid_records`,
+`provider_failure`, `rate_limited`. All mock output is labelled synthetic.
+
+Exit codes: `0` success, `1` error, `2` missing configuration, `3` database unavailable,
+`130` interrupted (an in-flight ingestion run is marked `cancelled`).
+
+Quota costs (defaults, configurable): each `search.list` page = 1 call from the 100/day
+search bucket; each `videos.list`, `channels.list`, `videoCategories.list` request = 1 unit
+from the 10,000/day pool (video/channel lookups are batched 50 IDs per request).
+
+## Testing
+
+```bash
+docker compose up -d                       # integration tests need the test database
+pytest                                     # unit + integration; live tests excluded
+pytest --cov                               # with coverage
+pytest tests/unit                          # no database, no network
+ruff check . && ruff format --check . && mypy && mypy tests --strict
+```
+
+* Unit tests never touch the network: YouTube HTTP is served by `httpx.MockTransport`
+  using fixtures in `tests/fixtures/`.
+* Integration tests use `TREND_AGENT_TEST_DATABASE_URL` (default: the `trend_agent_test`
+  database). They are **skipped** if it is unreachable; set
+  `TREND_AGENT_REQUIRE_DB_TESTS=1` to make that a failure (recommended in CI).
+* Live tests (`tests/live`) consume real quota and are opt-in only:
+  `TREND_AGENT_RUN_LIVE_TESTS=1 TREND_AGENT_YOUTUBE_API_KEY=... pytest -m live tests/live`
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `database unavailable` / exit code 3 | `docker compose up -d`; check `TREND_AGENT_DATABASE_URL`; `trend-agent doctor` |
+| `Schema is not at head` | `trend-agent db upgrade` (from the repository root) |
+| `[not_configured] ... TREND_AGENT_YOUTUBE_API_KEY` | Add the key to `.env` |
+| `[invalid_credentials]` | Key wrong, deleted, or restricted to other APIs/referrers |
+| `[access_restricted] ... accessNotConfigured` | Enable *YouTube Data API v3* for the key's Cloud project |
+| `[quota_exhausted]` | Wait for the reset (midnight Pacific) shown by `trend-agent quota status`; local estimates can differ from Google's — the Cloud Console is authoritative |
+| `invalid region code 'UK'` | Use ISO 3166-1 codes (`GB`) |
+| Google Trends `not_configured` | Expected: the official API is limited-access alpha. See [docs/data_sources.md](docs/data_sources.md) |
+| Integration tests all skipped | Test DB unreachable; `docker compose up -d` (the init script creates `trend_agent_test` on first start — if your volume predates it, run `docker compose exec postgres createdb -U trend_agent trend_agent_test`) |
+
+## Documentation
+
+* [docs/architecture.md](docs/architecture.md) — modules, data flow, interfaces, schema, errors
+* [docs/data_sources.md](docs/data_sources.md) — what each provider can and cannot measure
+* [docs/data_contracts.md](docs/data_contracts.md) — canonical models and comparison rules
+* [docs/compliance.md](docs/compliance.md) — YouTube API policies, retention, permissions
+* [docs/phase1_report.md](docs/phase1_report.md) — what was built and verified; Phase 2 readiness

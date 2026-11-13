@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": 403,
+    "message": "The request rate is too high.",
+    "errors": [
+      {
+        "message": "The request rate is too high.",
+        "domain": "usageLimits",
+        "reason": "rateLimitExceeded"
+      }
+    ],
+    "status": "PERMISSION_DENIED"
+  }
+}

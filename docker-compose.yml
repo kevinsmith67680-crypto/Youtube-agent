@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: trend-agent-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-trend_agent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trend_agent_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-trend_agent}
+      # Store and report timestamps in UTC regardless of host settings.
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      # Bound to localhost only: the development database is not exposed on the network.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - trend_agent_pgdata:/var/lib/postgresql/data
+      - ./scripts/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  trend_agent_pgdata:

@@ -1,0 +1,26 @@
+{
+  "kind": "youtube#videoCategoryListResponse",
+  "etag": "cat",
+  "items": [
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "c1",
+      "id": "1",
+      "snippet": {
+        "title": "Film & Animation",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "c2",
+      "id": "28",
+      "snippet": {
+        "title": "Science & Technology",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    }
+  ]
+}

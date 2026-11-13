@@ -1,0 +1,70 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "p1",
+  "nextPageToken": "CAIQAA",
+  "regionCode": "GB",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 2
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-vidAAAAAAA1",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "vidAAAAAAA1"
+      },
+      "snippet": {
+        "publishedAt": "2026-02-01T10:00:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "AI agents &amp; you: what&#39;s next",
+        "description": "An overview of &quot;AI agents&quot; in 2026.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA1/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA1/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel &amp; Co",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-02-01T10:00:00Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-vidAAAAAAA2",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "vidAAAAAAA2"
+      },
+      "snippet": {
+        "publishedAt": "2026-02-02T11:30:00Z",
+        "channelId": "UCbbbbbbbbbbbbbbbbbbbbbb",
+        "title": "Building AI agents",
+        "description": "An overview of &quot;AI agents&quot; in 2026.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA2/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA2/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel &amp; Co",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-02-02T11:30:00Z"
+      }
+    }
+  ]
+}

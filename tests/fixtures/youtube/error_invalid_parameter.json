@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": 400,
+    "message": "Invalid value for parameter regionCode.",
+    "errors": [
+      {
+        "message": "Invalid value for parameter regionCode.",
+        "domain": "youtube.parameter",
+        "reason": "invalidParameter"
+      }
+    ],
+    "status": "INVALID_ARGUMENT"
+  }
+}

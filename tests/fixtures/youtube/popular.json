@@ -1,0 +1,100 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "pop",
+  "nextPageToken": "CAIQAA",
+  "pageInfo": {
+    "totalResults": 200,
+    "resultsPerPage": 2
+  },
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "v-popAAAAAAA1",
+      "id": "popAAAAAAA1",
+      "snippet": {
+        "publishedAt": "2026-02-01T10:00:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "Popular one",
+        "description": "Full description",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/popAAAAAAA1/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/popAAAAAAA1/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel A",
+        "tags": [
+          "ai",
+          "agents"
+        ],
+        "categoryId": "28",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "defaultAudioLanguage": "en-GB"
+      },
+      "contentDetails": {
+        "duration": "PT1H2M3S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "999999",
+        "likeCount": "1000",
+        "commentCount": "50"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "v-popAAAAAAA2",
+      "id": "popAAAAAAA2",
+      "snippet": {
+        "publishedAt": "2026-02-01T10:00:00Z",
+        "channelId": "UCbbbbbbbbbbbbbbbbbbbbbb",
+        "title": "Popular two",
+        "description": "Full description",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/popAAAAAAA2/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/popAAAAAAA2/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel A",
+        "tags": [
+          "ai",
+          "agents"
+        ],
+        "categoryId": "28",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "defaultAudioLanguage": "en-GB"
+      },
+      "contentDetails": {
+        "duration": "PT4M",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "888888",
+        "commentCount": "10"
+      }
+    }
+  ]
+}

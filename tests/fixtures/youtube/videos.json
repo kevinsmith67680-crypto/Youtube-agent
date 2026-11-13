@@ -1,0 +1,100 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "vl",
+  "pageInfo": {
+    "totalResults": 2,
+    "resultsPerPage": 2
+  },
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "v-vidAAAAAAA1",
+      "id": "vidAAAAAAA1",
+      "snippet": {
+        "publishedAt": "2026-02-01T10:00:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "AI agents & you",
+        "description": "Full description",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA1/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA1/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel A",
+        "tags": [
+          "ai",
+          "agents"
+        ],
+        "categoryId": "28",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "defaultAudioLanguage": "en-GB"
+      },
+      "contentDetails": {
+        "duration": "PT15M33S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "12345",
+        "likeCount": "678",
+        "favoriteCount": "0",
+        "commentCount": "90"
+      }
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "v-vidAAAAAAA2",
+      "id": "vidAAAAAAA2",
+      "snippet": {
+        "publishedAt": "2026-02-01T10:00:00Z",
+        "channelId": "UCbbbbbbbbbbbbbbbbbbbbbb",
+        "title": "Building AI agents",
+        "description": "Full description",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA2/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA2/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel A",
+        "tags": [
+          "ai",
+          "agents"
+        ],
+        "categoryId": "28",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "en",
+        "defaultAudioLanguage": "en-GB"
+      },
+      "contentDetails": {
+        "duration": "P0D",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "500",
+        "favoriteCount": "0"
+      }
+    }
+  ]
+}

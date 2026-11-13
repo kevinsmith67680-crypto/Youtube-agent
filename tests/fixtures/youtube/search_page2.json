@@ -1,0 +1,41 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "p2",
+  "prevPageToken": "CAEQAQ",
+  "regionCode": "GB",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 2
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-vidAAAAAAA3",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "vidAAAAAAA3"
+      },
+      "snippet": {
+        "publishedAt": "2026-02-03T09:15:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "Agents explained",
+        "description": "An overview of &quot;AI agents&quot; in 2026.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA3/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vidAAAAAAA3/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Channel &amp; Co",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-02-03T09:15:00Z"
+      }
+    }
+  ]
+}
