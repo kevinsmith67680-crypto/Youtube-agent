@@ -184,6 +184,13 @@ class ForecastEngine:
             self.dloaded,
             strict=True,
         )
+        # Data cutoff = availability time of the newest observation used (target and
+        # supporting series). Forecast identity uses it, so re-running without new data
+        # is idempotent even though the wall-clock prediction time differs.
+        used = [a for a in pit.available.values() if a <= as_of]
+        for sp in _support_views(bundle, mode).values():
+            used += [a for a in sp.available.values() if a <= as_of]
+        cutoff = max(used) if used else as_of
         x = row.vector()
         values = {k: (None if math.isnan(v) else round(float(v), 6)) for k, v in row.values.items()}
         family = eligibility.target_family(meta.measurement)
@@ -225,7 +232,7 @@ class ForecastEngine:
                 "is_proxy": meta.is_proxy,
                 "synthetic": meta.is_synthetic,
                 "prediction_timestamp": as_of,
-                "data_cutoff": as_of,
+                "data_cutoff": cutoff,
                 "forecast_horizon_hours": h,
                 "data_quality": quality,
                 "features": values,
@@ -237,7 +244,7 @@ class ForecastEngine:
                 reasons = list(elig.reasons) or ([ref.reason] if ref.reason else [])
                 outputs.append(
                     ForecastOutput(
-                        prediction_id=prediction_id(meta.series_id, as_of, h, ["none"]),
+                        prediction_id=prediction_id(meta.series_id, cutoff, h, ["none"]),
                         status=elig.status
                         if elig.status is not ForecastStatus.READY
                         else ForecastStatus.INSUFFICIENT_HISTORY,
@@ -441,7 +448,9 @@ class ForecastEngine:
         if analog is not None:
             used_ids.append(analog[0].model_id)
         return ForecastOutput(
-            prediction_id=prediction_id(meta.series_id, vis.as_of, h, used_ids or ["baseline"]),
+            prediction_id=prediction_id(
+                meta.series_id, common["data_cutoff"], h, used_ids or ["baseline"]
+            ),
             status=status,
             status_reasons=tuple(reasons),
             breakout=breakout,

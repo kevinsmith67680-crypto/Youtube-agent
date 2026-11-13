@@ -247,8 +247,9 @@ class Bundle:
 
 
 _CATEGORY_EVENTS = {
-    "ai": (("launch", 0.35), ("adoption", 0.25), ("spike", 0.1), ("none", 0.3)),
-    "technology": (("adoption", 0.25), ("step", 0.15), ("launch", 0.15), ("none", 0.45)),
+    # AI / technology topics: sustained adoption as common as short launch spikes.
+    "ai": (("launch", 0.3), ("adoption", 0.35), ("spike", 0.1), ("none", 0.25)),
+    "technology": (("adoption", 0.35), ("step", 0.15), ("launch", 0.1), ("none", 0.4)),
     "gaming": (("limited", 0.4), ("spike", 0.15), ("launch", 0.1), ("none", 0.35)),
 }
 
@@ -277,7 +278,7 @@ def _random_event(rng: np.random.Generator, kind: str, span_h: float, step: floa
             "adoption",
             onset,
             float(rng.uniform(0.5, 1.5)),
-            length_h=float(rng.uniform(72, 240)) * (1 if step == 1 else 3),
+            length_h=float(rng.uniform(96, 600)) * (1 if step == 1 else 3),
         )
     if kind == "limited":
         return Event(

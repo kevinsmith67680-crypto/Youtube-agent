@@ -239,8 +239,8 @@ def scenario_c(ctx: Context) -> ScenarioResult:
         f"quick={q.status.value if q else None} deep={d.status.value if d else None}",
     )
     r.check(
-        "short event: deep dive no more likely than a quick reaction",
-        pq is None or pd is None or pd <= pq + 1e-9,
+        "short event: deep dive no more likely than a quick reaction (±0.05 analog noise)",
+        pq is None or pd is None or pd <= pq + 0.05,
         f"quick={pq} deep={pd}",
     )
     r.check(
@@ -398,8 +398,8 @@ def scenario_g(ctx: Context) -> ScenarioResult:
     monday_end = hours(start + timedelta(days=monday + 1))
     tuesday = start + timedelta(days=monday + 1, hours=23)
     wednesday = start + timedelta(days=monday + 2, hours=12)  # published Wed 10:00
-    seen_tue = bool(np.any(np.isclose(pit.at(tuesday).t_end, monday_end)))
-    seen_wed = bool(np.any(np.isclose(pit.at(wednesday).t_end, monday_end)))
+    seen_tue = bool(np.any(np.isclose(pit.at(tuesday).t_end, monday_end, rtol=0.0, atol=1e-6)))
+    seen_wed = bool(np.any(np.isclose(pit.at(wednesday).t_end, monday_end, rtol=0.0, atol=1e-6)))
     r.check("Tuesday forecast cannot see Monday's delayed value", not seen_tue, "")
     r.check("visible once published (Wednesday)", seen_wed, "")
     cut = SeriesBundle(

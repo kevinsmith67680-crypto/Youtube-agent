@@ -34,6 +34,7 @@ from trend_agent.forecasting.evaluation import (
     classification_metrics,
     paired_bootstrap,
     regression_metrics,
+    slices,
 )
 from trend_agent.forecasting.uncertainty import ConformalInterval
 from trend_agent.schemas.enums import TimeGranularity
@@ -308,6 +309,12 @@ def train_classifier(
             calib.status.value if calib else CalibrationStatus.INSUFFICIENT_CALIBRATION_DATA.value
         )
         c.test_predictions = p_test
+        age = ds.column("series_age_h")[m["test"]]
+        meta_test = {k: ds.meta[k][m["test"]] for k in ("category", "provider", "granularity")}
+        meta_test["history"] = np.where(age < math.log1p(336.0), "new_series", "established")
+        c.metrics["slices"] = slices(
+            meta_test, np.ones(ys.shape, dtype=bool), ys, p_test, c.threshold, k
+        )
         report.candidates.append(c)
 
     base = climatology(np.concatenate([yt, yv]))

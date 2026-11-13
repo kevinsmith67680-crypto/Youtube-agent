@@ -136,6 +136,23 @@ FEATURES: tuple[FeatureSpec, ...] = (
         _VIS,
     ),
     _spec(
+        "window_mean_change_log",
+        G.GROWTH,
+        "log_ratio",
+        "target_series",
+        "log ratio of the mean of the last growth window (24 h / 7 d) to the window "
+        "before it: free of the daily cycle",
+        _VIS,
+    ),
+    _spec(
+        "window_growth_persistence",
+        G.GROWTH,
+        "share",
+        "target_series",
+        "share of rising window-over-window steps among the last three windows",
+        _VIS,
+    ),
+    _spec(
         "threshold_gap_log",
         G.GROWTH,
         "log_ratio",
@@ -627,6 +644,16 @@ def compute(
         v["slope_prior_log_per_h"] = s_prior
         if math.isfinite(s_recent) and math.isfinite(s_prior):
             v["accel_log_per_h2"] = (s_recent - s_prior) / half
+        means = []
+        for k in range(4):
+            mk = ok & (vis.t_end > t_last - (k + 1) * gw) & (vis.t_end <= t_last - k * gw)
+            enough = np.sum(mk) >= 0.5 * gw / step
+            means.append(float(np.mean(vis.values[mk])) if enough else math.nan)
+        v["window_mean_change_log"] = _log_ratio(means[0], means[1])
+        steps = [_log_ratio(means[k], means[k + 1]) for k in range(3)]
+        steps = [x for x in steps if math.isfinite(x)]
+        if steps:
+            v["window_growth_persistence"] = float(np.mean([x > 0 for x in steps]))
         diffs = np.diff(ly[ok][-7:])
         if diffs.size:
             v["growth_persistence"] = float(np.mean(diffs > 0))

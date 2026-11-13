@@ -33,6 +33,8 @@ STATE_FEATURES = (
     "slope_recent_log_per_h",
     "accel_log_per_h2",
     "growth_persistence",
+    "window_mean_change_log",
+    "window_growth_persistence",
     "threshold_gap_log",
     "det_elevated_streak_h",
     "det_cusum_ratio",

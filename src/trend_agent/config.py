@@ -107,6 +107,10 @@ class Settings(BaseSettings):
     # Optional LLM generator (the anthropic SDK is not a dependency; install it to use).
     anthropic_api_key: SecretStr | None = None
 
+    # --- Phase 6: forecasting ------------------------------------------------------
+    # Local directory for checksummed model artifacts (JSON + LightGBM text, never pickle).
+    forecast_artifact_dir: str | None = None
+
     # --- Synthetic (mock) provider -------------------------------------------------
     mock_provider_enabled: bool = True
     mock_seed: int = 20_260_101

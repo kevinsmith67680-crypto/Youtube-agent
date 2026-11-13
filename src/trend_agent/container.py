@@ -38,6 +38,8 @@ if TYPE_CHECKING:
     from trend_agent.content_analysis.llm_client import AnalysisLLM
     from trend_agent.content_analysis.result_retrieval import ResultSource
     from trend_agent.content_analysis.service import ContentAnalysisService
+    from trend_agent.forecasting.config import LoadedForecastingConfig
+    from trend_agent.forecasting.service import ForecastingService
     from trend_agent.verification.service import VerificationService
 
 
@@ -56,6 +58,7 @@ class AppContainer:
     _detection_config: LoadedDetectionConfig | None = None
     _verification_config: LoadedVerificationConfig | None = None
     _content_config: LoadedContentConfig | None = None
+    _forecasting_config: LoadedForecastingConfig | None = None
 
     def ingestion(self, *, clock: Clock | None = None) -> IngestionService:
         return IngestionService(
@@ -230,6 +233,28 @@ class AppContainer:
             clock=clock or self.clock,
             ingestion=self.ingestion(clock=clock),
             settings=self.settings,
+        )
+
+    def forecasting_config(self) -> LoadedForecastingConfig:
+        from trend_agent.forecasting.config import load_forecasting_config
+
+        if self._forecasting_config is None:
+            self._forecasting_config = load_forecasting_config(self.settings.discovery_config_dir)
+        return self._forecasting_config
+
+    def forecasting(
+        self, *, clock: Clock | None = None, loaded: LoadedForecastingConfig | None = None
+    ) -> ForecastingService:
+        """Phase 6 forecasting (training, registry, inference, drift)."""
+        from trend_agent.forecasting.service import ForecastingService
+
+        loaded = loaded or self.forecasting_config()
+        return ForecastingService(
+            session_factory=self.session_factory,
+            loaded=loaded,
+            dloaded=self.detection_config(),
+            artifact_dir=self.settings.forecast_artifact_dir or loaded.config.artifact_dir,
+            clock=clock or self.clock,
         )
 
     async def aclose(self) -> None:

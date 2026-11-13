@@ -9,6 +9,7 @@ from trend_agent.db.repositories import ObservationRepository, VideoRepository
 from trend_agent.db.repositories.content_analyses import ContentAnalysisRepository
 from trend_agent.db.repositories.detection_runs import DetectionRunRepository
 from trend_agent.db.repositories.discovery import DiscoveryRepository
+from trend_agent.db.repositories.forecasts import ForecastRepository
 from trend_agent.db.repositories.surge_events import SurgeEventRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
 from trend_agent.db.repositories.verification import VerificationRepository
@@ -69,6 +70,7 @@ class RetentionService:
             expired["surge_events"] = SurgeEventRepository(session).count_expired(now)
             # Verification layer: evidence records and gate runs expire with their sources.
             expired.update(ContentAnalysisRepository(session).count_expired(now))
+            expired.update(ForecastRepository(session).count_expired(now))
             expired.update(VerificationRepository(session).count_expired(now))
             due = len(VideoRepository(session).videos_due_for_refresh(now, horizon, 100_000))
         return RetentionReport(
@@ -98,6 +100,9 @@ class RetentionService:
             # third-party titles/descriptions; they expire with the earliest video metadata
             # they were derived from. Run rows stay as audit records (no source text).
             deleted.update(ContentAnalysisRepository(session).purge_expired(now))
+            # Phase 6: forecasts expire with the observations they were computed from
+            # (trajectories, peak estimates and windows cascade).
+            deleted.update(ForecastRepository(session).purge_expired(now))
             deleted.update(VerificationRepository(session).purge_expired(now))
             deleted["ts_observations"] = TimeSeriesRepository(session).purge_expired(now)
         log_event(_log, "retention.purged", deleted=deleted, as_of=now.isoformat())

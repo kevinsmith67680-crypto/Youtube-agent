@@ -143,7 +143,7 @@ def outcome_labels(
             tail = max(1, round(expected * cfg.continuation_tail_fraction))
             tail_vals = fv[np.isfinite(fv)][-tail:]
             out[f"continuation_{h}"] = float(np.median(tail_vals) >= ref.threshold)
-        at_h = fv[np.isclose(ft, t_now + h)] if ft.size else np.array([])
+        at_h = fv[np.isclose(ft, t_now + h, rtol=0.0, atol=1e-6)] if ft.size else np.array([])
         if at_h.size and math.isfinite(at_h[0]):
             c = cfg.trajectory_offset
             out[f"trajectory_{h}"] = math.log((float(at_h[0]) + c) / (ref.level + c))
@@ -172,7 +172,7 @@ def outcome_labels(
     for d in LEADS_HOURS:
         if d < step - 1e-9 or abs(d / step - round(d / step)) > 1e-9:
             continue  # this lead is not an observable period end for the granularity
-        hit = final_v[np.isclose(final_t, t_now + d)]
+        hit = final_v[np.isclose(final_t, t_now + d, rtol=0.0, atol=1e-6)]
         if hit.size and math.isfinite(hit[0]):
             out[f"elevated_lead_{d}"] = float(hit[0] >= ref.threshold)
     return out

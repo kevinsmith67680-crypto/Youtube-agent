@@ -323,7 +323,7 @@ def slices(
 ) -> dict[str, dict[str, Any]]:
     """Per-category / provider / granularity / novelty metrics with sample sizes."""
     out: dict[str, dict[str, Any]] = {}
-    for col in ("category", "provider", "granularity"):
+    for col in [c for c in ("category", "provider", "granularity", "history") if c in ds_meta]:
         vals = ds_meta[col][mask]
         for v in sorted({str(x) for x in vals}):
             m = vals == v
