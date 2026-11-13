@@ -119,9 +119,9 @@ are the rules' author's, the data is fictional, and none of this is real-world a
 
 | check | result |
 |---|---|
-| full suite, Python 3.12 (with coverage) | pending (run in progress at this commit) |
-| full suite, Python 3.13 | pending (run in progress at this commit) |
-| Phase 5 unit tests (`tests/unit/content_analysis`) | 72 passed |
+| full suite, Python 3.12 (with coverage) | 633 passed, 3 live tests deselected; line+branch coverage 91 % overall (Phase 5 modules 81–100 %, `cli_analyze.py` 63 %) |
+| full suite, Python 3.13 | 633 passed, 3 live tests deselected |
+| Phase 5 unit tests (`tests/unit/content_analysis`) | 72 passed (the 3 offline CLI tests were added after the full runs and run separately) |
 | Phase 5 DB integration tests (real PostgreSQL 16, fake YouTube transport) | 7 passed |
 | `ruff check .`, `ruff format --check` (src, tests, scripts, migrations) | clean |
 | `mypy` (src, strict) and `mypy tests --strict` | clean |
