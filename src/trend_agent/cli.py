@@ -1014,6 +1014,9 @@ app.add_typer(_cli_discover.discover_app, name="discover")
 from trend_agent import cli_monitor as _cli_monitor  # noqa: E402
 
 app.add_typer(_cli_monitor.monitor_app, name="monitor")
+from trend_agent import cli_detect as _cli_detect  # noqa: E402
+
+app.add_typer(_cli_detect.detect_app, name="detect")
 
 
 def main() -> None:

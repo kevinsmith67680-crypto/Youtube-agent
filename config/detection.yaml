@@ -157,6 +157,9 @@ episodes:
   max_quiet_periods: 14    # no detector support for 14 periods -> RESOLVED (new normal)
   stale_after_periods: 7   # no new observation for 7 periods -> RESOLVED (stale)
   downgrade_hold_periods: 2
+  # The stage is held (no downgrade) while the value stays >= 3 sd above the pre-episode
+  # baseline, even when the adapting rolling baseline makes detectors quieter.
+  sustain_z: 3.0
 
 integration:
   run_after_collection: true   # Phase 3 executor triggers detection for new observations

@@ -745,6 +745,7 @@ class DetectionService:
                     "confidence": change.episode.confidence.value,
                     "severity": round(change.severity, 1),
                     "notification": change.notification,
+                    "triggered": [d.value for d in decision.triggered],
                     "reason": change.reason[:200],
                     "synthetic": meta.is_synthetic,
                 }

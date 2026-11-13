@@ -214,6 +214,10 @@ class EpisodeManager:
         result_ids: dict[DetectorType, int] | None = None,
     ) -> EpisodeChange | None:
         key = meta.key
+        revised = ev.observation is not None and ev.observation.revision > 1
+        if ev.is_late and not revised:
+            # Late history (e.g. re-evaluation after lost state) never drives the lifecycle.
+            return None
         ep = self.store.open_episode(key)
         stage = decision.stage if decision.opens else None
         obs_id = ev.observation_id
@@ -538,8 +542,18 @@ class EpisodeManager:
     ) -> EpisodeChange:
         c = ep.counters
         cfg = self.cfg.episodes
-        self._touch(ep, ev, meta, now, family, decision)
         revised = ev.observation is not None and ev.observation.revision > 1
+        if not revised and (
+            ev.period_end <= ep.episode_start or ev.period_end <= ep.last_observation_period_end
+        ):
+            # A late value for a period the episode already moved past: keep it as evidence
+            # (peak, provenance) but never let it drive escalation or resolution counters.
+            self._touch(ep, ev, meta, now, family, decision)
+            if stage is not None:
+                self._evidence(ep, ev, decision, result_ids)
+            self.store.update(ep)
+            return EpisodeChange("updated", ep, False, "late value for an earlier period")
+        self._touch(ep, ev, meta, now, family, decision)
         if (
             stage is None
             and revised
@@ -574,6 +588,10 @@ class EpisodeManager:
                             kind, previous.value, stage.value, ep.severity, notify, reason, now
                         ),
                     )
+                c["downgrade"] = 0
+            elif STAGE_RANK[stage] < STAGE_RANK[ep.status] and _sustained(ep, ev, cfg.sustain_z):
+                # Detectors weaken as rolling baselines adapt, but the value is still far
+                # above the pre-episode baseline: the surge persists, the stage is held.
                 c["downgrade"] = 0
             elif STAGE_RANK[stage] < STAGE_RANK[ep.status]:
                 c["downgrade"] = int(c.get("downgrade", 0)) + 1
@@ -637,3 +655,10 @@ def _remember(ep: Episode, ev: PointEvaluation) -> None:
     applied = [i for i in ep.counters.get("applied", []) if i != ev.observation_id]
     applied.append(ev.observation_id)
     ep.counters["applied"] = applied[-APPLIED_MEMORY:]
+
+
+def _sustained(ep: Episode, ev: PointEvaluation, sustain_z: float) -> bool:
+    ref, sd = ep.baseline_expected, ep.baseline_dispersion
+    if ref is None or sd is None or ev.value is None:
+        return False
+    return (ev.value - ref) / max(sd, 1e-9) >= sustain_z

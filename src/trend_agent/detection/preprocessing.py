@@ -240,7 +240,10 @@ def prepare(
         out = _empty(known, PreprocessStatus.INCOMPATIBLE, Reason.INCOMPARABLE.value)
         out.comparability = assessment
         out.reasons += [r.value for r in assessment.reasons] or ["different series"]
-        if any(r.value == "different_normalization_context" for r in assessment.reasons):
+        if any(
+            r.value in ("different_normalization_context", "different_scale_definition")
+            for r in assessment.reasons
+        ):
             out.reasons.append(Reason.NORMALIZATION_CHANGED.value)
         return out
     if head.granularity not in pre.supported_granularities:

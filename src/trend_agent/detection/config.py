@@ -343,6 +343,7 @@ class EpisodeConfig(_Strict):
     max_quiet_periods: int = Field(default=14, ge=1)
     stale_after_periods: int = Field(default=7, ge=1)
     downgrade_hold_periods: int = Field(default=2, ge=1)
+    sustain_z: float = Field(default=3.0, gt=0)
 
 
 class IntegrationConfig(_Strict):
