@@ -52,7 +52,7 @@ from trend_agent.utils.text import QueryValidationError, canonicalize_query
 
 app = typer.Typer(
     name="trend-agent",
-    help="YouTube Search Demand Intelligence Agent - Phase 1 (data acquisition).",
+    help="YouTube Search Demand Intelligence Agent: data acquisition, discovery, monitoring.",
     no_args_is_help=True,
     pretty_exceptions_enable=False,
 )
@@ -1011,6 +1011,9 @@ def db_current() -> None:
 from trend_agent import cli_discover as _cli_discover  # noqa: E402
 
 app.add_typer(_cli_discover.discover_app, name="discover")
+from trend_agent import cli_monitor as _cli_monitor  # noqa: E402
+
+app.add_typer(_cli_monitor.monitor_app, name="monitor")
 
 
 def main() -> None:

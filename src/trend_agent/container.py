@@ -19,6 +19,8 @@ from trend_agent.discovery.providers.factory import register_discovery_providers
 from trend_agent.discovery.service import DiscoveryService
 from trend_agent.ingestion.retention import RetentionService
 from trend_agent.ingestion.service import IngestionService, IngestionSettings
+from trend_agent.monitoring.config import LoadedMonitoringConfig, load_monitoring_config
+from trend_agent.monitoring.service import MonitoringService
 from trend_agent.providers.google_trends import GoogleTrendsProvider, TrendsTransport
 from trend_agent.providers.mock import MockSearchInterestProvider
 from trend_agent.providers.quota import QuotaStore
@@ -39,6 +41,7 @@ class AppContainer:
     clock: Clock
     http_client: httpx.AsyncClient | None = None
     _discovery_config: LoadedDiscoveryConfig | None = None
+    _monitoring_config: LoadedMonitoringConfig | None = None
 
     def ingestion(self) -> IngestionService:
         return IngestionService(
@@ -90,6 +93,29 @@ class AppContainer:
             session_factory=self.session_factory,
             loaded=loaded,
             clock=clock or self.clock,
+        )
+
+    def monitoring_config(self) -> LoadedMonitoringConfig:
+        if self._monitoring_config is None:
+            self._monitoring_config = load_monitoring_config(self.settings.discovery_config_dir)
+        return self._monitoring_config
+
+    def monitoring(
+        self,
+        *,
+        clock: Clock | None = None,
+        include_synthetic: bool | None = None,
+        loaded: LoadedMonitoringConfig | None = None,
+    ) -> MonitoringService:
+        """Phase 3 monitoring service (collectors are built from registered providers)."""
+        return MonitoringService(
+            settings=self.settings,
+            session_factory=self.session_factory,
+            registry=self.registry,
+            quota_store=self.quota_store,
+            loaded=loaded or self.monitoring_config(),
+            clock=clock or self.clock,
+            include_synthetic=include_synthetic,
         )
 
     async def aclose(self) -> None:

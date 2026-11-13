@@ -1,0 +1,99 @@
+# Synthetic monitoring scenarios (Phase 3). FICTIONAL subjects; every value is synthetic.
+# The demo clock starts at the anchor (a Monday) and runs `demo_days` days in hourly ticks.
+# Note: the window crosses the US DST change (2026-03-08), so the America/Los_Angeles quota
+# reset moves from 08:00 UTC to 07:00 UTC during the run (Scenario E).
+anchor: 2026-03-02T00:00:00Z
+demo_days: 10
+seed: 20260302
+quota_daily_requests: 8         # synthetic_trends local cap (resets at LA midnight; Scenario E)
+worker_crash_at_hour: 36        # Scenario I: a worker claims jobs and vanishes (Tue 12:00)
+
+providers:
+  synthetic_trends:
+    scale: consistent
+    publication_lag: PT36H       # Scenario G: Monday's value appears Wednesday 12:00 UTC
+    outages:                     # Scenario D: provider unavailable for 36 hours
+      - {start: 2026-03-07T00:00:00Z, end: 2026-03-08T12:00:00Z}
+  synthetic_trends_web:
+    scale: per_request           # Scenario H: 0-100 per request; batches never comparable
+    publication_lag: P1D
+    measurements: [external_search_interest]
+
+keywords:
+  - query: how to run nimbus coder 2 locally
+    scenario: "A - newly released (fictional) AI model"
+    category: ai
+    priority: 86
+    novelty_kind: new_version
+    intent: how_to
+    entity_name: Nimbus Coder 2
+    entity_type: ai_model
+    entity_age_days: 1
+    shape: {kind: emerging, base: 8, peak: 85, onset_day: -4, growth_days: 8}
+    history_days: 21
+  - query: ai coding agents
+    scenario: "J - revised history; backfill/replay examples"
+    category: ai
+    priority: 70
+    novelty_kind: recurring
+    intent: other
+    shape: {kind: steady, base: 35, peak: 60}
+    history_days: 120
+    revisions:
+      - {day: 2026-03-03, delta: 7.5, revised_at: 2026-03-07T06:00:00Z}
+  - query: ai wallpaper generator
+    scenario: "below activation threshold - stays a discovery candidate"
+    category: ai
+    priority: 48
+    novelty_kind: recurring
+    shape: {kind: steady, base: 20, peak: 22}
+  - query: fortnite neon rift event
+    scenario: "B - 48-hour limited-time event (fictional)"
+    category: gaming
+    priority: 88
+    novelty_kind: new_event
+    intent: game_guide
+    entity_name: Neon Rift
+    entity_type: game_event
+    entity_age_days: 0.5
+    time_sensitive_until: 2026-03-05T18:00:00Z
+    shape: {kind: event, base: 4, peak: 92, onset_day: 1}
+    history_days: 14
+  - query: frostfall festival rewards
+    scenario: "gaming baseline (HIGH tier, older event)"
+    category: gaming
+    priority: 66
+    novelty_kind: new_event
+    intent: game_guide
+    entity_name: Frostfall Festival
+    entity_type: game_event
+    entity_age_days: 20
+    shape: {kind: steady, base: 30, peak: 26}
+    history_days: 30
+  - query: python tutorial for beginners
+    scenario: "C - established evergreen tutorial"
+    category: technology
+    priority: 58
+    novelty_kind: evergreen
+    intent: tutorial
+    shape: {kind: evergreen, base: 62, weekly_amplitude: 8}
+    history_days: 400
+  - query: lattice 5 migration guide
+    scenario: "F - provider repeats points (duplicates)"
+    category: technology
+    priority: 74
+    novelty_kind: new_version
+    intent: tutorial
+    entity_name: Lattice 5
+    entity_type: framework
+    entity_age_days: 3
+    shape: {kind: emerging, base: 15, peak: 55, onset_day: -3, growth_days: 6}
+    history_days: 30
+    duplicate_points: true
+
+# Backfills issued during the demo (hour offsets from the anchor).
+backfills:
+  - {query: python tutorial for beginners, provider: synthetic_trends, days: 365, at_hour: 1}
+  - {query: ai coding agents, provider: synthetic_trends, days: 90, at_hour: 1}
+  - {query: ai coding agents, provider: synthetic_trends_web, days: 30, at_hour: 2, measurement: external_search_interest}
+  - {query: ai coding agents, provider: synthetic_trends_web, days: 60, at_hour: 50, measurement: external_search_interest}

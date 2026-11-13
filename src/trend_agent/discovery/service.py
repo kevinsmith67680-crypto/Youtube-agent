@@ -1457,11 +1457,10 @@ class _RunContext:
                     i.is_synthetic for i, _ in items
                 )
                 self._link_evidence(keyword.id, items)
-                if keyword.candidate_status in (
-                    CandidateStatus.REJECTED,
-                    CandidateStatus.MONITORING,
-                ):
+                if keyword.candidate_status is CandidateStatus.REJECTED:
                     continue
+                # MONITORING keywords keep being re-scored (Phase 3 reads the priority);
+                # status_after_scoring never changes a MONITORING status.
                 self._score_and_transition(keyword, entity, cat.scores, cat.primary, primary_intent)
                 continue
 

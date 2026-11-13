@@ -113,6 +113,17 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 3 (monitoring)
+    "monitoring_job_attempts",
+    "ts_observations",
+    "ts_series",
+    "monitoring_jobs",
+    "monitoring_backfills",
+    "monitoring_target_events",
+    "monitoring_targets",
+    "monitoring_plan_runs",
+    "monitoring_provider_health",
+    "data_policies",
     # Phase 2 (keyword discovery)
     "keyword_status_history",
     "discovery_evidence",

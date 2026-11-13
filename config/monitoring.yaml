@@ -1,0 +1,222 @@
+# Historical monitoring configuration (Phase 3).
+# Monitoring collects observations for discovered keywords from sources that can actually
+# measure them. Tiers and budgets describe OPERATIONAL importance, not search growth.
+# Durations use ISO 8601 (P1D = one day, PT6H = six hours).
+version: 1
+config_version: monitoring-v1
+
+# Discretionary monitoring effort per category (must sum to 1). Guides capacity; never
+# forces observations into existence.
+category_budgets: {ai: 0.45, technology: 0.25, gaming: 0.30}
+exploration_share: 0.20          # capacity reserved for new/exploratory targets
+exploration_window: P7D          # a target counts as exploratory for this long after activation
+
+regions: [US]
+languages: [en]
+
+# Which measurement a target asks for, in order of preference. A keyword with no usable
+# provider for any of these is NOT shown as monitored (status provider_unavailable).
+measurement_preferences: [direct_youtube_search_interest, external_search_interest]
+provider_preferences:
+  direct_youtube_search_interest: [google_trends, synthetic_trends, mock]
+  external_search_interest: [google_trends, synthetic_trends, synthetic_trends_web, mock]
+
+# Optional proxy monitoring: timestamped official/community/suggestion signals derived from
+# stored discovery evidence. Always labelled as proxy; never treated as search interest.
+proxy_monitoring: {enabled: true, provider: discovery_evidence}
+
+capacity:
+  max_active_targets: 1000       # search-interest targets
+  max_active_proxy_targets: 1000
+  max_jobs_per_cycle: 200        # jobs created per planning cycle (all categories)
+  max_queue_depth: 2000          # no new jobs while this many are waiting (no backlog growth)
+  starvation_after: PT72H        # an overdue target is scheduled ahead of everything else
+  planning_page_size: 500
+
+activation:
+  keyword_statuses: [prioritized, monitoring]
+  min_priority: 55               # activate at or above (Phase 2 discovery priority)
+  deactivate_below: 40           # demote below (hysteresis gap)
+  min_independent_origins: 1     # discovery evidence quality floor
+  min_active: P7D                # minimum active time before demotion (no thrashing)
+  reactivation_cooldown: P3D
+  dormant_after_no_evidence: P30D
+  include_synthetic: false       # demo/tests enable this explicitly
+
+tiers:
+  critical: {min_priority: 75, time_window: P14D, recheck_after_no_data: PT2H, collect_every_periods: 1, weight: 4.0}
+  high:     {min_priority: 65, time_window: P30D, recheck_after_no_data: PT4H, collect_every_periods: 1, weight: 3.0}
+  normal:   {min_priority: 50, recheck_after_no_data: PT12H, collect_every_periods: 1, weight: 2.0}
+  low:      {recheck_after_no_data: P1D, collect_every_periods: 7, weight: 1.0}
+  dormant:  {recheck_after_no_data: P7D, collect_every_periods: 28, weight: 0.5}
+  downgrade_hold: PT24H          # a tier is lowered only after conditions held this long
+
+time_sensitive_entity_types: [game_event, game_update, ai_model, ai_product, release]
+
+jobs:
+  max_attempts: 5
+  retry_base: PT1M               # exponential backoff with full jitter
+  retry_max: PT6H
+  lease_duration: PT5M
+  worker_concurrency: 4
+  claim_batch: 8
+  stale_after_failures: 3        # target -> stale after this many consecutive failures
+  unhealthy_after_failures: 3    # provider -> unhealthy
+  initial_lookback: P30D         # first collection of a new target requests this much history
+  collect_timeout: PT2M          # one provider call; must stay below lease_duration
+
+readiness:
+  default_profile: short_term
+  profiles:
+    short_term:     {granularity: day, min_observations: 14, min_span: P14D, min_coverage: 0.8, max_staleness_periods: 3, partial_min_observations: 7}
+    weekly_seasonal: {granularity: day, min_observations: 56, min_span: P56D, min_coverage: 0.85, max_staleness_periods: 3, partial_min_observations: 28}
+    weekly_trend:   {granularity: week, min_observations: 12, min_span: P84D, min_coverage: 0.8, max_staleness_periods: 2, partial_min_observations: 6}
+  provider_profiles: {}
+
+quality:
+  constant_run_periods: 14
+  frequent_revision_ratio: 0.2
+  unexpected_gap_periods: 3
+  stale_after_periods: 3
+  error_window: P1D
+
+compliance:
+  # YouTube API Services: derived metrics and statistics retention need explicit review /
+  # approval (see docs/compliance.md). Keep false unless that permission exists.
+  youtube_derived_metrics_permitted: false
+  youtube_statistics_monitoring: false
+
+# Freshness / capability profiles. Only documented capabilities; unknown is "unknown".
+providers:
+  google_trends:
+    display_name: Google Trends API (official alpha)
+    collector: search_interest
+    measurement_categories: [external_search_interest]
+    supports_youtube_search: unknown      # not confirmed in public alpha information
+    granularities: [day, week, month, year]
+    collection_granularity: day
+    publication_cadence: P1D
+    typical_delay: P2D                    # publicly described: data up to ~48 h ago
+    historical_lookback: P1800D           # publicly described ~5-year rolling window
+    max_historical_lookback: P1800D
+    max_window_per_request: P90D
+    min_poll_interval: PT6H
+    rate_limit: "not publicly documented (alpha)"
+    quota: {daily_requests: 200, reset_timezone: UTC, safety_margin_pct: 10}
+    revision_behaviour: unknown
+    revision_window: P3D
+    sampling: "announced as consistently scaled; sampling details not public"
+    normalization: consistent_index
+    retention_policy: google-trends-alpha
+    notes: "Requires alpha access and an operator-supplied transport; NOT_CONFIGURED otherwise."
+  mock:
+    display_name: Phase 1 synthetic provider (website-style per-request scaling)
+    collector: search_interest
+    synthetic: true
+    measurement_categories: [direct_youtube_search_interest, external_search_interest]
+    supports_youtube_search: yes
+    granularities: [day, week]
+    collection_granularity: day
+    publication_cadence: P1D
+    typical_delay: P1D
+    historical_lookback: P3650D
+    max_historical_lookback: P3650D
+    max_window_per_request: P365D
+    min_poll_interval: PT1H
+    quota: {daily_requests: 1000, reset_timezone: UTC, safety_margin_pct: 0}
+    revision_behaviour: partial_periods_revised
+    normalization: per_request
+    window_strategy: full_window
+    full_window: P30D
+    retention_policy: synthetic-test-data
+  synthetic_trends:
+    display_name: Synthetic consistently-scaled interest (Phase 3 fixtures)
+    collector: search_interest
+    synthetic: true
+    measurement_categories: [direct_youtube_search_interest, external_search_interest]
+    supports_youtube_search: yes
+    granularities: [day]
+    collection_granularity: day
+    publication_cadence: P1D
+    typical_delay: PT36H                  # Monday's value is published Wednesday 12:00 UTC
+    historical_lookback: P730D
+    max_historical_lookback: P730D
+    max_window_per_request: P180D
+    min_poll_interval: PT1H
+    quota: {daily_requests: 24, reset_timezone: America/Los_Angeles, safety_margin_pct: 0}
+    revision_behaviour: revisable
+    revision_window: P5D
+    normalization: consistent_index
+    retention_policy: synthetic-test-data
+  synthetic_trends_web:
+    display_name: Synthetic website-style interest (per-request scaling; Scenario H)
+    collector: search_interest
+    synthetic: true
+    measurement_categories: [external_search_interest]
+    supports_youtube_search: no
+    granularities: [day]
+    publication_cadence: P1D
+    typical_delay: P1D
+    historical_lookback: P365D
+    max_historical_lookback: P365D
+    max_window_per_request: P90D
+    quota: {daily_requests: 50, reset_timezone: UTC, safety_margin_pct: 0}
+    revision_behaviour: partial_periods_revised
+    normalization: per_request
+    window_strategy: full_window
+    full_window: P30D
+    retention_policy: synthetic-test-data
+  discovery_evidence:
+    display_name: Event signals from stored discovery evidence (proxy)
+    collector: event_signals
+    measurement_categories: [official_event_signal, community_activity, search_suggestion_presence]
+    supports_youtube_search: no
+    granularities: [day]
+    publication_cadence: null             # irregular: events happen when they happen
+    typical_delay: PT0S
+    historical_lookback: P365D
+    max_historical_lookback: P365D
+    max_window_per_request: P365D
+    min_poll_interval: PT6H
+    revision_behaviour: revisable         # late-discovered items raise a day's count
+    normalization: absolute
+    constant_values_expected: true
+    retention_policy: discovery-evidence-derived
+    notes: "Counts of independent discovery items per day. Missing days are unknown, not zero."
+  youtube_data_api:
+    display_name: YouTube Data API v3 (video activity proxy)
+    collector: none
+    measurement_categories: [video_activity]
+    supports_youtube_search: no           # the Data API exposes no search-interest data
+    granularities: [day]
+    publication_cadence: null
+    min_poll_interval: PT6H
+    quota: {use_provider_quota: true, request_cost: 1}
+    normalization: absolute
+    retention_policy: youtube-api-services
+    collection_disabled_reason: >-
+      Not a search-interest source. Monitoring video statistics over time creates derived
+      metrics that require YouTube API Services approval; enable only with that permission.
+
+policies:
+  - id: synthetic-test-data
+    version: "1"
+    description: Synthetic fixtures; no third-party terms. Never evidence of real demand.
+  - id: google-trends-alpha
+    version: "1"
+    description: Google Trends API alpha terms (supplied to admitted testers).
+    retention_from_setting: google_trends_retention_days
+    requires_authorization: true
+    notes: Storage denied until a retention period consistent with the access terms is set.
+  - id: discovery-evidence-derived
+    version: "1"
+    description: Counts derived from stored discovery items; expire with their source items.
+    inherit_source_expiry: true
+    permissions: {include_youtube_sourced_items: false}
+  - id: youtube-api-services
+    version: "2026-11-reviewed"
+    description: YouTube API Services Terms and Developer Policies (30-day storage; derived metrics restricted).
+    retention_days: 30
+    requires_authorization: true
+    permissions: {derived_metrics: false, statistics_history: false}
+    notes: Collection disabled in Phase 3; see docs/compliance.md for the required approvals.
