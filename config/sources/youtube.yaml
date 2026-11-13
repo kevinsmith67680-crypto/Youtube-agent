@@ -1,0 +1,7 @@
+# YouTube Data API discovery sources. Video titles/descriptions are VIDEO_ACTIVITY
+# evidence (supply), never search demand. Quota: charts = 1 unit/request; seed searches
+# (generated from seed files) = 1 call each from the 100/day search bucket.
+sources:
+  - {key: "youtube:chart:US:20", provider: youtube_discovery, name: Most popular - Gaming (US), source_type: chart, category: gaming, reference: "20", region: US, evidence_type: video_title, reliability: 0.6, min_poll_interval_minutes: 360, verified: true}
+  - {key: "youtube:chart:GB:20", provider: youtube_discovery, name: Most popular - Gaming (GB), source_type: chart, category: gaming, reference: "20", region: GB, evidence_type: video_title, reliability: 0.6, min_poll_interval_minutes: 360, verified: true}
+  - {key: "youtube:chart:US:28", provider: youtube_discovery, name: Most popular - Science & Technology (US), source_type: chart, category: technology, reference: "28", region: US, evidence_type: video_title, reliability: 0.6, min_poll_interval_minutes: 360, verified: true}

@@ -1,0 +1,7 @@
+# Google Trends related/rising queries. Requires the official API alpha (see
+# docs/data_sources.md). Until configured these sources report not_configured and yield
+# nothing; no related queries are ever fabricated.
+sources:
+  - {key: "trends:related:ai", provider: google_trends_discovery, name: Trends related queries - AI, source_type: api_query, category: ai, reference: "artificial intelligence", evidence_type: related_query, reliability: 0.85, min_poll_interval_minutes: 1440, verified: false}
+  - {key: "trends:related:technology", provider: google_trends_discovery, name: Trends related queries - Technology, source_type: api_query, category: technology, reference: technology, evidence_type: related_query, reliability: 0.85, min_poll_interval_minutes: 1440, verified: false}
+  - {key: "trends:related:gaming", provider: google_trends_discovery, name: Trends related queries - Gaming, source_type: api_query, category: gaming, reference: video games, evidence_type: related_query, reliability: 0.85, min_poll_interval_minutes: 1440, verified: false}

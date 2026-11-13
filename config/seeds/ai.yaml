@@ -1,0 +1,53 @@
+# AI seeds and curated entities.
+# seeds: starting points for query-based sources. They are NOT evidence of search interest.
+# entities: known entities used to ground and disambiguate extraction (never as evidence).
+category: ai
+seeds:
+  - {term: AI agent, subcategory: ai_agents, priority: 95}
+  - {term: autonomous AI agent, subcategory: ai_agents, priority: 90}
+  - {term: AI coding assistant, subcategory: ai_coding, priority: 95}
+  - {term: new LLM release, subcategory: llm_releases, priority: 95}
+  - {term: open-source AI model, subcategory: open_models, priority: 90}
+  - {term: run LLM locally, subcategory: local_llm, priority: 90, track_as_keyword: true}
+  - {term: AI automation, subcategory: ai_automation, priority: 80}
+  - {term: AI app builder, subcategory: ai_builders, priority: 75}
+  - {term: AI video generation, subcategory: ai_video, priority: 85}
+  - {term: AI image generation, subcategory: ai_image, priority: 75}
+  - {term: AI voice generator, subcategory: ai_voice, priority: 70}
+  - {term: embodied AI robot, subcategory: robotics, priority: 65}
+  - {term: multimodal AI model, subcategory: multimodal, priority: 70}
+  - {term: AI browser, subcategory: ai_browsers, priority: 75}
+  - {term: AI productivity tools, subcategory: ai_productivity, priority: 70}
+  - {term: LLM benchmark, subcategory: benchmarks, priority: 80}
+  - {term: AI model comparison, subcategory: benchmarks, priority: 80}
+  - {term: AI startup launch, subcategory: ai_startups, priority: 60}
+  - {term: AI cybersecurity, subcategory: ai_security, priority: 60}
+  - {term: AI inference hardware, subcategory: ai_hardware, priority: 65}
+entities:
+  - {name: OpenAI, entity_type: company, aliases: [], evergreen: true, priority: 80}
+  - {name: Anthropic, entity_type: company, evergreen: true, priority: 80}
+  - {name: Google DeepMind, entity_type: company, aliases: [DeepMind], evergreen: true, priority: 75}
+  - {name: Meta AI, entity_type: company, evergreen: true, priority: 60}
+  - {name: Mistral AI, entity_type: company, evergreen: true, priority: 65}
+  - {name: DeepSeek, entity_type: company, evergreen: true, priority: 75}
+  - {name: Hugging Face, entity_type: company, evergreen: true, priority: 70}
+  - {name: ChatGPT, entity_type: ai_product, evergreen: true, priority: 85}
+  - {name: Claude, entity_type: ai_model, context_terms: [anthropic, ai, model, llm, chatbot, assistant], evergreen: true, priority: 85}
+  - {name: Gemini, entity_type: ai_model, context_terms: [google, ai, model, llm, deepmind, chatbot], evergreen: true, priority: 85}
+  - {name: Llama, entity_type: ai_model, context_terms: [meta, model, llm, weights, ai], evergreen: true, priority: 75}
+  - {name: Qwen, entity_type: ai_model, evergreen: true, priority: 75}
+  - {name: GPT, entity_type: ai_model, case_sensitive_aliases: [GPT], context_terms: [openai, model, ai, llm], evergreen: true, priority: 80}
+  - {name: GitHub Copilot, entity_type: ai_product, aliases: [Copilot], context_terms: [github, microsoft, code, coding, ai], evergreen: true, priority: 80}
+  - {name: Cursor, entity_type: ai_product, context_terms: [editor, ide, code, coding, ai], evergreen: true, priority: 75}
+  - {name: Ollama, entity_type: software, evergreen: true, priority: 80}
+  - {name: LM Studio, entity_type: software, evergreen: true, priority: 70}
+  - {name: vLLM, entity_type: software, evergreen: true, priority: 70}
+  - {name: LangChain, entity_type: framework, evergreen: true, priority: 70}
+  - {name: llama.cpp, entity_type: software, evergreen: true, priority: 70}
+  - {name: Transformers, entity_type: framework, context_terms: [hugging face, model, python, library], evergreen: true, priority: 60}
+  - {name: Stable Diffusion, entity_type: ai_model, evergreen: true, priority: 70}
+  - {name: Sora, entity_type: ai_model, context_terms: [openai, video, ai], evergreen: true, priority: 75}
+  - {name: Midjourney, entity_type: ai_product, evergreen: true, priority: 70}
+  - {name: ElevenLabs, entity_type: ai_product, evergreen: true, priority: 65}
+  - {name: Perplexity, entity_type: ai_product, context_terms: [ai, search, answer], evergreen: true, priority: 65}
+  - {name: Model Context Protocol, entity_type: technology, aliases: [MCP], case_sensitive_aliases: [MCP], evergreen: true, priority: 75}

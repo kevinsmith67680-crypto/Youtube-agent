@@ -214,3 +214,4 @@ class RecordKind(StrEnum):
     VIDEO_STATISTICS = "video_statistics"
     CHANNEL = "channel"
     VIDEO_SEARCH_RESULT = "video_search_result"
+    DISCOVERY_ITEM = "discovery_item"  # Phase 2: source material behind keyword candidates

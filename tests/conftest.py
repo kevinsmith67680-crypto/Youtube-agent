@@ -113,6 +113,20 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 2 (keyword discovery)
+    "keyword_status_history",
+    "discovery_evidence",
+    "discovered_keywords",
+    "intent_clusters",
+    "topic_clusters",
+    "entity_mentions",
+    "entity_aliases",
+    "discovered_entities",
+    "discovery_items",
+    "discovery_run_sources",
+    "discovery_runs",
+    "discovery_sources",
+    # Phase 1
     "video_search_results",
     "video_statistics",
     "rejected_records",

@@ -90,12 +90,14 @@ ENDPOINT_SEARCH = "search.list"
 ENDPOINT_VIDEOS = "videos.list"
 ENDPOINT_CHANNELS = "channels.list"
 ENDPOINT_CATEGORIES = "videoCategories.list"
+ENDPOINT_PLAYLIST_ITEMS = "playlistItems.list"  # Phase 2: monitored channel uploads
 
 BUCKET_SEARCH = "search"
 BUCKET_DEFAULT = "default"
 
 MAX_RESULTS_PER_PAGE = 50  # documented maximum for search.list and videos.list
 _VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+_HANDLE = re.compile(r"^@[A-Za-z0-9._-]{3,100}$")
 _CHANNEL_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 _QUOTA_REASONS = frozenset({"quotaExceeded", "dailyLimitExceeded", "dailyLimitExceededUnreg"})
@@ -141,6 +143,7 @@ def youtube_quota_policy(settings: Settings) -> QuotaPolicy:
             ENDPOINT_VIDEOS: EndpointCost(BUCKET_DEFAULT, 1),
             ENDPOINT_CHANNELS: EndpointCost(BUCKET_DEFAULT, 1),
             ENDPOINT_CATEGORIES: EndpointCost(BUCKET_DEFAULT, 1),
+            ENDPOINT_PLAYLIST_ITEMS: EndpointCost(BUCKET_DEFAULT, 1),
         },
     )
 
@@ -598,6 +601,74 @@ class YouTubeDataApiProvider:
             except _ItemError:
                 continue
         return categories
+
+    async def channel_uploads(
+        self, channel_ref: str, ctx: RequestContext, max_results: int = 25
+    ) -> VideoSearchResponse:
+        """Recent uploads of a channel given as '@handle' or channel id.
+
+        Costs 2 units from the default bucket (``channels.list`` to resolve the uploads
+        playlist, then one ``playlistItems.list`` page) instead of a ``search.list`` call.
+        Results are wrapped as a search response (rank = upload order) for reuse.
+        """
+        ref = channel_ref.strip()
+        if _HANDLE.match(ref):
+            lookup = {"part": "contentDetails,snippet", "forHandle": ref}
+        elif _CHANNEL_ID.match(ref):
+            lookup = {"part": "contentDetails,snippet", "id": ref}
+        else:
+            raise InvalidRequestError(
+                f"invalid channel reference {channel_ref!r}", provider=PROVIDER_NAME
+            )
+        data = await self._get_json(ENDPOINT_CHANNELS, "channels", lookup, ctx)
+        items = _require_list(data, "items", ENDPOINT_CHANNELS)
+        if not items:
+            raise InvalidRequestError(f"channel {channel_ref!r} not found", provider=PROVIDER_NAME)
+        uploads = _opt_str(items[0], "contentDetails", "relatedPlaylists", "uploads")
+        if uploads is None:
+            raise MalformedResponseError("channel has no uploads playlist", provider=PROVIDER_NAME)
+        params = {
+            "part": "snippet",
+            "playlistId": uploads,
+            "maxResults": str(max(1, min(MAX_RESULTS_PER_PAGE, max_results))),
+        }
+        page = await self._get_json(ENDPOINT_PLAYLIST_ITEMS, "playlistItems", params, ctx)
+        results: list[VideoSearchResult] = []
+        warnings: list[str] = []
+        for index, item in enumerate(_require_list(page, "items", ENDPOINT_PLAYLIST_ITEMS)):
+            try:
+                description = _opt_str(item, "snippet", "description")
+                results.append(
+                    VideoSearchResult(
+                        video_id=_req_str(item, "snippet", "resourceId", "videoId"),
+                        title=_req_str(item, "snippet", "title"),
+                        description=description,
+                        channel_id=_opt_str(item, "snippet", "channelId") or ref,
+                        channel_title=_opt_str(item, "snippet", "channelTitle"),
+                        published_at=_opt_datetime(item, "snippet", "publishedAt"),
+                        thumbnails=_thumbnails(item),
+                        rank=len(results) + 1,
+                        page=1,
+                    )
+                )
+            except _ItemError as exc:
+                warnings.append(f"item {index}: {exc}")
+        return VideoSearchResponse(
+            provider_name=PROVIDER_NAME,
+            provider_version=PROVIDER_VERSION,
+            query=f"uploads:{ref}",
+            region=None,
+            language=None,
+            order="date",
+            published_after=None,
+            published_before=None,
+            results=tuple(results),
+            pages_fetched=1,
+            more_available=isinstance(page.get("nextPageToken"), str),
+            collected_at=self._clock(),
+            source_reference=self._source_reference("playlistItems", {"playlistId": uploads}),
+            warnings=tuple(warnings),
+        )
 
     # ------------------------------------------------------------------ transport
     def _require_key(self) -> str:

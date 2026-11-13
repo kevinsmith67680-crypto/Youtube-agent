@@ -387,3 +387,8 @@ class RejectedRecordRow(Base):
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
     expires_at: Mapped[datetime | None]
     created_at: Mapped[datetime] = _created()
+
+
+# Phase 2 tables live in their own module; importing it registers them on Base.metadata
+# wherever the Phase 1 models are imported (application, Alembic, tests).
+from trend_agent.db import discovery_models as _discovery_models  # noqa: E402, F401

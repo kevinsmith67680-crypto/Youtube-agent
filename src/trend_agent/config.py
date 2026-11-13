@@ -91,6 +91,15 @@ class Settings(BaseSettings):
     # consistent with their access agreement".
     google_trends_retention_days: int | None = Field(default=None, ge=1)
 
+    # --- Phase 2: keyword discovery -----------------------------------------------
+    # Directory with discovery.yaml, seeds/ and sources/ (default: ./config).
+    discovery_config_dir: str | None = None
+    # Identifies this client to public APIs and feeds (several require a descriptive UA).
+    http_user_agent: str = "youtube-trend-agent/0.2 (keyword discovery; +https://example.invalid)"
+    github_token: SecretStr | None = None  # optional; raises GitHub's limit to 5,000/h
+    reddit_client_id: SecretStr | None = None
+    reddit_client_secret: SecretStr | None = None
+
     # --- Synthetic (mock) provider -------------------------------------------------
     mock_provider_enabled: bool = True
     mock_seed: int = 20_260_101
@@ -103,7 +112,9 @@ class Settings(BaseSettings):
             raise ValueError(f"unsupported log level: {value!r}")
         return level
 
-    @field_validator("youtube_api_key", mode="before")
+    @field_validator(
+        "youtube_api_key", "github_token", "reddit_client_id", "reddit_client_secret", mode="before"
+    )
     @classmethod
     def _blank_key_is_none(cls, value: Any) -> Any:
         if isinstance(value, str) and not value.strip():
@@ -156,6 +167,11 @@ class Settings(BaseSettings):
             "google_trends_endpoint": "set" if self.google_trends_endpoint else "missing",
             "google_trends_retention_days": self.google_trends_retention_days,
             "mock_provider_enabled": self.mock_provider_enabled,
+            "discovery_config_dir": self.discovery_config_dir or "./config",
+            "github_token": "set" if self.github_token else "missing (unauthenticated limits)",
+            "reddit_credentials": (
+                "set" if self.reddit_client_id and self.reddit_client_secret else "missing"
+            ),
         }
 
 

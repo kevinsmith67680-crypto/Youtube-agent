@@ -1,0 +1,15 @@
+# Community sources: useful for discovering candidates, never for measuring demand.
+# Community claims get low evidence quality and cannot alone verify an entity.
+# Reddit requires OAuth app credentials (TREND_AGENT_REDDIT_CLIENT_ID / _SECRET) and
+# acceptance of Reddit's Data API terms; without them these sources report not_configured.
+sources:
+  - {key: "reddit:r/LocalLLaMA", provider: reddit, name: r/LocalLLaMA, source_type: community, category: ai, reference: LocalLLaMA, evidence_type: community_discussion, reliability: 0.5, min_poll_interval_minutes: 180, verified: true}
+  - {key: "reddit:r/MachineLearning", provider: reddit, name: r/MachineLearning, source_type: community, category: ai, reference: MachineLearning, evidence_type: community_discussion, reliability: 0.5, min_poll_interval_minutes: 360, verified: true}
+  - {key: "reddit:r/programming", provider: reddit, name: r/programming, source_type: community, category: technology, reference: programming, evidence_type: community_discussion, reliability: 0.45, min_poll_interval_minutes: 360, verified: true}
+  - {key: "reddit:r/hardware", provider: reddit, name: r/hardware, source_type: community, category: technology, reference: hardware, evidence_type: community_discussion, reliability: 0.5, min_poll_interval_minutes: 360, verified: true}
+  - {key: "reddit:r/FortNiteBR", provider: reddit, name: r/FortNiteBR, source_type: community, category: gaming, reference: FortNiteBR, evidence_type: community_discussion, reliability: 0.45, min_poll_interval_minutes: 120, verified: true}
+  - {key: "reddit:r/Minecraft", provider: reddit, name: r/Minecraft, source_type: community, category: gaming, reference: Minecraft, evidence_type: community_discussion, reliability: 0.45, min_poll_interval_minutes: 240, verified: true}
+  - {key: "reddit:r/roblox", provider: reddit, name: r/roblox, source_type: community, category: gaming, reference: roblox, evidence_type: community_discussion, reliability: 0.4, min_poll_interval_minutes: 240, verified: true}
+  - {key: "reddit:r/GTA6", provider: reddit, name: r/GTA6, source_type: community, category: gaming, reference: GTA6, evidence_type: community_discussion, reliability: 0.35, min_poll_interval_minutes: 360, verified: true}
+  # Hacker News front page (Algolia HN Search API, documented, no auth).
+  - {key: "hn:front-page", provider: hackernews, name: Hacker News front page, source_type: community, category: technology, reference: front_page, evidence_type: community_discussion, reliability: 0.55, min_poll_interval_minutes: 120, verified: true}

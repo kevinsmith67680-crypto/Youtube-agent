@@ -1,0 +1,341 @@
+# Official announcement and release feeds (RSS/Atom).
+# verified: true  = URL confirmed reachable and correct by the configuration author.
+# verified: false = well-known publisher URL that could not be checked from the build
+#                   environment; confirm it before relying on it (failures are tracked
+#                   per source and back off automatically).
+# entity_hint: the entity a release feed is about (release items are often just '1.2.3').
+sources:
+  - key: feed:pypi:vllm
+    provider: feeds
+    name: PyPI releases - vllm
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/vllm/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: vLLM
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:transformers
+    provider: feeds
+    name: PyPI releases - transformers
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/transformers/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Transformers
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:langchain
+    provider: feeds
+    name: PyPI releases - langchain
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/langchain/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: LangChain
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:llama-cpp-python
+    provider: feeds
+    name: PyPI releases - llama-cpp-python
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/llama-cpp-python/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: llama-cpp-python
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:ollama
+    provider: feeds
+    name: PyPI releases - ollama
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/ollama/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Ollama Python library
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:openai
+    provider: feeds
+    name: PyPI releases - openai
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/openai/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: OpenAI Python SDK
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:anthropic
+    provider: feeds
+    name: PyPI releases - anthropic
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/anthropic/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Anthropic Python SDK
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:diffusers
+    provider: feeds
+    name: PyPI releases - diffusers
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/diffusers/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Diffusers
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:crewai
+    provider: feeds
+    name: PyPI releases - crewai
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/crewai/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: CrewAI
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:huggingface-hub
+    provider: feeds
+    name: PyPI releases - huggingface-hub
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/huggingface-hub/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Hugging Face Hub library
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:mcp
+    provider: feeds
+    name: PyPI releases - mcp
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/mcp/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: MCP Python SDK
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:torch
+    provider: feeds
+    name: PyPI releases - torch
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/torch/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: PyTorch
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:sentence-transformers
+    provider: feeds
+    name: PyPI releases - sentence-transformers
+    source_type: feed
+    category: ai
+    reference: https://pypi.org/rss/project/sentence-transformers/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Sentence Transformers
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:django
+    provider: feeds
+    name: PyPI releases - django
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/django/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Django
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:fastapi
+    provider: feeds
+    name: PyPI releases - fastapi
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/fastapi/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: FastAPI
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:flask
+    provider: feeds
+    name: PyPI releases - flask
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/flask/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Flask
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:numpy
+    provider: feeds
+    name: PyPI releases - numpy
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/numpy/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: NumPy
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:pandas
+    provider: feeds
+    name: PyPI releases - pandas
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/pandas/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: pandas
+    entity_hint_type: software
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:pydantic
+    provider: feeds
+    name: PyPI releases - pydantic
+    source_type: feed
+    category: technology
+    reference: https://pypi.org/rss/project/pydantic/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: Pydantic
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:pypi:pygame
+    provider: feeds
+    name: PyPI releases - pygame
+    source_type: feed
+    category: gaming
+    reference: https://pypi.org/rss/project/pygame/releases.xml
+    evidence_type: code_release
+    publisher: pypi.org
+    entity_hint: pygame
+    entity_hint_type: framework
+    reliability: 0.9
+    min_poll_interval_minutes: 720
+    verified: true
+  - key: feed:blog:google-ai
+    provider: feeds
+    name: Google AI blog
+    source_type: feed
+    category: ai
+    reference: https://blog.google/technology/ai/rss/
+    evidence_type: official_announcement
+    publisher: blog.google
+    reliability: 0.9
+    min_poll_interval_minutes: 360
+    verified: false
+  - key: feed:blog:github
+    provider: feeds
+    name: GitHub blog
+    source_type: feed
+    category: technology
+    reference: https://github.blog/feed/
+    evidence_type: official_announcement
+    publisher: github.blog
+    reliability: 0.85
+    min_poll_interval_minutes: 360
+    verified: false
+  - key: feed:steam:cs2
+    provider: feeds
+    name: Steam news - Counter-Strike 2
+    source_type: feed
+    category: gaming
+    reference: https://store.steampowered.com/feeds/news/app/730/
+    evidence_type: official_announcement
+    publisher: store.steampowered.com
+    reliability: 0.85
+    min_poll_interval_minutes: 360
+    verified: false
+    entity_hint: Counter-Strike 2
+    entity_hint_type: game
+  - key: feed:steam:dota2
+    provider: feeds
+    name: Steam news - Dota 2
+    source_type: feed
+    category: gaming
+    reference: https://store.steampowered.com/feeds/news/app/570/
+    evidence_type: official_announcement
+    publisher: store.steampowered.com
+    reliability: 0.85
+    min_poll_interval_minutes: 360
+    verified: false
+    entity_hint: Dota 2
+    entity_hint_type: game
+  - key: feed:steam:pubg
+    provider: feeds
+    name: "Steam news - PUBG: Battlegrounds"
+    source_type: feed
+    category: gaming
+    reference: https://store.steampowered.com/feeds/news/app/578080/
+    evidence_type: official_announcement
+    publisher: store.steampowered.com
+    reliability: 0.8
+    min_poll_interval_minutes: 360
+    verified: false
+    entity_hint: PUBG
+    entity_hint_type: game
+  - key: feed:steam:apex
+    provider: feeds
+    name: Steam news - Apex Legends
+    source_type: feed
+    category: gaming
+    reference: https://store.steampowered.com/feeds/news/app/1172470/
+    evidence_type: official_announcement
+    publisher: store.steampowered.com
+    reliability: 0.8
+    min_poll_interval_minutes: 360
+    verified: false
+    entity_hint: Apex Legends
+    entity_hint_type: game

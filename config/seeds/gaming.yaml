@@ -1,0 +1,31 @@
+category: gaming
+seeds:
+  - {term: Fortnite update, subcategory: fortnite, priority: 95}
+  - {term: Fortnite event, subcategory: fortnite, priority: 95}
+  - {term: Fortnite new season, subcategory: fortnite, priority: 90}
+  - {term: Minecraft update, subcategory: minecraft, priority: 90}
+  - {term: Minecraft snapshot, subcategory: minecraft, priority: 75}
+  - {term: Roblox game, subcategory: roblox, priority: 85}
+  - {term: Roblox event, subcategory: roblox, priority: 85}
+  - {term: GTA update, subcategory: gta, priority: 85}
+  - {term: new multiplayer game, subcategory: new_releases, priority: 85}
+  - {term: new indie game, subcategory: indie, priority: 70}
+  - {term: limited time event game, subcategory: live_events, priority: 90}
+  - {term: game mod, subcategory: mods, priority: 65}
+  - {term: gaming AI, subcategory: gaming_ai, priority: 70}
+  - {term: game patch notes, subcategory: updates, priority: 75}
+  - {term: best settings fps, subcategory: performance, priority: 70}
+entities:
+  - {name: Fortnite, entity_type: game, evergreen: true, priority: 95}
+  - {name: Minecraft, entity_type: game, evergreen: true, priority: 90}
+  - {name: Roblox, entity_type: game, evergreen: true, priority: 90}
+  - {name: Grand Theft Auto, entity_type: game, aliases: [GTA Online], case_sensitive_aliases: [GTA], evergreen: true, priority: 85}
+  - {name: Counter-Strike 2, entity_type: game, case_sensitive_aliases: [CS2], evergreen: true, priority: 75}
+  - {name: Valorant, entity_type: game, evergreen: true, priority: 75}
+  - {name: Apex Legends, entity_type: game, evergreen: true, priority: 70}
+  - {name: Call of Duty, entity_type: game, case_sensitive_aliases: [CoD], evergreen: true, priority: 75}
+  - {name: League of Legends, entity_type: game, evergreen: true, priority: 65}
+  - {name: Dota 2, entity_type: game, evergreen: true, priority: 60}
+  - {name: Rocket League, entity_type: game, evergreen: true, priority: 60}
+  - {name: Marvel Rivals, entity_type: game, evergreen: true, priority: 70}
+  - {name: PUBG, entity_type: game, aliases: [PUBG Battlegrounds], case_sensitive_aliases: [PUBG], evergreen: true, priority: 60}

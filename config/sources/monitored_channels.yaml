@@ -1,0 +1,7 @@
+# Curated YouTube channels whose recent uploads are scanned (channels.list + playlistItems.list,
+# 1 quota unit each). Reference by handle ("@name") or channel id ("UC...").
+# Disabled by default: confirm each handle on YouTube before enabling.
+sources:
+  - {key: "youtube:channel:@Fortnite", provider: youtube_discovery, name: Fortnite (official), source_type: channel, category: gaming, reference: "@Fortnite", evidence_type: video_title, reliability: 0.8, min_poll_interval_minutes: 360, enabled: false, verified: false}
+  - {key: "youtube:channel:@Minecraft", provider: youtube_discovery, name: Minecraft (official), source_type: channel, category: gaming, reference: "@Minecraft", evidence_type: video_title, reliability: 0.8, min_poll_interval_minutes: 720, enabled: false, verified: false}
+  - {key: "youtube:channel:@Roblox", provider: youtube_discovery, name: Roblox (official), source_type: channel, category: gaming, reference: "@Roblox", evidence_type: video_title, reliability: 0.75, min_poll_interval_minutes: 720, enabled: false, verified: false}

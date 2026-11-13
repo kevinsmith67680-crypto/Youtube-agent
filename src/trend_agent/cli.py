@@ -1007,6 +1007,12 @@ def db_current() -> None:
         raise typer.Exit(3)
 
 
+# Phase 2 command group (registered last: it uses the helpers defined above).
+from trend_agent import cli_discover as _cli_discover  # noqa: E402
+
+app.add_typer(_cli_discover.discover_app, name="discover")
+
+
 def main() -> None:
     app()
 

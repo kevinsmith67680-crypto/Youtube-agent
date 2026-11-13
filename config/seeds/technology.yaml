@@ -1,0 +1,45 @@
+category: technology
+seeds:
+  - {term: programming tutorial, subcategory: software_engineering, priority: 60}
+  - {term: new developer tools, subcategory: developer_tools, priority: 80}
+  - {term: new programming framework, subcategory: frameworks, priority: 75}
+  - {term: new GPU, subcategory: gpus, priority: 85}
+  - {term: new CPU, subcategory: cpus, priority: 70}
+  - {term: cybersecurity vulnerability, subcategory: cybersecurity, priority: 75}
+  - {term: operating system update, subcategory: operating_systems, priority: 65}
+  - {term: robotics, subcategory: robotics, priority: 60}
+  - {term: smart glasses, subcategory: ar_vr, priority: 80}
+  - {term: VR headset, subcategory: ar_vr, priority: 70}
+  - {term: wearable tech, subcategory: wearables, priority: 60}
+  - {term: open source project release, subcategory: open_source, priority: 70}
+  - {term: new API SDK release, subcategory: apis_sdks, priority: 70}
+  - {term: cloud computing, subcategory: cloud, priority: 55}
+  - {term: quantum computing, subcategory: emerging_computing, priority: 55}
+entities:
+  - {name: NVIDIA, entity_type: company, evergreen: true, priority: 80}
+  - {name: AMD, entity_type: company, case_sensitive_aliases: [AMD], evergreen: true, priority: 70}
+  - {name: Intel, entity_type: company, evergreen: true, priority: 65}
+  - {name: Apple, entity_type: company, context_terms: [iphone, mac, ipad, ios, macos, vision], evergreen: true, priority: 70}
+  - {name: Microsoft, entity_type: company, evergreen: true, priority: 65}
+  - {name: GeForce RTX, entity_type: hardware, aliases: [RTX], case_sensitive_aliases: [RTX], evergreen: true, priority: 80}
+  - {name: Raspberry Pi, entity_type: hardware, evergreen: true, priority: 65}
+  - {name: Steam Deck, entity_type: hardware, evergreen: true, priority: 70}
+  - {name: Meta Quest, entity_type: hardware, evergreen: true, priority: 70}
+  - {name: Apple Vision Pro, entity_type: hardware, evergreen: true, priority: 65}
+  - {name: Windows, entity_type: software, context_terms: [microsoft, pc, update, os, laptop], evergreen: true, priority: 60}
+  - {name: macOS, entity_type: software, evergreen: true, priority: 60}
+  - {name: Linux, entity_type: software, evergreen: true, priority: 60}
+  - {name: Android, entity_type: software, evergreen: true, priority: 60}
+  - {name: iOS, entity_type: software, case_sensitive_aliases: [iOS], evergreen: true, priority: 60}
+  - {name: Python, entity_type: technology, context_terms: [programming, code, developer, pip, script], evergreen: true, priority: 70}
+  - {name: TypeScript, entity_type: technology, evergreen: true, priority: 65}
+  - {name: Rust, entity_type: technology, context_terms: [programming, cargo, crate, compiler, language], evergreen: true, priority: 65}
+  - {name: React, entity_type: framework, context_terms: [javascript, component, frontend, hooks, web], evergreen: true, priority: 65}
+  - {name: Next.js, entity_type: framework, evergreen: true, priority: 65}
+  - {name: Node.js, entity_type: software, evergreen: true, priority: 60}
+  - {name: Django, entity_type: framework, evergreen: true, priority: 55}
+  - {name: FastAPI, entity_type: framework, evergreen: true, priority: 60}
+  - {name: Docker, entity_type: software, evergreen: true, priority: 60}
+  - {name: Kubernetes, entity_type: software, evergreen: true, priority: 55}
+  - {name: Visual Studio Code, entity_type: software, aliases: [VS Code], evergreen: true, priority: 60}
+  - {name: Godot, entity_type: software, context_terms: [engine, game, gdscript], evergreen: true, priority: 55}

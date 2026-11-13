@@ -1,0 +1,328 @@
+# SYNTHETIC DISCOVERY FIXTURE - every entity, company, URL and claim below is fictional.
+# Domains use the reserved .example TLD. Used by `trend-agent discover demo` and tests.
+#
+# Two stages replay time: "history" runs 90 days before the anchor and establishes older
+# entities (Nimbus Coder 1.5, Lattice 4.0, the Ember Rush Carnival event); "current" runs
+# at the anchor with new releases/events plus data-quality traps.
+anchor: "2026-03-01T12:00:00Z"
+stages:
+  - {name: history, offset_days: -90}
+  - {name: current, offset_days: 0}
+
+sources:
+  # ------------------------------------------------------------------ history stage
+  - key: "synthetic:ai:corvid-blog-archive"
+    stage: history
+    category: ai
+    name: Corvid Labs blog (archive)
+    evidence_type: official_announcement
+    publisher: corvid-labs.example
+    reliability: 0.9
+    items:
+      - id: nimbus-coder-1-5
+        title: Corvid Labs releases Nimbus Coder 1.5
+        text: Nimbus Coder 1.5 is our coding model, available through the API for developers.
+        url: https://corvid-labs.example/blog/nimbus-coder-1-5
+        published_offset_hours: -48
+  - key: "synthetic:gaming:skyforge-news-archive"
+    stage: history
+    category: gaming
+    name: Skyforge Arena news (archive)
+    evidence_type: official_announcement
+    publisher: skyforge-arena.example
+    entity_hint: Skyforge Arena
+    entity_hint_type: game
+    reliability: 0.9
+    items:
+      - id: ember-rush
+        title: Ember Rush Carnival comes to Skyforge Arena
+        text: >-
+          The limited-time Ember Rush Carnival event runs for two weeks. New items include the
+          Cinder Bow. Complete challenges to unlock rewards.
+        url: https://skyforge-arena.example/news/ember-rush-carnival
+        published_offset_hours: -24
+  - key: "synthetic:technology:lattice-releases-archive"
+    stage: history
+    category: technology
+    name: Lattice releases (archive)
+    evidence_type: code_release
+    publisher: lattice-js.example
+    entity_hint: Lattice
+    entity_hint_type: framework
+    reliability: 0.9
+    items:
+      - id: lattice-4-0-0
+        title: "4.0.0"
+        text: Lattice 4.0 introduces signals and a new router.
+        url: https://lattice-js.example/releases/4.0.0
+        published_offset_hours: -120
+
+  # ------------------------------------------------------------------ current stage: AI
+  - key: "synthetic:ai:corvid-blog"
+    stage: current
+    category: ai
+    name: Corvid Labs blog
+    evidence_type: official_announcement
+    publisher: corvid-labs.example
+    reliability: 0.9
+    items:
+      - id: nimbus-coder-2
+        title: Introducing Nimbus Coder 2
+        text: >-
+          Corvid Labs today released Nimbus Coder 2, an open-weights coding model. Nimbus
+          Coder 2 outperforms Nimbus Coder 1.5 on SWE-bench. Developers can run it locally
+          with Ollama or call it through the API. API pricing starts at $2 per million
+          tokens. Nimbus Coder 2 was released on February 28, 2026.
+        url: https://corvid-labs.example/blog/nimbus-coder-2
+        published_offset_hours: -20
+  - key: "synthetic:ai:techwire"
+    stage: current
+    category: ai
+    name: TechWire (syndicates press releases)
+    evidence_type: official_announcement
+    publisher: techwire.example
+    reliability: 0.6
+    items:
+      # Syndicated copy of the announcement: must NOT count as independent corroboration.
+      - id: syndicated-nimbus
+        title: Corvid Labs releases Nimbus Coder 2
+        text: >-
+          Corvid Labs today released Nimbus Coder 2, an open-weights coding model. Nimbus
+          Coder 2 outperforms Nimbus Coder 1.5 on SWE-bench. Developers can run it locally
+          with Ollama or call it through the API. API pricing starts at $2 per million
+          tokens.
+        url: https://techwire.example/2026/02/corvid-nimbus-coder-2?utm_source=feed
+        published_offset_hours: -18
+      # Exact duplicate delivery of the same article (same reference): stored once.
+      - id: syndicated-nimbus
+        title: Corvid Labs releases Nimbus Coder 2
+        text: Duplicate delivery of the same syndicated article.
+        url: https://techwire.example/2026/02/corvid-nimbus-coder-2
+        published_offset_hours: -18
+  - key: "synthetic:ai:dailybyte"
+    stage: current
+    category: ai
+    name: DailyByte (syndication, conflicting date)
+    evidence_type: official_announcement
+    publisher: dailybyte.example
+    reliability: 0.5
+    items:
+      - id: dailybyte-nimbus
+        title: Corvid Labs releases Nimbus Coder 2 coding model
+        text: >-
+          Corvid Labs today released Nimbus Coder 2, an open-weights coding model. Nimbus
+          Coder 2 outperforms Nimbus Coder 1.5 on SWE-bench. Developers can run it locally
+          with Ollama or call it through the API. Nimbus Coder 2 was released on March 4, 2026.
+        url: https://dailybyte.example/news/nimbus-coder-2
+        published_offset_hours: -16
+  - key: "synthetic:ai:creator-videos"
+    stage: current
+    category: ai
+    name: Creator videos (AI)
+    evidence_type: video_title
+    reliability: 0.6
+    items:
+      - id: video-install-nimbus
+        title: How to Install Nimbus Coder 2 Locally (Step by Step)
+        text: In this video I install Nimbus Coder 2 with Ollama and test it on a real project.
+        url: https://video.example/watch?v=nimbus-install
+        publisher: video.example/channel/code-with-ana
+        author: code-with-ana
+        published_offset_hours: -10
+      - id: video-benchmark-nimbus
+        title: Nimbus Coder 2 vs Nimbus Coder 1.5 - Benchmark Test
+        text: I compare Nimbus Coder 2 vs Nimbus Coder 1.5 on three coding benchmarks.
+        url: https://video.example/watch?v=nimbus-bench
+        publisher: video.example/channel/bench-lab
+        author: bench-lab
+        published_offset_hours: -6
+  - key: "synthetic:ai:community"
+    stage: current
+    category: ai
+    name: AI community forum
+    evidence_type: community_discussion
+    reliability: 0.4
+    items:
+      # Low-quality claim: speculative entity must not be expanded into keywords.
+      - id: rumor-nimbus-3
+        title: Nimbus Coder 3 leaked??
+        text: Rumor says Nimbus Coder 3 might launch next month, unconfirmed.
+        url: https://forum.example/t/123
+        author: anon-user-1
+        published_offset_hours: -3
+  - key: "synthetic:ai:suggestions"
+    stage: current
+    category: ai
+    name: Simulated query-suggestion provider
+    evidence_type: search_suggestion
+    publisher: suggest.example
+    reliability: 0.8
+    items:
+      - id: suggestions-nimbus
+        title: Suggestions for nimbus coder
+        observed_queries:
+          - nimbus coder 2 install
+          - nimbus coder 2 vs nimbus coder 1.5
+          - nimbus coder 2 free
+        url: https://suggest.example/q/nimbus-coder
+        published_offset_hours: -2
+
+  # ------------------------------------------------------------------ current: technology
+  - key: "synthetic:technology:lattice-releases"
+    stage: current
+    category: technology
+    name: Lattice releases
+    evidence_type: code_release
+    publisher: lattice-js.example
+    entity_hint: Lattice
+    entity_hint_type: framework
+    reliability: 0.9
+    items:
+      - id: lattice-5-0-0
+        title: "5.0.0"
+        text: >-
+          Lattice 5.0 is a major release with breaking changes. See the migration guide to
+          upgrade from Lattice 4.0. Install with npm install lattice@5.
+        url: https://lattice-js.example/releases/5.0.0
+        published_offset_hours: -26
+      - id: lattice-5-0-1
+        title: "5.0.1"
+        text: Patch release fixing a typo in the CLI output.
+        url: https://lattice-js.example/releases/5.0.1
+        published_offset_hours: -4
+  - key: "synthetic:technology:dev-community"
+    stage: current
+    category: technology
+    name: Developer forum
+    evidence_type: community_discussion
+    reliability: 0.45
+    items:
+      - id: lattice-errors
+        title: Lattice 5.0 upgrade broke my build - any fix?
+        text: After upgrading to Lattice 5.0 I get errors in every component file.
+        url: https://devforum.example/t/9
+        author: dev42
+        published_offset_hours: -12
+  - key: "synthetic:technology:creator-videos"
+    stage: current
+    category: technology
+    name: Creator videos (technology)
+    evidence_type: video_title
+    reliability: 0.6
+    items:
+      - id: lattice-whats-new
+        title: Lattice 5.0 - What's New? (Full Overview)
+        text: Everything new in Lattice 5.0, including the breaking changes.
+        url: https://video.example/watch?v=lattice5
+        publisher: video.example/channel/frontend-fm
+        author: frontend-fm
+        published_offset_hours: -8
+      # Missing timestamp: kept, but flagged and scored lower.
+      - id: lattice-perf
+        title: Lattice 5.0 vs Lattice 4.0 Performance
+        text: Comparing Lattice 5.0 vs Lattice 4.0 render performance.
+        url: https://video.example/watch?v=lattice-perf
+        publisher: video.example/channel/perf-nerd
+        author: perf-nerd
+        published_offset_hours: null
+  - key: "synthetic:technology:haldane-home"
+    stage: current
+    category: technology
+    name: Haldane Home newsroom
+    evidence_type: official_announcement
+    publisher: haldane-home.example
+    reliability: 0.85
+    items:
+      # Similar name to "Nimbus Coder 2" but an unrelated product: must stay separate.
+      - id: nimbus-thermostat
+        title: Haldane Home announces the Nimbus 2 smart thermostat
+        text: The Nimbus 2 thermostat is a smart home device priced at $129.
+        url: https://haldane-home.example/news/nimbus-2
+        published_offset_hours: -30
+  - key: "synthetic:technology:old-archive"
+    stage: current
+    category: technology
+    name: Old article archive
+    evidence_type: official_announcement
+    publisher: oldnews.example
+    reliability: 0.6
+    items:
+      # Outdated information: stored and flagged, but not expanded into keywords.
+      - id: lattice-2
+        title: Lattice 2.0 released with a new compiler
+        text: Lattice 2.0 is available today.
+        url: https://oldnews.example/lattice-2
+        published_offset_hours: -19200
+
+  # ------------------------------------------------------------------ current: gaming
+  - key: "synthetic:gaming:skyforge-news"
+    stage: current
+    category: gaming
+    name: Skyforge Arena news
+    evidence_type: official_announcement
+    publisher: skyforge-arena.example
+    entity_hint: Skyforge Arena
+    entity_hint_type: game
+    reliability: 0.9
+    items:
+      - id: frostfall
+        title: Frostfall Festival is live in Skyforge Arena!
+        text: >-
+          The limited-time Frostfall Festival event runs until March 15. New items include
+          the Glacier Lance and the Rime Glider. Complete the festival challenges to unlock
+          rewards. Update 3.2 also fixes a crash on startup.
+        url: https://skyforge-arena.example/news/frostfall-festival
+        published_offset_hours: -14
+  - key: "synthetic:gaming:creator-videos"
+    stage: current
+    category: gaming
+    name: Creator videos (gaming)
+    evidence_type: video_title
+    reliability: 0.6
+    items:
+      - id: glacier-lance-location
+        title: Where to Find the Glacier Lance in Skyforge Arena
+        text: Fast route to the Glacier Lance during the Frostfall Festival.
+        url: https://video.example/watch?v=lance
+        publisher: video.example/channel/arena-guides
+        author: arena-guides
+        published_offset_hours: -9
+      - id: frostfall-guide
+        title: Frostfall Festival Guide - All Challenges in Skyforge Arena
+        text: Every Frostfall Festival challenge explained.
+        url: https://video.example/watch?v=frostfall
+        publisher: video.example/channel/pro-skyforge
+        author: pro-skyforge
+        published_offset_hours: -5
+  - key: "synthetic:gaming:community"
+    stage: current
+    category: gaming
+    name: Gaming community forum
+    evidence_type: community_discussion
+    reliability: 0.35
+    items:
+      # Unverified item claim: "Void Crown" must never become a keyword.
+      - id: void-crown-rumor
+        title: Secret Void Crown in Skyforge Arena?
+        text: Rumor says a hidden Void Crown might be in the festival. Unconfirmed.
+        url: https://forum.example/t/77
+        author: gamer7
+        published_offset_hours: -4
+  - key: "synthetic:gaming:outage-source"
+    stage: current
+    category: gaming
+    name: Flaky game news API
+    behaviour: outage
+    items: []
+  - key: "synthetic:gaming:quota-source"
+    stage: current
+    category: gaming
+    name: Quota-limited game API
+    behaviour: quota_exhausted
+    items: []
+  - key: "synthetic:gaming:scraped-site"
+    stage: current
+    category: gaming
+    provider: unlicensed_scraper
+    name: Unsupported scraped source
+    items: []

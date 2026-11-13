@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from trend_agent.db.repositories import ObservationRepository, VideoRepository
+from trend_agent.db.repositories.discovery import DiscoveryRepository
 from trend_agent.db.session import SessionFactory, transaction
 from trend_agent.logging import get_logger, log_event
 from trend_agent.schemas.enums import RecordKind
@@ -56,6 +57,7 @@ class RetentionService:
             expired["search_interest_observations"] = ObservationRepository(session).count_expired(
                 now
             )
+            expired["discovery_items"] = DiscoveryRepository(session).count_expired_items(now)
             due = len(VideoRepository(session).videos_due_for_refresh(now, horizon, 100_000))
         return RetentionReport(
             checked_at=now, expired=expired, expiring_videos_within_horizon=due, horizon=horizon
@@ -69,5 +71,8 @@ class RetentionService:
             deleted["search_interest_observations"] = ObservationRepository(session).delete_expired(
                 now
             )
+            # Phase 2: discovery source material (e.g. YouTube titles) expires too; its
+            # evidence links and entity mentions cascade.
+            deleted["discovery_items"] = DiscoveryRepository(session).purge_expired_items(now)
         log_event(_log, "retention.purged", deleted=deleted, as_of=now.isoformat())
         return deleted

@@ -1,0 +1,89 @@
+# Keyword discovery configuration (Phase 2).
+# Discovery finds and prioritises CANDIDATE keywords. Nothing configured here measures
+# search demand; see docs/keyword_discovery.md.
+version: 1
+
+# Share of each run's fetch budget per category. Must sum to 1.0. These steer effort;
+# they do not force the final keyword mix (no candidates are invented to fill a quota).
+category_budgets:
+  ai: 0.45
+  technology: 0.25
+  gaming: 0.30
+
+# Share of each category's fetch slots reserved for exploration (new entities, sources
+# never fetched before). Unused exploration slots fall back to exploitation and vice versa.
+exploration_share: 0.20
+
+regions: [US, GB]
+languages: [en]
+
+run:
+  max_fetches_per_run: 24        # total source fetches across categories per `discover run --all`
+  max_items_per_source: 50
+  lookback_days: 14              # only ask sources for material newer than this
+  max_item_age_days: 365         # older material is flagged outdated and not expanded
+  fetch_concurrency: 4
+  fetch_timeout_seconds: 60
+  max_failure_backoff_multiplier: 16   # failing sources wait up to 16x their poll interval
+
+expansion:
+  max_depth: 2                   # 0 none, 1 entity templates, 2 + grounded comparisons
+  max_templates_per_entity: 10
+  max_comparisons_per_entity: 2
+  max_keywords_per_run: 400
+  min_entity_confidence: 0.6
+  max_query_words: 10
+
+clustering:
+  backend: lexical               # 'embedding' requires an embedding backend (not bundled)
+  intent_similarity_threshold: 0.5
+  topic_similarity_threshold: 0.6
+
+scoring:
+  version: priority-v1           # heuristic weights, not experimentally validated
+  weights:
+    novelty: 0.25
+    freshness: 0.20
+    corroboration: 0.20
+    relevance: 0.15
+    intent_actionability: 0.10
+    evidence_quality: 0.10
+  freshness_half_life_days: 7
+  recency_half_life_days: 7
+  prioritize_threshold: 45
+
+lifecycle:
+  dormant_after_days: 30
+
+# Per-provider switches, local daily request caps (on top of each API's own limits) and
+# retention of stored source items. retention_days empty = keep (first-party/public feeds);
+# YouTube is capped at 30 days by policy regardless of this value.
+providers:
+  youtube_discovery:
+    enabled: true
+    daily_request_limit: 40      # search.list calls come from the 100/day search bucket
+    retention_days: 30
+    params: {search_results_per_query: 25}
+  feeds:
+    enabled: true
+    daily_request_limit: 500
+    retention_days: 90
+  github_releases:
+    enabled: true
+    daily_request_limit: 200
+    retention_days: 180
+  hackernews:
+    enabled: true
+    daily_request_limit: 300
+    retention_days: 90
+    params: {categories: [ai, technology]}
+  reddit:
+    enabled: true
+    daily_request_limit: 200
+    retention_days: 30
+  google_trends_discovery:
+    enabled: true
+    daily_request_limit: 100
+  curated_seeds:
+    enabled: true
+    daily_request_limit: 100000

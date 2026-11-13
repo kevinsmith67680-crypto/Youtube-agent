@@ -21,7 +21,7 @@ from tests.helpers import (
     load_fixture,
     make_settings,
 )
-from trend_agent import cli
+from trend_agent import __version__, cli
 from trend_agent.container import build_container
 
 UNREACHABLE_DB = "postgresql+psycopg://nobody:secretpw@127.0.0.1:1/none"
@@ -76,7 +76,7 @@ def test_help_text(args: list[str]) -> None:
 def test_version() -> None:
     result = runner.invoke(cli.app, ["version"])
     assert result.exit_code == 0
-    assert result.output.strip() == "0.1.0"
+    assert result.output.strip() == __version__
 
 
 def test_youtube_search_missing_key_names_the_variable(fake_youtube: FakeYouTube) -> None:

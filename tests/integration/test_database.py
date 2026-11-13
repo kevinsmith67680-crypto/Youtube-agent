@@ -88,8 +88,21 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "rejected_records",
         "channels",
         "video_search_results",
+        # Phase 2 (revision 0002)
+        "discovery_sources",
+        "discovery_runs",
+        "discovery_run_sources",
+        "discovery_items",
+        "discovered_entities",
+        "entity_aliases",
+        "entity_mentions",
+        "topic_clusters",
+        "intent_clusters",
+        "discovered_keywords",
+        "discovery_evidence",
+        "keyword_status_history",
     } <= tables
-    assert version == "0001"
+    assert version == "0002"
     command.check(cfg)  # raises if the ORM models and migrations have drifted
 
 
