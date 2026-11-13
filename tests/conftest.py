@@ -113,6 +113,12 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Verification layer
+    "verification_claims",
+    "verification_attempts",
+    "verification_runs",
+    "evidence_bundles",
+    "evidence_records",
     # Phase 4 (detection)
     "surge_evidence",
     "surge_event_transitions",

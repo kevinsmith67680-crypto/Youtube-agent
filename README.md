@@ -1,4 +1,4 @@
-# YouTube Trend Agent — Phases 1–4: Data Acquisition, Keyword Discovery, Historical Monitoring & Surge Detection
+# YouTube Trend Agent — Phases 1–4: Data Acquisition, Keyword Discovery, Historical Monitoring & Surge Detection (+ verification layer)
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
@@ -82,7 +82,26 @@ event. Details: [docs/phase4_architecture.md](docs/phase4_architecture.md),
 | Causal replay, walk-forward calibration, independent synthetic evaluation | Implemented — results in [docs/phase4_report.md](docs/phase4_report.md); **synthetic only**, real-world accuracy unknown |
 
 Not in scope yet (by design): search-intent and content-gap analysis (Phase 5),
-forecasting, recommendations, dashboard.
+forecasting, dashboard.
+
+## Verification layer — anti-hallucination gate
+
+Every recommendation (from a template, a person or an optional LLM) passes a
+deterministic **verification gate** before it can be shown. Details:
+[docs/verification_layer.md](docs/verification_layer.md),
+[docs/verification_evaluation.md](docs/verification_evaluation.md),
+[docs/verification_report.md](docs/verification_report.md).
+
+| Area | Status |
+|---|---|
+| Persistent, versioned evidence registry: signed, application-issued IDs, per-request bundles, integrity re-checked on use, immutable content (DB trigger), retention copied from sources | Implemented |
+| Claim verification (declared + extracted from title/rationale/notes): VERIFIED / CORROBORATED / UNVERIFIED / CONTRADICTED, support checked per claim (entities, numbers, dates, release wording, content), credible contradictions, freshness, attribution | Implemented (deterministic, English-only, lexical) |
+| Statistical authority: growth, scores, severity, significance, freshness and readiness only from Phase 4; no search volumes; proxy activity never presented as search growth | Implemented |
+| Entity verification: canonical resolution, ambiguity, unknown names, confirmed vs reported vs rumoured, release dates, denials, conflicts | Implemented |
+| Prompt-injection protection: no generator tools, least-privilege permission policy, read-only assembly, data blocks with escaped markup, output URL/self-certification checks | Implemented |
+| Abstention (VERIFIED_RESULT, PARTIALLY_VERIFIED, INSUFFICIENT_EVIDENCE, CONTRADICTED, SOURCE_UNAVAILABLE) and publication decided by code; bounded retries | Implemented |
+| Optional Claude adapter (structured output, refusal handling, server-side fallbacks) | Implemented; **not run against the live API here** (fake-client tests only) |
+| Adversarial evaluation (58 labelled fictional cases, dev + held-out) | 0 labelled unsupported claims published; held-out first run: precision 1.00, false rejection 0.10, contradiction recall 0.60 — **fictional data, real-world accuracy unknown** |
 
 ## Architecture overview
 
@@ -101,8 +120,10 @@ detection/   Phase 4: preprocessing, baselines, anomaly, CUSUM, change points, c
 db/          SQLAlchemy models, session management, repositories (all SQL lives here)
 comparability.py   decides whether two observations' values may be compared
 container.py composition root (dependency injection), cli*.py Typer CLI
+verification/  evidence registry, claim extraction/verification, entities, statistical
+             authority, untrusted-content handling, permissions, generators, gate
 config/      discovery.yaml, seeds/, sources/ (Phase 2); monitoring.yaml (Phase 3);
-             detection.yaml (Phase 4)
+             detection.yaml (Phase 4); verification.yaml + verification/ (fixtures)
 ```
 
 Data flows `provider -> candidates -> validation -> storage policy -> one DB transaction
@@ -233,6 +254,13 @@ trend-agent detect readiness | thresholds | stats | schema
 trend-agent detect replay --query "AI coding agents" --provider mock
 trend-agent detect calibrate --dataset synthetic
 trend-agent detect evaluate --dataset synthetic
+
+# Verification layer (see docs/verification_layer.md)
+trend-agent verify demo                     # offline walk-through of labelled fictional cases
+trend-agent verify evaluate --split all     # labelled adversarial evaluation (offline)
+trend-agent verify recommend --target 42    # evidence -> draft (template by default) -> gate
+trend-agent verify check --target 42 --draft draft.json   # verify an externally written draft
+trend-agent verify runs | explain <run-id> | evidence [--id ev_...] | stats | schema
 ```
 
 `discover run` fetches within budgets, quotas and poll intervals (`--force` ignores
@@ -310,3 +338,6 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/surge_alerts.md](docs/surge_alerts.md) — evidence classes, stages, severity, episodes, output contract, explanations
 * [docs/detection_evaluation.md](docs/detection_evaluation.md) — ground truth, metrics, causal replay, calibration, leakage control
 * [docs/phase4_report.md](docs/phase4_report.md) — what was built and verified, synthetic accuracy, benchmarks, limitations, Phase 5 readiness
+* [docs/verification_layer.md](docs/verification_layer.md) — evidence registry, claim verification, statistical authority, entities, injection protection, abstention, gate, failure modes
+* [docs/verification_evaluation.md](docs/verification_evaluation.md) — labelled adversarial evaluation (fictional), metrics, held-out results
+* [docs/verification_report.md](docs/verification_report.md) — verification-layer report: changes, schemas, tests, risks, Phase 5 readiness

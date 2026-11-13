@@ -100,6 +100,13 @@ class Settings(BaseSettings):
     reddit_client_id: SecretStr | None = None
     reddit_client_secret: SecretStr | None = None
 
+    # --- Verification layer -----------------------------------------------------------
+    # HMAC key for evidence IDs and bundle tokens. Required when environment=production;
+    # development uses a fixed, documented key (IDs are then guessable, never secret).
+    verification_signing_key: SecretStr | None = None
+    # Optional LLM generator (the anthropic SDK is not a dependency; install it to use).
+    anthropic_api_key: SecretStr | None = None
+
     # --- Synthetic (mock) provider -------------------------------------------------
     mock_provider_enabled: bool = True
     mock_seed: int = 20_260_101
@@ -113,7 +120,13 @@ class Settings(BaseSettings):
         return level
 
     @field_validator(
-        "youtube_api_key", "github_token", "reddit_client_id", "reddit_client_secret", mode="before"
+        "youtube_api_key",
+        "github_token",
+        "reddit_client_id",
+        "reddit_client_secret",
+        "verification_signing_key",
+        "anthropic_api_key",
+        mode="before",
     )
     @classmethod
     def _blank_key_is_none(cls, value: Any) -> Any:
@@ -172,6 +185,10 @@ class Settings(BaseSettings):
             "reddit_credentials": (
                 "set" if self.reddit_client_id and self.reddit_client_secret else "missing"
             ),
+            "verification_signing_key": (
+                "set" if self.verification_signing_key else "missing (development key)"
+            ),
+            "anthropic_api_key": "set" if self.anthropic_api_key else "missing",
         }
 
 

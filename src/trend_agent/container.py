@@ -7,6 +7,7 @@ which is how the test-suite runs the full stack without network access.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import httpx
 from sqlalchemy import Engine
@@ -30,6 +31,10 @@ from trend_agent.providers.registry import ProviderRegistry
 from trend_agent.providers.youtube import PROVIDER_NAME as YOUTUBE
 from trend_agent.providers.youtube import YouTubeDataApiProvider
 from trend_agent.utils.time import Clock, utc_now
+from trend_agent.verification.config import LoadedVerificationConfig, load_verification_config
+
+if TYPE_CHECKING:
+    from trend_agent.verification.service import VerificationService
 
 
 @dataclass
@@ -45,6 +50,7 @@ class AppContainer:
     _discovery_config: LoadedDiscoveryConfig | None = None
     _monitoring_config: LoadedMonitoringConfig | None = None
     _detection_config: LoadedDetectionConfig | None = None
+    _verification_config: LoadedVerificationConfig | None = None
 
     def ingestion(self) -> IngestionService:
         return IngestionService(
@@ -168,6 +174,23 @@ class AppContainer:
             monitoring=monitoring,
             clock=clock or self.clock,
             include_synthetic=include_synthetic,
+        )
+
+    def verification_config(self) -> LoadedVerificationConfig:
+        if self._verification_config is None:
+            self._verification_config = load_verification_config(self.settings.discovery_config_dir)
+        return self._verification_config
+
+    def verification(self, *, clock: Clock | None = None) -> VerificationService:
+        """Evidence registry + recommendation verification gate."""
+        from trend_agent.verification.registry import EvidenceSigner
+        from trend_agent.verification.service import VerificationService
+
+        return VerificationService(
+            session_factory=self.session_factory,
+            loaded=self.verification_config(),
+            signer=EvidenceSigner.from_settings(self.settings),
+            clock=clock or self.clock,
         )
 
     async def aclose(self) -> None:

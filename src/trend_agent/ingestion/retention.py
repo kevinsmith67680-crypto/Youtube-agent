@@ -10,6 +10,7 @@ from trend_agent.db.repositories.detection_runs import DetectionRunRepository
 from trend_agent.db.repositories.discovery import DiscoveryRepository
 from trend_agent.db.repositories.surge_events import SurgeEventRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
+from trend_agent.db.repositories.verification import VerificationRepository
 from trend_agent.db.session import SessionFactory, transaction
 from trend_agent.logging import get_logger, log_event
 from trend_agent.schemas.enums import RecordKind
@@ -65,6 +66,8 @@ class RetentionService:
             # Phase 4: derived detection records carry the expiry of their sources.
             expired["anomaly_results"] = DetectionRunRepository(session).count_expired(now)
             expired["surge_events"] = SurgeEventRepository(session).count_expired(now)
+            # Verification layer: evidence records and gate runs expire with their sources.
+            expired.update(VerificationRepository(session).count_expired(now))
             due = len(VideoRepository(session).videos_due_for_refresh(now, horizon, 100_000))
         return RetentionReport(
             checked_at=now, expired=expired, expiring_videos_within_horizon=due, horizon=horizon
@@ -87,6 +90,9 @@ class RetentionService:
             # first (also enforced by cascades when the source observations are deleted).
             deleted["anomaly_results"] = DetectionRunRepository(session).purge_expired(now)
             deleted["surge_events"] = SurgeEventRepository(session).purge_expired(now)
+            # Verification runs (expiry = earliest expiry of the evidence they were shown),
+            # then unused expired bundles, then evidence records copied from expiring sources.
+            deleted.update(VerificationRepository(session).purge_expired(now))
             deleted["ts_observations"] = TimeSeriesRepository(session).purge_expired(now)
         log_event(_log, "retention.purged", deleted=deleted, as_of=now.isoformat())
         return deleted

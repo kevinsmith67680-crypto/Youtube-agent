@@ -1,0 +1,56 @@
+# Verification layer (anti-hallucination gate) configuration.
+# Every value has an in-code default (src/trend_agent/verification/config.py); the file
+# documents the operating point and is hashed into every verification run.
+version: 1
+config_version: verification-v1
+
+freshness:
+  # How long a record can support time-sensitive claims (from publication, else collection).
+  # Older than fresh * usable_factor is STALE.
+  fresh:
+    measurement: P3D
+    surge_detection: P3D
+    statistical_calculation: P3D
+    video_metadata: P7D
+    community_post: P7D
+    search_suggestion: P7D
+    related_query: P7D
+    news_report: P14D
+    official_announcement: P30D
+    code_release: P30D
+    entity_record: P90D
+    curated_reference: P365D
+    synthetic_test_data: P3650D
+  usable_factor: 4.0
+  # "new", "just announced", "latest" need a supporting record published within this.
+  novelty_window: P45D
+
+matching:
+  term_coverage: 0.6          # share of a claim's content words found in its support
+  min_content_terms: 1
+  percent_tolerance: 2.0      # percentage points, against the engine's relative change
+  relative_tolerance: 0.02    # other numbers (prices, sizes, counts)
+  min_independent_sources: 2  # CORROBORATED needs this many independent lower-trust sources
+  max_excerpt_chars: 4000
+
+retry:
+  max_attempts: 3             # total generations per request (bounded)
+  retry_on_malformed: true
+  retry_on_unsupported_title: true
+  stop_on_repeated_claim: true  # stop when a rejected claim is generated again
+
+generator:
+  default: template           # template (deterministic, offline) | anthropic (optional)
+  anthropic_model: claude-opus-5-5
+  anthropic_max_tokens: 8000
+  anthropic_timeout_seconds: 120
+  server_side_fallbacks: true  # fallbacks="default" (beta server-side-fallback-2026-07-01)
+
+vocabulary:
+  title_neutral: []           # extra words a title may use without evidence
+  stopwords: []
+
+bundle_ttl: PT6H
+allow_synthetic_evidence: false   # production default: synthetic data supports nothing
+max_bundle_records: 40
+max_observations: 14

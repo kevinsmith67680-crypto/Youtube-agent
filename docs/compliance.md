@@ -159,6 +159,24 @@ Unresolved questions (need the operator / legal review before production):
 2. Whether surge episodes derived from YouTube video statistics, if that metric is ever
    permitted, count as "derived metrics" under the YouTube API Services policies.
 
+## Verification layer
+
+* **Evidence copies keep their sources' retention.** `evidence_records` carry the
+  source's `expires_at` and data policy; verification runs expire with the earliest
+  expiry of the evidence they were shown. `trend-agent data retention --purge` deletes
+  them (runs first, then unused bundles, then evidence records).
+* **Source text is untrusted data.** YouTube titles/descriptions, comments, feeds and
+  GitHub pages are stored only as sanitised, bounded excerpts, flagged for injection
+  patterns, and can never authorise an action.
+* **Optional LLM use sends evidence excerpts to the model provider.** With
+  `--generator anthropic`, the request bundle (excerpts of stored source text, the
+  monitored query and the engine's statistics) is sent to Anthropic's API. Before
+  enabling it, confirm that the provider terms of each source (in particular YouTube API
+  data) allow sending that content to a third-party processor; the default generator
+  (`template`) sends nothing anywhere.
+* **Signing key.** `TREND_AGENT_VERIFICATION_SIGNING_KEY` is required in production; keep
+  it in a secret manager. The development key is public.
+
 ## Default posture (conservative)
 
 | Control | Default |
@@ -173,6 +191,8 @@ Unresolved questions (need the operator / legal review before production):
 | YouTube monitored channels | disabled until handles are confirmed |
 | Monitoring observations | per data policy; Trends denied until a retention period is set; derived values expire with their sources |
 | YouTube derived metrics / statistics history | disabled (`compliance.*` false) |
+| Recommendation generator | deterministic template (no external calls); LLM adapter opt-in |
+| Synthetic evidence | cannot support claims outside synthetic runs |
 
 ## Operator checklist before production use
 
