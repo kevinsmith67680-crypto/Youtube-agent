@@ -610,3 +610,4 @@ docker compose --profile app up -d --build # full local stack (development crede
 * [docs/model_maintenance.md](docs/model_maintenance.md) — statuses, promotion, drift, rollback, experiments
 * [docs/production_readiness.md](docs/production_readiness.md) — the readiness scorecard and release state
 * [docs/phase8_report.md](docs/phase8_report.md) — Phase 8 report and verdict
+* [docs/youtube_api_connection_report.md](docs/youtube_api_connection_report.md) — live verification of the YouTube Data API v3 key, quota, retention and a real discovery run

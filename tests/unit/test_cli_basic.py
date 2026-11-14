@@ -153,3 +153,11 @@ def test_quota_status_in_memory_when_db_down() -> None:
     data = json.loads(result.output[result.output.index("{") :])
     assert data["store"] == "InMemoryQuotaStore"
     assert {b["bucket"] for b in data["buckets"]} == {"search", "default"}
+
+
+def test_console_prints_source_keys_verbatim() -> None:
+    # Rich would otherwise render ":chart:" in "youtube:chart:US:20" as an emoji.
+    with cli.console.capture() as captured:
+        cli.console.print("youtube:chart:US:20")
+    assert captured.get().strip() == "youtube:chart:US:20"
+    assert cli.err_console._emoji is False

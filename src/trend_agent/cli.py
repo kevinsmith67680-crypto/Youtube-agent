@@ -72,8 +72,10 @@ for sub, name in [
 ]:
     app.add_typer(sub, name=name)
 
-console = Console()
-err_console = Console(stderr=True)
+# emoji=False: source keys such as "youtube:chart:US:20" must print verbatim (Rich would
+# otherwise turn ":chart:" into an emoji).
+console = Console(emoji=False)
+err_console = Console(stderr=True, emoji=False)
 
 # Tests replace this to inject fakes (HTTP transport, clock, database).
 ContainerFactory = Callable[..., AppContainer]
