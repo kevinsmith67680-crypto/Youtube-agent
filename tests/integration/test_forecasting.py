@@ -22,6 +22,7 @@ from typer.testing import CliRunner
 from tests.helpers import FakeYouTube, make_settings
 from tests.integration.test_detection import DAY, World, _deny, count
 from tests.unit.discovery.helpers import CONFIG_DIR
+from tests.unit.forecasting.helpers import trained
 from trend_agent import cli
 from trend_agent.container import AppContainer, build_container
 from trend_agent.db.content_models import (
@@ -46,6 +47,7 @@ from trend_agent.detection import demo as ddemo
 from trend_agent.forecasting.service import ForecastingService
 from trend_agent.ingestion.retention import RetentionService
 from trend_agent.schemas.forecast import ForecastOutput, ForecastStatus
+from trend_agent.schemas.model_metadata import ModelStatus
 
 runner = CliRunner()
 NOW = ddemo.START + DAY * 75 + timedelta(hours=12)
@@ -256,6 +258,12 @@ def test_cli_forecast_commands(world: World) -> None:
     promoted = as_json("forecast", "promote", validated[0]["model_id"])
     assert promoted["status"] == "champion"
     invoke("forecast", "promote", "fm_does_not_exist", code=2)
+    evaluated = as_json("forecast", "evaluate", "--horizon", "24h", "--scale", "0.05",
+                        "--workers", "2")  # fmt: skip
+    assert all(r["scope"].split("/")[2] == "24h" for r in evaluated)
+    assert all(r["test_rows"] is not None for r in evaluated)
+    compared = as_json("forecast", "compare", "--scale", "0.05")
+    assert all("comparable" in r for r in compared)  # no challengers registered: may be empty
     preds = as_json("forecast", "predict", "--include-synthetic")
     assert preds
     assert all(p["created"] for p in preds)
@@ -335,3 +343,51 @@ def test_phase4_and_phase5_inputs_and_classification_preserved(world: World) -> 
         assert o.is_proxy is is_proxy
         assert o.synthetic
         assert (o.target_family == "proxy_attention") is is_proxy
+
+
+def _import_breakout_models(svc: ForecastingService) -> list[str]:
+    """Copy validated hourly 24 h breakout models of the shared synthetic training run
+    (tests.unit.forecasting.helpers, corpus scale 0.3) into the database registry."""
+    ctx = trained()
+    out = []
+    for m in ctx.registry.store.all():
+        if (
+            m.target_type.value == "breakout"
+            and m.granularity == "hour"
+            and m.horizon_hours == 24
+            and m.status in (ModelStatus.CHAMPION, ModelStatus.VALIDATED)
+        ):
+            _, payload, text = ctx.registry.load(m.model_id)
+            copy = m.model_copy(
+                update={"model_id": m.model_id + "_db", "status": ModelStatus.VALIDATED}
+            )
+            out.append(svc.registry.register(copy, payload, text).model_id)
+    return out
+
+
+@pytest.mark.usefixtures("wired_cli")
+def test_evaluate_and_champion_challenger_through_service_and_cli(world: World) -> None:
+    svc = _service(world)
+    ids = _import_breakout_models(svc)
+    assert ids
+    with transaction(world.factory) as s:
+        stored = {r.id: r.status for r in s.execute(sa.select(ForecastModelRow)).scalars()}
+    assert all(stored[i] == "validated" for i in ids)  # imported, not promoted
+    svc.promote(ids[0])
+    rows = svc.evaluate(horizon=24, scale=0.1, workers=1)
+    assert [r["model_id"] for r in rows] == [ids[0]]
+    assert rows[0]["test_rows"] > 0
+    assert "brier" in rows[0]["metrics"]
+    assert count(world.factory, ForecastEvaluationRow) == 1
+    cli_rows = as_json("forecast", "evaluate", "--horizon", "24h", "--scale", "0.1",
+                       "--workers", "1")  # fmt: skip
+    assert [r["model_id"] for r in cli_rows] == [ids[0]]
+    if len(ids) > 1:
+        pairs = as_json("forecast", "compare", "--scale", "0.1")
+        assert pairs
+        assert all(p["comparable"] for p in pairs)
+        assert {p["champion"]["model_id"] for p in pairs} == {ids[0]}
+        assert all(set(p["criteria"]) >= {"brier_better_with_ci", "same_data_origin"}
+                   for p in pairs)  # fmt: skip
+        # comparing is read-only: nothing was promoted
+        assert {m.model_id for m in svc.models() if m.status is ModelStatus.CHAMPION} == {ids[0]}

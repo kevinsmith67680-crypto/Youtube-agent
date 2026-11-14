@@ -136,6 +136,13 @@ class PointInTimeSeries:
             self._t, self._v, self._r, self._c = _arrays(by_period)
             self._keys = [p.normalization_key for p in by_period]
 
+    def latest_available(self, as_of_h: float) -> float | None:
+        """Availability time (hours) of the newest observation available at ``as_of_h``."""
+        if not hasattr(self, "_avail_sorted"):
+            self._avail_sorted = np.sort(self._avail_h)
+        k = int(np.searchsorted(self._avail_sorted, as_of_h + 1e-9, side="right"))
+        return float(self._avail_sorted[k - 1]) if k else None
+
     def at(self, as_of: datetime) -> Visible:
         if self.fast:
             k = int(np.searchsorted(self._avail_h, hours(as_of), side="right"))

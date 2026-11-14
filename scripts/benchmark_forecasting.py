@@ -74,6 +74,7 @@ from trend_agent.forecasting.model_selection import (  # noqa: E402
 )
 from trend_agent.forecasting.prediction import ForecastEngine  # noqa: E402
 from trend_agent.schemas.model_metadata import DataOrigin  # noqa: E402
+from trend_agent.schemas.monitoring import MeasurementCategory  # noqa: E402
 
 DEFAULT_URL = bd.DEFAULT_URL
 DAY = timedelta(days=1)
@@ -232,8 +233,15 @@ def database_benchmarks(
         t0 = time.perf_counter()
         bd.seed(factory, active, dormant, days)
         with transaction(factory) as s:  # benchmark data is synthetic: label it so
-            for model in (SeriesRow, ObservationRow, MonitoringTargetRow):
-                s.execute(sa.update(model).values(is_synthetic=True))
+            for model in (SeriesRow, ObservationRow):
+                s.execute(
+                    sa.update(model).values(
+                        is_synthetic=True,
+                        measurement_category=MeasurementCategory.SYNTHETIC_TEST_OBSERVATION,
+                        simulated_category=MeasurementCategory.DIRECT_YOUTUBE_SEARCH_INTEREST,
+                    )
+                )
+            s.execute(sa.update(MonitoringTargetRow).values(is_synthetic=True))
         out["seed"] = {
             "active_targets": active,
             "dormant_targets": dormant,
@@ -311,6 +319,7 @@ def main() -> None:
     ap.add_argument("--dormant", type=int, default=10_000)
     ap.add_argument("--days", type=int, default=120)
     ap.add_argument("--skip-db", action="store_true")
+    ap.add_argument("--skip-memory", action="store_true")
     args = ap.parse_args()
     loaded = load_forecasting_config(ROOT / "config")
     dloaded = load_detection_config(ROOT / "config")
@@ -322,9 +331,10 @@ def main() -> None:
         "corpus_scale": args.scale,
         "workers": args.workers,
     }
-    t0 = time.perf_counter()
-    report["memory"] = memory_benchmarks(loaded, dloaded, args.scale, args.workers)
-    report["memory"]["total_seconds"] = round(time.perf_counter() - t0, 1)
+    if not args.skip_memory:
+        t0 = time.perf_counter()
+        report["memory"] = memory_benchmarks(loaded, dloaded, args.scale, args.workers)
+        report["memory"]["total_seconds"] = round(time.perf_counter() - t0, 1)
     if not args.skip_db:
         url = os.environ.get("TREND_AGENT_BENCH_DATABASE_URL", DEFAULT_URL)
         name = url.rsplit("/", 1)[-1]

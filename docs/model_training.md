@@ -18,11 +18,20 @@ hour. For each example:
    examples whose windows are all unobserved or immature are skipped.
 3. The feature vector, computed with the same code used at inference.
 
+Each example records its series, query ID, entity ID, topic cluster, category, provider,
+measurement target, region, granularity, prediction time T and **data availability
+cutoff** (the newest availability time ≤ T among the observations it could use). It also
+records the labels per horizon with their **label quality** (`coverage_H`, the share of
+the window observed), the peak **censoring** flags, and the source-quality features
+(missing rate, staleness, normalization stability). The dataset version is in the manifest.
+
 The **manifest** records the dataset version (a hash of configuration, feature schema,
 target definition, code hash and per-series source digests), a hash of all rows, label
 counts, the period, the synthetic flags and the leakage audit. Rebuilding from the same
 data gives the same `rows_hash`, and parallel builds (`--workers`) give identical results.
-Worker processes start with `forkserver`/`spawn`, never `fork`.
+Worker processes start with `forkserver`/`spawn`, never `fork`. Where worker processes
+cannot start (e.g. no importable `__main__`), the build falls back to one process with a
+logged warning and the same result.
 
 A real-data (`data_origin = real`) training run refuses any synthetic row. Synthetic data
 is used only through `--dataset synthetic`, which builds the isolated experimental corpus
@@ -132,7 +141,8 @@ hyperparameters, metrics, calibration summary, code version, artifact checksum a
   challenger is promoted only if it is validated, its Brier score is better with a
   bootstrap interval excluding zero, precision@50 and the false-positive rate are not
   worse, its ECE is within the limit and its data origin matches. Otherwise it is marked
-  CHALLENGER with the comparison as evidence. Lead time (hours between the first alert and
+  CHALLENGER with the comparison as evidence. The promotion step reads current statuses
+  from the registry, so re-running it never demotes a scope's current champion (tested). Lead time (hours between the first alert and
   the end of a breakout's run-up), inference time and forecast stability (mean absolute
   change of consecutive probabilities) are reported alongside.
 * Synthetic models are selected only for synthetic series. A synthetic model can be

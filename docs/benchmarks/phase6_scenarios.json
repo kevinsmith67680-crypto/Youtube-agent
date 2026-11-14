@@ -1,0 +1,871 @@
+{
+  "synthetic": true,
+  "note": "SYNTHETIC scenarios A-M (fictional series); behaviour checks, not accuracy",
+  "corpus_scale": 0.5,
+  "timings": {
+    "dataset_seconds": 30.39,
+    "training_seconds": 43.41
+  },
+  "dataset": {
+    "dataset_version": "ds-b04d047627f8",
+    "rows": 36013,
+    "leakage_audit": {
+      "checked": 6,
+      "mismatches": 0,
+      "details": []
+    }
+  },
+  "scenarios": [
+    {
+      "scenario": "A",
+      "name": "Explosive AI model launch (fictional coding model)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "strong breakout signal or already elevated",
+          "ok": true,
+          "detail": "p24=None base_rate=0.032 elevated=True"
+        },
+        {
+          "check": "uncertainty reported",
+          "ok": true,
+          "detail": "in_distribution"
+        },
+        {
+          "check": "no search counts claimed",
+          "ok": true,
+          "detail": "Forecasts describe relative interest in the measured source "
+        },
+        {
+          "check": "labelled synthetic",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional ai coding model tutorial",
+          "forecast_horizon_hours": 6,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional ai coding model tutorial",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional ai coding model tutorial",
+          "forecast_horizon_hours": 72,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "B",
+      "name": "Gradual AI tool adoption",
+      "passed": true,
+      "checks": [
+        {
+          "check": "growth persistence recognised",
+          "ok": true,
+          "detail": "slope=0.0, change72=0.160343"
+        },
+        {
+          "check": "trajectory not forecasting a collapse",
+          "ok": true,
+          "detail": "value=29.0 level=29.0"
+        },
+        {
+          "check": "no false immediate-peak claim",
+          "ok": true,
+          "detail": "ESTIMATED"
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional agent framework tutorial",
+          "forecast_horizon_hours": 6,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional agent framework tutorial",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0221,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional agent framework tutorial",
+          "forecast_horizon_hours": 72,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "C",
+      "name": "Limited-time gaming event (fictional battle-royale season event)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "opportunity windows estimated",
+          "ok": true,
+          "detail": "quick=UNKNOWN deep=UNKNOWN"
+        },
+        {
+          "check": "short event: deep dive no more likely than a quick reaction (\u00b10.05 analog noise)",
+          "ok": true,
+          "detail": "quick=0.123 deep=0.15"
+        },
+        {
+          "check": "deep dive not a longer window",
+          "ok": true,
+          "detail": "UNKNOWN"
+        },
+        {
+          "check": "relative uncertainty grows with the horizon",
+          "ok": true,
+          "detail": "width6=0.2669 width72=0.4823"
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional arena event challenges",
+          "forecast_horizon_hours": 6,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional arena event challenges",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0221,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional arena event challenges",
+          "forecast_horizon_hours": 72,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "D",
+      "name": "Evergreen programming tutorial (weekly seasonality)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "seasonal baseline competitive",
+          "ok": true,
+          "detail": "seasonal 0.054 vs persistence 0.195"
+        },
+        {
+          "check": "no unjustified breakout forecast",
+          "ok": true,
+          "detail": "probabilities=[0.0034, 0.0176]"
+        },
+        {
+          "check": "daily series: no 6 h forecast",
+          "ok": true,
+          "detail": "UNSUPPORTED_GRANULARITY"
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional programming language tutorial",
+          "forecast_horizon_hours": 6,
+          "status": "UNSUPPORTED_GRANULARITY",
+          "status_reasons": [
+            "a 6 h horizon is not a whole number of day periods; values are never interpolated"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional programming language tutorial",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0034,
+          "peak": "PEAK_LIKELY_BEYOND_HORIZON",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional programming language tutorial",
+          "forecast_horizon_hours": 72,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0176,
+          "peak": "PEAK_LIKELY_BEYOND_HORIZON",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "E",
+      "name": "False viral signal (video activity rises, search does not)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "proxy forecast labelled proxy",
+          "ok": true,
+          "detail": "proxy_attention"
+        },
+        {
+          "check": "no YouTube Search forecast from video activity",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "direct search series shows no breakout",
+          "ok": true,
+          "detail": "p24=0.0116"
+        },
+        {
+          "check": "video change visible only as a supporting feature",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 6,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0116,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 72,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 6,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "proxy_attention",
+          "is_proxy": true,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "proxy_attention",
+          "is_proxy": true,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional viral clip game",
+          "forecast_horizon_hours": 72,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "proxy_attention",
+          "is_proxy": true,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        }
+      ]
+    },
+    {
+      "scenario": "F",
+      "name": "Sparse history (newly discovered query)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "insufficient history",
+          "ok": true,
+          "detail": "INSUFFICIENT_HISTORY, INSUFFICIENT_HISTORY, INSUFFICIENT_HISTORY"
+        },
+        {
+          "check": "no probability",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional brand-new model",
+          "forecast_horizon_hours": 6,
+          "status": "INSUFFICIENT_HISTORY",
+          "status_reasons": [
+            "72 h of history available, 168 h required"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional brand-new model",
+          "forecast_horizon_hours": 24,
+          "status": "INSUFFICIENT_HISTORY",
+          "status_reasons": [
+            "72 h of history available, 168 h required"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional brand-new model",
+          "forecast_horizon_hours": 72,
+          "status": "INSUFFICIENT_HISTORY",
+          "status_reasons": [
+            "72 h of history available, 168 h required"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        }
+      ]
+    },
+    {
+      "scenario": "G",
+      "name": "Provider delay (Monday's value published on Wednesday)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "Tuesday forecast cannot see Monday's delayed value",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "visible once published (Wednesday)",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "Tuesday features identical with or without the late value",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": []
+    },
+    {
+      "scenario": "H",
+      "name": "Normalization mismatch (re-based scale / incompatible series)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "forecast refused after a normalization change",
+          "ok": true,
+          "detail": "the normalization context changed inside the baseline window"
+        },
+        {
+          "check": "cross-series level ratio rejected",
+          "ok": true,
+          "detail": "cross_level_ratio_log rejected: different_measurement_category, different_scale_type"
+        },
+        {
+          "check": "within-series external change still available",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional rebased series",
+          "forecast_horizon_hours": 6,
+          "status": "FORECAST_UNAVAILABLE",
+          "status_reasons": [
+            "the normalization context changed inside the baseline window"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional rebased series",
+          "forecast_horizon_hours": 24,
+          "status": "FORECAST_UNAVAILABLE",
+          "status_reasons": [
+            "the normalization context changed inside the baseline window"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional rebased series",
+          "forecast_horizon_hours": 72,
+          "status": "FORECAST_UNAVAILABLE",
+          "status_reasons": [
+            "the normalization context changed inside the baseline window"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        }
+      ]
+    },
+    {
+      "scenario": "I",
+      "name": "Model overfitting (good in training, poor in chronological test)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "LightGBM fits the training period",
+          "ok": true,
+          "detail": "train=0.37144095269080246 test=0.0224"
+        },
+        {
+          "check": "promotion rejected",
+          "ok": true,
+          "detail": "note: in-sample PR-AUC exceeds held-out PR-AUC by 0.35 (diagnostic), failed: beats_climatology"
+        },
+        {
+          "check": "no model selected (baseline retained)",
+          "ok": true,
+          "detail": "None"
+        }
+      ],
+      "forecasts": []
+    },
+    {
+      "scenario": "J",
+      "name": "Distribution shift (new kind of gaming event)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "distribution shift flagged",
+          "ok": true,
+          "detail": "out_of_distribution"
+        },
+        {
+          "check": "probability withheld when out of distribution",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional unprecedented event",
+          "forecast_horizon_hours": 6,
+          "status": "OUT_OF_DISTRIBUTION",
+          "status_reasons": [
+            "features outside the training distribution: level_vs_baseline_log, change_72h_log, change_168h_log, window_mean_change_log, threshold_gap_log, det_anomaly_z"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional unprecedented event",
+          "forecast_horizon_hours": 24,
+          "status": "OUT_OF_DISTRIBUTION",
+          "status_reasons": [
+            "features outside the training distribution: level_vs_baseline_log, change_72h_log, change_168h_log, window_mean_change_log, threshold_gap_log, det_anomaly_z"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional unprecedented event",
+          "forecast_horizon_hours": 72,
+          "status": "OUT_OF_DISTRIBUTION",
+          "status_reasons": [
+            "features outside the training distribution: level_vs_baseline_log, change_72h_log, change_168h_log, window_mean_change_log, threshold_gap_log, det_anomaly_z"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "PEAK_NOT_ESTIMABLE",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "K",
+      "name": "Peak beyond the forecast horizon (still growing)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "no confirmed peak inside the window",
+          "ok": true,
+          "detail": "ESTIMATED"
+        },
+        {
+          "check": "censoring stated",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional fast-growing tool",
+          "forecast_horizon_hours": 6,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional fast-growing tool",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.008,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional fast-growing tool",
+          "forecast_horizon_hours": 72,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "L",
+      "name": "Insufficient calibration data (too few labelled breakouts)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "calibration refused",
+          "ok": true,
+          "detail": "INSUFFICIENT_CALIBRATION_DATA"
+        },
+        {
+          "check": "no probability mapping",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "uncalibrated models are not validated",
+          "ok": true,
+          "detail": "2 such models"
+        }
+      ],
+      "forecasts": []
+    },
+    {
+      "scenario": "M",
+      "name": "Mixed temporal resolutions (hourly and daily providers)",
+      "passed": true,
+      "checks": [
+        {
+          "check": "6 h forecast available for hourly data",
+          "ok": true,
+          "detail": "BASELINE_ONLY"
+        },
+        {
+          "check": "6 h forecast refused for daily data",
+          "ok": true,
+          "detail": "a 6 h horizon is not a whole number of day periods; values are never interpolated"
+        },
+        {
+          "check": "daily trajectories only at whole days",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "forecasts": [
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 6,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 24,
+          "status": "READY",
+          "status_reasons": [],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.008,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 72,
+          "status": "BASELINE_ONLY",
+          "status_reasons": [
+            "no validated breakout model for this scope; no probability"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 6,
+          "status": "UNSUPPORTED_GRANULARITY",
+          "status_reasons": [
+            "a 6 h horizon is not a whole number of day periods; values are never interpolated"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": null,
+          "peak": null,
+          "windows": {}
+        },
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 24,
+          "status": "LIMITED_CONFIDENCE",
+          "status_reasons": [
+            "some features near or beyond the training range"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0487,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        },
+        {
+          "query": "fictional mixed resolution",
+          "forecast_horizon_hours": 72,
+          "status": "LIMITED_CONFIDENCE",
+          "status_reasons": [
+            "some features near or beyond the training range"
+          ],
+          "target_family": "youtube_search_interest",
+          "is_proxy": false,
+          "breakout_probability": 0.0588,
+          "peak": "ESTIMATED",
+          "windows": {
+            "QUICK_REACTION": "UNKNOWN",
+            "STANDARD_TUTORIAL": "UNKNOWN",
+            "DEEP_DIVE": "UNKNOWN"
+          }
+        }
+      ]
+    }
+  ]
+}

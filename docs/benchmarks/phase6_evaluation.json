@@ -48,9 +48,9 @@
     }
   },
   "timings_seconds": {
-    "dataset": 65.1,
-    "training_and_promotion": 59.2,
-    "heldout_dataset": 33.8
+    "dataset": 63.0,
+    "training_and_promotion": 59.5,
+    "heldout_dataset": 31.6
   },
   "scopes": [
     {
@@ -1591,7 +1591,7 @@
       },
       "peak_models": [
         {
-          "model_id": "fm_analog_peak_window_day_72h_fc351e8e20",
+          "model_id": "fm_analog_peak_window_day_72h_2b416e9414",
           "status": "validated",
           "metrics": {
             "examples": 4717,
@@ -5536,7 +5536,7 @@
       },
       "peak_models": [
         {
-          "model_id": "fm_analog_peak_window_hour_72h_69641ec394",
+          "model_id": "fm_analog_peak_window_hour_72h_9aaea9b1c7",
           "status": "validated",
           "metrics": {
             "examples": 6720,
@@ -5554,66 +5554,66 @@
   "promotions": [
     {
       "scope": "youtube_search_interest/day/24h/breakout",
-      "promoted": "fm_logistic_breakout_day_24h_17e94b8787",
+      "promoted": "fm_logistic_breakout_day_24h_d6bd88a2bd",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/day/24h/trajectory",
-      "promoted": "fm_lightgbm_trajectory_day_24h_dd90e8d2a1",
+      "promoted": "fm_lightgbm_trajectory_day_24h_40cbe43a8b",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/day/72h/breakout",
-      "promoted": "fm_lightgbm_breakout_day_72h_dfcc331365",
+      "promoted": "fm_lightgbm_breakout_day_72h_da0f6978b0",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/day/72h/trajectory",
-      "promoted": "fm_lightgbm_trajectory_day_72h_d87f9fcdcd",
+      "promoted": "fm_lightgbm_trajectory_day_72h_2f684e0626",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/day/72h/peak",
-      "promoted": "fm_analog_peak_window_day_72h_fc351e8e20"
+      "promoted": "fm_analog_peak_window_day_72h_2b416e9414"
     },
     {
       "scope": "youtube_search_interest/hour/6h/breakout",
-      "promoted": "fm_logistic_breakout_hour_6h_593d5f3619",
+      "promoted": "fm_logistic_breakout_hour_6h_5d65ebc09a",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/6h/continuation",
-      "promoted": "fm_logistic_breakout_hour_6h_46cda12c85",
+      "promoted": "fm_logistic_continuation_hour_6h_d224d7375d",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/6h/trajectory",
-      "promoted": "fm_lightgbm_trajectory_hour_6h_305bba7507",
+      "promoted": "fm_lightgbm_trajectory_hour_6h_a99e4ae4ce",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/24h/breakout",
-      "promoted": "fm_lightgbm_breakout_hour_24h_55ee095550",
+      "promoted": "fm_lightgbm_breakout_hour_24h_0cdd852c83",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/24h/trajectory",
-      "promoted": "fm_lightgbm_trajectory_hour_24h_58ca6acdcf",
+      "promoted": "fm_lightgbm_trajectory_hour_24h_7e06c91977",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/72h/breakout",
-      "promoted": "fm_lightgbm_breakout_hour_72h_6cbfe40db8",
+      "promoted": "fm_lightgbm_breakout_hour_72h_e5c19cf5ec",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/72h/trajectory",
-      "promoted": "fm_lightgbm_trajectory_hour_72h_f4d54900a0",
+      "promoted": "fm_lightgbm_trajectory_hour_72h_3d9fe9f658",
       "replaced": null
     },
     {
       "scope": "youtube_search_interest/hour/72h/peak",
-      "promoted": "fm_analog_peak_window_hour_72h_69641ec394"
+      "promoted": "fm_analog_peak_window_hour_72h_9aaea9b1c7"
     }
   ],
   "models": {
@@ -5719,7 +5719,7 @@
       },
       {
         "scope": "youtube_search_interest/hour/6h/continuation",
-        "model": "logistic_breakout",
+        "model": "logistic_continuation",
         "test_rows": 163,
         "test_positives": 128,
         "metrics": {

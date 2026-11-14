@@ -58,6 +58,23 @@ def test_dataset_manifest_and_leakage_audit() -> None:
     assert np.all(np.isnan(ds.labels["breakout_6"][daily]))
 
 
+def test_every_example_records_identity_availability_and_label_quality() -> None:
+    ds = small()
+    cols = ("series_id", "query", "query_id", "entity_id", "topic_cluster_id", "category",
+            "provider", "measurement", "region", "t", "data_cutoff", "granularity")  # fmt: skip
+    for col in cols:
+        assert ds.meta[col].shape == (ds.n,)
+    t = ds.meta["t"].astype(float)
+    cutoff = ds.meta["data_cutoff"].astype(float)
+    assert np.all(cutoff <= t + 1e-9)  # nothing published after T was available
+    assert np.all(t - cutoff < 24 * 4)  # and the series was fresh at T (eligibility)
+    assert set(ds.meta["measurement"]) == {"direct_youtube_search_interest"}
+    for h in (6, 24, 72):  # label quality (coverage) and censoring travel with each row
+        assert f"coverage_{h}" in ds.labels
+    assert "peak_censored" in ds.labels
+    assert ds.manifest["dataset_version"].startswith("ds-")
+
+
 def test_dataset_is_reproducible_and_parallel_safe() -> None:
     a = small()
     b = build_dataset(_corpus(), LOADED, DLOADED, source="synthetic", audit_rows=8, workers=2)

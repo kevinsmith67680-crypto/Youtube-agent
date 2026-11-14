@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -56,9 +57,12 @@ from trend_agent.forecasting.target_definition import (
     outcome_labels,
     reference,
 )
+from trend_agent.logging import get_logger, log_event
 from trend_agent.monitoring.replay import AvailabilityMode
 from trend_agent.schemas.forecast import ForecastStatus
 from trend_agent.schemas.monitoring import MeasurementCategory
+
+_log = get_logger(__name__)
 
 
 @dataclass
@@ -141,12 +145,48 @@ _META_COLS = (
     "family",
     "synthetic",
     "query",
+    "query_id",
+    "entity_id",
+    "topic_cluster_id",
+    "region",
+    "measurement",
     "provider",
+    "data_cutoff",
     "baseline",
     "threshold",
     "level",
     "elevated",
 )
+
+
+_OBJECT_COLS = frozenset(
+    (
+        "group",
+        "category",
+        "granularity",
+        "family",
+        "query",
+        "query_id",
+        "entity_id",
+        "topic_cluster_id",
+        "region",
+        "measurement",
+        "provider",
+    )
+)
+
+
+def _cutoff(
+    pit: PointInTimeSeries, supports: dict[MeasurementCategory, PointInTimeSeries], t: float
+) -> float:
+    """Data availability cutoff of an example: the newest availability time <= T among
+    the target and supporting observations it could use (hours since epoch)."""
+    times = [
+        x
+        for x in (pit.latest_available(t), *(sp.latest_available(t) for sp in supports.values()))
+        if x is not None
+    ]
+    return max(times) if times else t
 
 
 @dataclass
@@ -246,7 +286,13 @@ def _series_rows(
             ("family", family.value),
             ("synthetic", b.meta.is_synthetic),
             ("query", b.meta.query),
+            ("query_id", b.meta.query_id),
+            ("entity_id", b.meta.entity_id),
+            ("topic_cluster_id", b.meta.topic_cluster_id),
+            ("region", b.meta.region),
+            ("measurement", b.meta.measurement.value),
             ("provider", b.meta.provider),
+            ("data_cutoff", _cutoff(pit, supports, t)),
             ("baseline", ref.baseline),
             ("threshold", ref.threshold),
             ("level", ref.level),
@@ -270,16 +316,28 @@ def build_dataset(
     """Build the dataset; ``workers > 1`` processes series in parallel (same result)."""
     lnames = label_names(loaded.config.horizons_hours)
     jobs = [(b, loaded, dloaded, end) for b in bundles]
+    parts: list[_SeriesRows] | None = None
     if workers > 1 and len(jobs) > 1:
         import multiprocessing as mp
         from concurrent.futures import ProcessPoolExecutor
+        from concurrent.futures.process import BrokenProcessPool
 
         # Never fork a multi-threaded process (database pools, BLAS threads): fork can
         # deadlock. forkserver/spawn start clean interpreters; results are identical.
         method = "forkserver" if "forkserver" in mp.get_all_start_methods() else "spawn"
-        with ProcessPoolExecutor(max_workers=workers, mp_context=mp.get_context(method)) as pool:
-            parts = list(pool.map(_series_rows, jobs, chunksize=max(1, len(jobs) // (4 * workers))))
-    else:
+        try:
+            with ProcessPoolExecutor(
+                max_workers=workers, mp_context=mp.get_context(method)
+            ) as pool:
+                parts = list(
+                    pool.map(_series_rows, jobs, chunksize=max(1, len(jobs) // (4 * workers)))
+                )
+        except BrokenProcessPool:
+            # e.g. no importable __main__ (stdin, notebooks): same result, one process
+            log_event(_log, "forecast.dataset.sequential_fallback", logging.WARNING,
+                      reason="worker processes could not start")  # fmt: skip
+            parts = None
+    if parts is None:
         parts = [_series_rows(j) for j in jobs]
     rows: list[np.ndarray] = []
     labels: dict[str, list[float]] = {k: [] for k in lnames}
@@ -309,9 +367,7 @@ def build_dataset(
         {
             k: np.array(
                 v,
-                dtype=object
-                if k in ("group", "category", "granularity", "family", "query", "provider")
-                else None,
+                dtype=object if k in _OBJECT_COLS else None,
             )
             for k, v in meta.items()
         },

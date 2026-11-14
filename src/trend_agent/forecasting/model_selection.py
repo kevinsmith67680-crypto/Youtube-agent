@@ -529,9 +529,16 @@ def promote_selected(
 ) -> list[dict[str, Any]]:
     """Explicit promotion step for the selected candidate of each scope."""
     decisions: list[dict[str, Any]] = []
+
+    def fresh(m: ModelMetadata) -> ModelMetadata:
+        # Statuses in ``results`` are those at registration; the registry is authoritative
+        # (re-running this step must never demote the current champion).
+        found = registry.store.get(m.model_id)
+        return found[0] if found is not None else m
+
     for res in results:
         if res.task == "peak":
-            for m in res.registered:
+            for m in map(fresh, res.registered):
                 if m.status is not ModelStatus.VALIDATED:
                     continue
                 current = registry.champion(
@@ -568,6 +575,7 @@ def promote_selected(
             ),
             None,
         )
+        chosen = fresh(chosen) if chosen is not None else None
         if chosen is None or chosen.status is not ModelStatus.VALIDATED:
             continue
         current = registry.champion(
@@ -577,6 +585,8 @@ def promote_selected(
             target_type=chosen.target_type.value,
             data_origin=chosen.data_origin,
         )
+        if current is not None and current.model_id == chosen.model_id:
+            continue
         if current is None:
             registry.promote(
                 chosen.model_id,
