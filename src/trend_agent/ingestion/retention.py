@@ -10,6 +10,7 @@ from trend_agent.db.repositories.content_analyses import ContentAnalysisReposito
 from trend_agent.db.repositories.detection_runs import DetectionRunRepository
 from trend_agent.db.repositories.discovery import DiscoveryRepository
 from trend_agent.db.repositories.forecasts import ForecastRepository
+from trend_agent.db.repositories.github import GitHubRepository
 from trend_agent.db.repositories.recommendations import RecommendationRepository
 from trend_agent.db.repositories.surge_events import SurgeEventRepository
 from trend_agent.db.repositories.time_series import TimeSeriesRepository
@@ -74,6 +75,7 @@ class RetentionService:
             expired.update(ForecastRepository(session).count_expired(now))
             expired.update(RecommendationRepository(session).count_expired(now))
             expired.update(VerificationRepository(session).count_expired(now))
+            expired.update(GitHubRepository(session).count_expired(now))
             due = len(VideoRepository(session).videos_due_for_refresh(now, horizon, 100_000))
         return RetentionReport(
             checked_at=now, expired=expired, expiring_videos_within_horizon=due, horizon=horizon
@@ -109,6 +111,8 @@ class RetentionService:
             # were derived from, unless the creator saved or is producing them (their data).
             deleted.update(RecommendationRepository(session).purge_expired(now))
             deleted.update(VerificationRepository(session).purge_expired(now))
+            # GitHub repository metadata, observations and releases (provider retention).
+            deleted.update(GitHubRepository(session).purge_expired(now))
             deleted["ts_observations"] = TimeSeriesRepository(session).purge_expired(now)
         log_event(_log, "retention.purged", deleted=deleted, as_of=now.isoformat())
         return deleted

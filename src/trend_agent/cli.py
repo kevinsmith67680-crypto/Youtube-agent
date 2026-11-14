@@ -1048,3 +1048,7 @@ app.add_typer(_cli_system.system_app, name="system")
 from trend_agent import cli_evaluate as _cli_evaluate  # noqa: E402  (Phase 8 evaluation)
 
 app.add_typer(_cli_evaluate.evaluate_app, name="evaluate")
+
+from trend_agent import cli_github as _cli_github  # noqa: E402  (GitHub integration)
+
+app.add_typer(_cli_github.github_app, name="github")

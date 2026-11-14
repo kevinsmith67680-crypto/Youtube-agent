@@ -6,7 +6,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class _Strict(BaseModel):
@@ -27,6 +27,9 @@ class TaskConfig(_Strict):
 def _default_tasks() -> dict[str, TaskConfig]:
     return {
         "ops_checks": TaskConfig(interval_seconds=60, timeout_seconds=60),
+        # Unattended discovery (feeds, GitHub, YouTube, ...): only when
+        # TREND_AGENT_SCHEDULED_DISCOVERY=true; bounded by max_per_run fetches per run.
+        "discovery": TaskConfig(interval_seconds=3600, timeout_seconds=900, max_per_run=24),
         "monitor_plan": TaskConfig(interval_seconds=300, timeout_seconds=120),
         "content_analysis": TaskConfig(interval_seconds=1800, timeout_seconds=900, max_per_run=10),
         "forecasting": TaskConfig(interval_seconds=3600, timeout_seconds=900),
@@ -41,6 +44,12 @@ class SchedulerConfig(_Strict):
     stale_run_minutes: int = Field(default=120, ge=1)
     failure_retry_seconds: int = Field(default=60, ge=1)
     tasks: dict[str, TaskConfig] = Field(default_factory=_default_tasks)
+
+    @field_validator("tasks", mode="after")
+    @classmethod
+    def _with_defaults(cls, tasks: dict[str, TaskConfig]) -> dict[str, TaskConfig]:
+        """Tasks missing from operations.yaml keep their defaults (new stages included)."""
+        return {**_default_tasks(), **tasks}
 
 
 class WorkerConfig(_Strict):

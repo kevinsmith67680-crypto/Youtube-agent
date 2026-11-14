@@ -10,6 +10,8 @@ scheduler:
   failure_retry_seconds: 60   # first retry after a failed stage (doubles, capped by interval)
   tasks:
     ops_checks:       {interval_seconds: 60,    timeout_seconds: 60}
+    # unattended discovery (GitHub, feeds, YouTube, ...); needs TREND_AGENT_SCHEDULED_DISCOVERY=true
+    discovery:        {interval_seconds: 3600,  timeout_seconds: 900,  max_per_run: 24}
     monitor_plan:     {interval_seconds: 300,   timeout_seconds: 120}
     content_analysis: {interval_seconds: 1800,  timeout_seconds: 900,  max_per_run: 10}
     forecasting:      {interval_seconds: 3600,  timeout_seconds: 900}

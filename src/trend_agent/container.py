@@ -114,11 +114,14 @@ class AppContainer:
             clock=self.clock,
             http_client=self.http_client,
         )
+        from trend_agent.github.service import GitHubObservationRecorder
+
         return DiscoveryService(
             registry=self.registry,
             session_factory=self.session_factory,
             loaded=loaded,
             clock=clock or self.clock,
+            observers=[GitHubObservationRecorder(loaded.config.provider("github").retention_days)],
         )
 
     def monitoring_config(self) -> LoadedMonitoringConfig:

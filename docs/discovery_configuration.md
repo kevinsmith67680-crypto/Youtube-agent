@@ -90,7 +90,7 @@ Current files: AI 20 seeds / 27 entities, technology 15 / 27, gaming 15 / 13.
 ```yaml
 sources:
   - key: feed:pypi:vllm                # unique; letters, digits and _ : - . / @
-    provider: feeds                    # feeds | github_releases | hackernews | reddit |
+    provider: feeds                    # feeds | github | hackernews | reddit |
                                        # youtube_discovery | google_trends_discovery
     name: PyPI releases - vllm
     source_type: feed                  # feed | api_query | chart | channel | repository |
@@ -114,7 +114,8 @@ sources:
 | `source_type` | Provider | `reference` |
 |---|---|---|
 | `feed` | `feeds` | `https://` RSS/Atom URL |
-| `repository` | `github_releases` | `owner/repo` (validated; no `.`/`..` segments) |
+| `repository` | `github` | `owner/repo` (validated; no `.`/`..` segments): metadata + latest releases |
+| `repository_search` | `github` | GitHub search query (`topic:llm`, `"coding agent" in:name,description`); `params.strategy` = `emerging` or `active` (see [github_api_integration_report.md](github_api_integration_report.md)) |
 | `community` | `reddit` | subreddit name (`LocalLLaMA`) |
 | `community` / `api_query` | `hackernews` | `front_page` or a search term |
 | `api_query` | `youtube_discovery`, `google_trends_discovery` | query text |

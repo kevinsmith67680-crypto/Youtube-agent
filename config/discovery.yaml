@@ -70,10 +70,30 @@ providers:
     enabled: true
     daily_request_limit: 500
     retention_days: 90
-  github_releases:
-    enabled: true
-    daily_request_limit: 200
+  github:                        # GitHub REST API: repository search + monitored releases
+    enabled: true                # also needs GITHUB_API_ENABLED (default true)
+    daily_request_limit: 200     # not used: GitHub has its own core/search budgets below
     retention_days: 180
+    params:
+      api:
+        per_page: 30             # search results per page (max 100)
+        max_pages: 1             # bounded pagination per search
+        release_page_size: 10    # latest releases per monitored repository
+        core_daily_budget: 1500  # local daily budgets (UTC), far below GitHub's limits
+        search_daily_budget: 300
+        min_remaining_core: 25   # stop before GitHub's live limit is exhausted
+        min_remaining_search: 2
+        dedup_ttl_seconds: 600   # identical requests within 10 min reuse the response
+      strategies:
+        # A. emerging: created recently; light filters so new projects are not excluded
+        emerging: {created_within_days: 21, min_stars: 2, sort: stars}
+        # established and active: pushed this week (feeds momentum observations)
+        active: {pushed_within_days: 7, min_stars: 500, sort: updated}
+      quality:
+        min_description_chars: 20
+        min_relevance: 0.34
+      momentum:
+        min_interval_hours: 6    # no rate from observations closer than this
   hackernews:
     enabled: true
     daily_request_limit: 300

@@ -42,9 +42,24 @@ TRUSTED_EVIDENCE = frozenset(
         EvidenceType.SEARCH_SUGGESTION,
     }
 )
+
+
+def trusted_mention(evidence_type: EvidenceType, extractor: str) -> bool:
+    """Does this mention verify the entity's name?
+
+    Repository metadata verifies exactly one name: the repository's own (GitHub's
+    identifier, passed as the item's source hint). Other names in the owner's description
+    ("works with GPT-6") are unverified claims until corroborated independently.
+    """
+    if evidence_type is EvidenceType.REPOSITORY_METADATA:
+        return extractor == "source_hint"
+    return evidence_type in TRUSTED_EVIDENCE
+
+
 BASE_CONFIDENCE: dict[EvidenceType, float] = {
     EvidenceType.OFFICIAL_ANNOUNCEMENT: 0.85,
     EvidenceType.CODE_RELEASE: 0.85,
+    EvidenceType.REPOSITORY_METADATA: 0.8,
     EvidenceType.RELATED_QUERY: 0.8,
     EvidenceType.SEARCH_SUGGESTION: 0.8,
     EvidenceType.VIDEO_TITLE: 0.65,
@@ -127,6 +142,15 @@ ATTRIBUTE_PATTERNS: dict[str, re.Pattern[str]] = {
     "bugs": re.compile(r"(?i)\b(bugs?|crash\w*|errors?|glitch\w*|issues?)\b"),
     "performance": re.compile(r"(?i)\b(fps|performance|settings|optimi[sz]\w*)\b"),
     "limited_time": re.compile(r"(?i)\b(limited[- ]time|ends?|until|for a limited)\b"),
+    # The item is (or names) a public code repository: grounds developer-tool templates.
+    "repository": re.compile(
+        r"(?i)\bpublic github repository\b|\bgithub\.com/[A-Za-z0-9-]+/[A-Za-z0-9_.-]+"
+    ),
+    # Something people build *with* (not just use): grounds "building an app with X".
+    "build": re.compile(
+        r"(?i)\b(framework|sdk|library|toolkit|build(?:ing)?\s+(?:ai\s+)?(?:apps?|agents?|"
+        r"applications?|tools?|workflows?))\b"
+    ),
     "speculative": _SPECULATIVE,
 }
 
@@ -139,8 +163,10 @@ _STOP_CAPS = frozenset(
     january february march april may june july august september october november december
     monday tuesday wednesday thursday friday saturday sunday i we you my in on at to of for
     and or with vs versus round game games guide tutorial review every all each
+    runs builds turns lets makes helps gives uses creates generates provides supports brings
+    connects automates converts adds enables allows keeps finds tracks writes reads ships
     """.split()
-)
+)  # the last two lines: verbs that open repository and app descriptions ("Runs ...")
 
 _CONTEXT_TYPES: list[tuple[re.Pattern[str], EntityType]] = [
     (re.compile(r"(?i)\b(model|llm|weights|parameters|checkpoint)\b"), EntityType.AI_MODEL),
@@ -778,7 +804,7 @@ def _finalise(mentions: list[_Mention], text: str, item: DiscoveryItem) -> list[
         if item.is_synthetic and "simulated_evidence_type" in item.metadata:
             evidence_type = EvidenceType(item.metadata["simulated_evidence_type"])
         if m.origin is not EntityOrigin.GAZETTEER and (
-            evidence_type not in TRUSTED_EVIDENCE or "speculative" in flags
+            not trusted_mention(evidence_type, m.extractor) or "speculative" in flags
         ):
             status = EntityStatus.NEEDS_VERIFICATION
         if "ambiguous_context" in flags:

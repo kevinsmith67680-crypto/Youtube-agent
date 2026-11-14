@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/opportunities", label: "Opportunities" },
   { href: "/gaps", label: "Content gaps" },
   { href: "/trends", label: "Trends" },
+  { href: "/github", label: "GitHub" },
   { href: "/recommendations", label: "Recommendations" },
   { href: "/saved", label: "Saved ideas" },
   { href: "/settings", label: "Settings" },

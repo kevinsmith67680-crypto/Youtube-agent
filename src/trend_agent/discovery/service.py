@@ -21,6 +21,7 @@ import uuid
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from typing import Protocol
 
 import sqlalchemy as sa
 from pydantic import BaseModel, Field
@@ -54,11 +55,11 @@ from trend_agent.discovery.expansion import (
     make_candidate,
 )
 from trend_agent.discovery.extraction import (
-    TRUSTED_EVIDENCE,
     DeterministicExtractor,
     EntityExtractor,
     Gazetteer,
     ground,
+    trusted_mention,
 )
 from trend_agent.discovery.intent import (
     CategoryClassifier,
@@ -125,6 +126,7 @@ _log = get_logger(__name__)
 AUTHORITY = [
     EvidenceType.OFFICIAL_ANNOUNCEMENT,
     EvidenceType.CODE_RELEASE,
+    EvidenceType.REPOSITORY_METADATA,
     EvidenceType.RELATED_QUERY,
     EvidenceType.SEARCH_SUGGESTION,
     EvidenceType.VIDEO_TITLE,
@@ -171,6 +173,8 @@ class SourceOutcome(BaseModel):
     error_type: str | None = None
     error_message: str | None = None
     quota_used: dict[str, int] = Field(default_factory=dict)
+    # provider notes, e.g. GitHub "excluded by quality gates: fake_star_pattern x29"
+    warnings: list[str] = Field(default_factory=list)
 
 
 class CategorySummary(BaseModel):
@@ -233,6 +237,30 @@ class _EntityState:
 # ---------------------------------------------------------------------------- service
 
 
+class DiscoveryObserver(Protocol):
+    """Optional per-item hook, called inside the category's transaction.
+
+    Used by integrations that keep their own structured records next to the generic
+    discovery items (e.g. GitHub repository observations). An observer must not change
+    the item, its entities or its keywords.
+    """
+
+    def observe(
+        self,
+        session: Session,
+        *,
+        run_id: uuid.UUID,
+        source: DiscoverySource,
+        item: DiscoveryItem,
+        item_id: int,
+        source_id: int,
+    ) -> None: ...
+
+    def finish(self, session: Session, *, run_id: uuid.UUID, item_ids: Sequence[int]) -> None:
+        """After entities and keywords of the category were stored."""
+        ...
+
+
 class DiscoveryService:
     def __init__(
         self,
@@ -244,8 +272,10 @@ class DiscoveryService:
         extra_extractors: Sequence[EntityExtractor] = (),
         intent_classifier: IntentClassifier | None = None,
         similarity: SimilarityBackend | None = None,
+        observers: Sequence[DiscoveryObserver] = (),
     ) -> None:
         self._registry = registry
+        self._observers = list(observers)
         self._factory = session_factory
         self._loaded = loaded
         self._config = loaded.config
@@ -618,6 +648,7 @@ class DiscoveryService:
             error_type=f.error.error_type if f.error else None,
             error_message=f.error.message if f.error else None,
             quota_used=dict(f.ledger.used),
+            warnings=[redact_text(w)[:300] for w in (f.result.warnings if f.result else ())][:10],
         )
 
     # ------------------------------------------------------------------ processing
@@ -855,6 +886,7 @@ class _RunContext:
         self.entities: dict[str, _EntityState] = {}
         self.item_rows: dict[int, DiscoveryItemRow] = {}
         self.item_entities: dict[int, list[str]] = {}
+        self.observed_item_ids: list[int] = []
         known = self._known_gazetteer()
         self.extractor = DeterministicExtractor(service._gazetteer, known)
 
@@ -890,6 +922,16 @@ class _RunContext:
                 if stored is None:
                     continue
                 row, created, flags = stored
+                for observer in self.svc._observers:
+                    observer.observe(
+                        self.session,
+                        run_id=self.run_id,
+                        source=fetch.source,
+                        item=item,
+                        item_id=row.id,
+                        source_id=fetch.record.id,
+                    )
+                    self.observed_item_ids.append(row.id)
                 if created:
                     new += 1
                     self.summary.items_new += 1
@@ -940,6 +982,11 @@ class _RunContext:
         capped, dropped = cap_candidates(candidates, self.config.expansion.max_keywords_per_run)
         self.summary.candidates_capped = dropped
         self._persist_candidates(capped)
+        if self.observed_item_ids:
+            for observer in self.svc._observers:
+                observer.finish(
+                    self.session, run_id=self.run_id, item_ids=sorted(set(self.observed_item_ids))
+                )
 
     def _count_rejection(self, reason: str) -> None:
         self.summary.rejected_reasons[reason] = self.summary.rejected_reasons.get(reason, 0) + 1
@@ -1142,7 +1189,12 @@ class _RunContext:
                     "status": ex.status,
                     "origin": ex.origin,
                     "is_family": False,
-                    "evergreen": bool(gaz.evergreen) if gaz else ex.extractor == "source_hint",
+                    # A configured source's hint names an established product (evergreen);
+                    # a hint the provider *discovered* per item (e.g. a new repository) does not.
+                    "evergreen": bool(gaz.evergreen)
+                    if gaz
+                    else ex.extractor == "source_hint"
+                    and (item.extra or {}).get("entity_hint_origin") != "discovered",
                     "confidence": ex.confidence,
                     "first_seen_at": self.now,
                     "last_seen_at": self.now,
@@ -1209,7 +1261,9 @@ class _RunContext:
             etype = _row_effective_type(item)
             if mention.status is not EntityStatus.REJECTED:
                 attributes.update(mention.attributes or [])
-            if mention.status is EntityStatus.VERIFIED and etype in TRUSTED_EVIDENCE:
+            if mention.status is EntityStatus.VERIFIED and trusted_mention(
+                etype, mention.extractor
+            ):
                 trusted_verified = True
             names = (row.canonical_name, mention.matched_text)
             for claimed in claimed_release_dates(f"{item.title}. {item.excerpt or ''}", names):

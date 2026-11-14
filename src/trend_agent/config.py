@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from enum import StrEnum
 from functools import lru_cache
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlsplit, urlunsplit
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -96,7 +96,29 @@ class Settings(BaseSettings):
     discovery_config_dir: str | None = None
     # Identifies this client to public APIs and feeds (several require a descriptive UA).
     http_user_agent: str = "youtube-trend-agent/0.2 (keyword discovery; +https://example.invalid)"
-    github_token: SecretStr | None = None  # optional; raises GitHub's limit to 5,000/h
+    # --- GitHub REST API (discovery of repositories and releases) --------------------
+    # Read-only. GITHUB_TOKEN (or TREND_AGENT_GITHUB_TOKEN) is optional: without it the
+    # public endpoints are used unauthenticated (60 core requests/hour, 10 searches/minute).
+    # A fine-grained token with *no* repository permissions is enough for public data.
+    # (AliasChoices lets the conventional GITHUB_TOKEN name work alongside the prefixed one;
+    # the pydantic mypy plugin cannot type such dynamic aliases, hence the ignores.)
+    github_token: SecretStr | None = Field(  # type: ignore[pydantic-alias]
+        default=None,
+        validation_alias=AliasChoices("github_token", "GITHUB_TOKEN", "TREND_AGENT_GITHUB_TOKEN"),
+    )
+    github_api_enabled: bool = Field(  # type: ignore[pydantic-alias]
+        default=True,
+        validation_alias=AliasChoices(
+            "github_api_enabled", "GITHUB_API_ENABLED", "TREND_AGENT_GITHUB_API_ENABLED"
+        ),
+    )
+    # Calendar API version sent as X-GitHub-Api-Version. 2026-03-10 is the current version;
+    # 2022-11-28 stays supported until 2028-03-10.
+    github_api_version: Literal["2026-03-10", "2022-11-28"] = "2026-03-10"
+    github_api_base_url: str = "https://api.github.com"
+    # Run discovery (all providers, GitHub included) from `trend-agent system scheduler`.
+    # Off by default so that tests and ad-hoc schedulers never reach the network.
+    scheduled_discovery: bool = False
     reddit_client_id: SecretStr | None = None
     reddit_client_secret: SecretStr | None = None
 
@@ -183,7 +205,7 @@ class Settings(BaseSettings):
             return None
         return value
 
-    @field_validator("youtube_api_base_url", "google_trends_endpoint")
+    @field_validator("youtube_api_base_url", "google_trends_endpoint", "github_api_base_url")
     @classmethod
     def _require_https(cls, value: str | None) -> str | None:
         if value is None:
@@ -230,7 +252,9 @@ class Settings(BaseSettings):
             "google_trends_retention_days": self.google_trends_retention_days,
             "mock_provider_enabled": self.mock_provider_enabled,
             "discovery_config_dir": self.discovery_config_dir or "./config",
+            "github_api_enabled": self.github_api_enabled,
             "github_token": "set" if self.github_token else "missing (unauthenticated limits)",
+            "github_api_version": self.github_api_version,
             "reddit_credentials": (
                 "set" if self.reddit_client_id and self.reddit_client_secret else "missing"
             ),

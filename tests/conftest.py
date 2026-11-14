@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import random
 from collections.abc import Callable, Iterator
@@ -52,11 +53,15 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
             item.add_marker(pytest.mark.live)
 
 
+# Settings read under their own names as well (see Settings.github_token).
+_UNPREFIXED_SETTINGS = frozenset({"GITHUB_TOKEN", "GITHUB_API_ENABLED", "GH_TOKEN"})
+
+
 @pytest.fixture(autouse=True)
 def _isolate_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Tests never read the developer's .env or TREND_AGENT_* variables."""
     for key in list(os.environ):
-        if key.startswith("TREND_AGENT_"):
+        if key.startswith("TREND_AGENT_") or key in _UNPREFIXED_SETTINGS:
             monkeypatch.delenv(key, raising=False)
     monkeypatch.chdir(tmp_path)  # no .env in cwd
 
@@ -113,6 +118,10 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # GitHub integration
+    "github_repository_observations",
+    "github_releases",
+    "github_repositories",
     # Phase 8 (operations, evaluation)
     "recommendation_outcomes",
     "experiments",
@@ -229,6 +238,13 @@ def db_engine() -> Iterator[sa.Engine]:
             pytest.fail(message)
         pytest.skip(message)
     cfg = alembic_config(TEST_DB_URL)
+    # Rows left by an interrupted run would make data-guarded downgrades refuse; the
+    # test database is scratch space, so empty it first (tables may not exist yet).
+    with contextlib.suppress(sa.exc.SQLAlchemyError), engine.begin() as conn:
+        existing = set(sa.inspect(conn).get_table_names())
+        present = [t for t in TABLES if t in existing]
+        if present:
+            conn.execute(sa.text(f"TRUNCATE {', '.join(present)} RESTART IDENTITY CASCADE"))
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     yield engine

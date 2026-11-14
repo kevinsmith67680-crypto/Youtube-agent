@@ -1,8 +1,8 @@
-"""Code-release and community adapters: GitHub releases, Hacker News, Reddit.
+"""Community adapters: Hacker News, Reddit.
 
-All three use documented public APIs:
-* GitHub REST ``GET /repos/{owner}/{repo}/releases`` (60 req/h unauthenticated, 5,000 with a
-  token). Rate-limit headers are honoured.
+(GitHub repositories and releases moved to :mod:`trend_agent.discovery.providers.github`.)
+
+Both use documented public APIs:
 * Hacker News via the Algolia HN Search API (no authentication).
 * Reddit via OAuth2 application-only credentials (``client_credentials``) on
   ``oauth.reddit.com``; without credentials the provider reports NOT_CONFIGURED and never
@@ -50,8 +50,6 @@ from trend_agent.schemas.provider import ProviderDescriptor, ProviderStatusRepor
 from trend_agent.utils.time import Clock, parse_rfc3339
 
 MAX_TEXT = 2000
-# owner: GitHub login rules; repo: no "." / ".." segments (no path traversal).
-_REPO = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})/(?!\.{1,2}$)[A-Za-z0-9_.-]{1,100}$")
 _SUBREDDIT = re.compile(r"^[A-Za-z0-9_]{2,21}$")
 
 
@@ -64,121 +62,6 @@ def _dt(value: Any) -> datetime | None:
     if isinstance(value, int | float) and value > 0:
         return datetime.fromtimestamp(value, tz=UTC)
     return None
-
-
-# ---------------------------------------------------------------------------- GitHub
-
-
-class GitHubReleasesProvider:
-    NAME = "github_releases"
-    API = "https://api.github.com"
-
-    def __init__(
-        self,
-        *,
-        fetcher: HttpFetcher,
-        token: SecretStr | None,
-        user_agent: str,
-        enabled: bool,
-        retention_days: int | None,
-        clock: Clock,
-    ) -> None:
-        self._fetcher = fetcher
-        self._token = token
-        self._ua = user_agent
-        self._enabled = enabled
-        self._clock = clock
-        self._descriptor = discovery_descriptor(
-            name=self.NAME,
-            display_name="GitHub releases (REST API)",
-            version="1.0.0",
-            provider_type=ProviderType.OFFICIAL_API,
-            capabilities=frozenset({Capability.TREND_DISCOVERY}),
-            requires_authentication=False,
-            enabled=enabled,
-            retention_days=retention_days,
-            usage_restrictions=(
-                "GitHub API terms; 60 requests/hour unauthenticated, 5,000 with a token.",
-            ),
-            documentation_urls=("https://docs.github.com/en/rest/releases/releases",),
-        )
-
-    @property
-    def descriptor(self) -> ProviderDescriptor:
-        return self._descriptor
-
-    def status(self) -> ProviderStatusReport:
-        detail = (
-            "Token configured (5,000 requests/hour)."
-            if self._token
-            else "No token: unauthenticated limit of 60 requests/hour applies."
-        )
-        return simple_status(self.NAME, self._enabled, detail, self._clock())
-
-    async def aclose(self) -> None:
-        return None
-
-    def supports(self, source: DiscoverySource) -> bool:
-        return source.source_type is SourceType.REPOSITORY and bool(_REPO.match(source.reference))
-
-    def can_afford(self, source: DiscoverySource) -> tuple[bool, str]:
-        return afford(self._fetcher.quota, REQUEST_BUCKET, 1)
-
-    async def discover(self, request: DiscoveryRequest, ctx: RequestContext) -> DiscoveryResult:
-        source = request.source
-        if not _REPO.match(source.reference):
-            raise InvalidRequestError(
-                f"invalid repository {source.reference!r}", provider=self.NAME
-            )
-        headers = {
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": self._ua,
-        }
-        if self._token is not None:
-            headers["Authorization"] = f"Bearer {self._token.get_secret_value()}"
-        data = await self._fetcher.get_json(
-            f"{self.API}/repos/{source.reference}/releases",
-            ctx,
-            params={"per_page": str(min(request.max_items, 100))},
-            headers=headers,
-        )
-        if not isinstance(data, list):
-            raise MalformedResponseError("releases response is not a list", provider=self.NAME)
-        now = self._clock()
-        items: list[DiscoveryItem] = []
-        for release in data:
-            if not isinstance(release, dict) or release.get("draft"):
-                continue
-            published = _dt(release.get("published_at"))
-            if request.since and published and published < request.since:
-                continue
-            title = str(release.get("name") or release.get("tag_name") or "").strip()
-            url = release.get("html_url")
-            if not title or not isinstance(url, str):
-                continue
-            items.append(
-                DiscoveryItem(
-                    provider_name=self.NAME,
-                    source_key=source.key,
-                    source_reference=url,
-                    evidence_type=source.evidence_type or EvidenceType.CODE_RELEASE,
-                    title=title[:1000],
-                    text=strip_html(str(release.get("body") or ""))[:MAX_TEXT] or None,
-                    url=url,
-                    publisher=f"github.com/{source.reference}",
-                    published_at=published,
-                    collected_at=now,
-                    category_hint=source.category,
-                    entity_hint=source.entity_hint,
-                    entity_hint_type=source.entity_hint_type,
-                    metadata={
-                        "tag": release.get("tag_name"),
-                        "prerelease": bool(release.get("prerelease")),
-                    },
-                )
-            )
-        return DiscoveryResult(provider_name=self.NAME, source_key=source.key, items=tuple(items))
 
 
 # ---------------------------------------------------------------------------- Hacker News

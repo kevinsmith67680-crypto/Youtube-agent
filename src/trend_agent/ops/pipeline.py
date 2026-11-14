@@ -85,6 +85,29 @@ def _ops_checks(ctx: StageContext) -> dict[str, Any]:
     return {"mode": ctx.decision.mode.value, "base_mode": ctx.decision.base_mode.value}
 
 
+async def _discovery(ctx: StageContext) -> dict[str, Any]:
+    """Unattended discovery across all categories and providers (GitHub included)."""
+    c = ctx.container
+    if ctx.synthetic:
+        return {"skipped": "synthetic mode: no live discovery"}
+    if not c.settings.scheduled_discovery:
+        return {"skipped": "disabled: set TREND_AGENT_SCHEDULED_DISCOVERY=true"}
+    from trend_agent.discovery.models import TARGET_CATEGORIES
+
+    summary = await c.discovery().run(TARGET_CATEGORIES, max_fetches=ctx.max_per_run)
+    by_provider: dict[str, dict[str, int]] = {}
+    for s in summary.sources:
+        p = by_provider.setdefault(s.provider, {"fetched": 0, "failed": 0, "items_new": 0})
+        p["fetched"] += 1
+        p["failed"] += int(s.status == "failed")
+        p["items_new"] += s.items_new
+    return {
+        "status": summary.status.value,
+        "candidates_new": sum(v.candidates_new for v in summary.categories.values()),
+        "providers": by_provider,
+    }
+
+
 def _monitor_plan(ctx: StageContext) -> dict[str, Any]:
     svc = ctx.container.monitoring(include_synthetic=ctx.synthetic or None)
     sync = svc.sync_targets()
@@ -152,6 +175,7 @@ def _retention(ctx: StageContext) -> dict[str, Any]:
 
 DEFAULT_STAGES: tuple[Stage, ...] = (
     Stage("ops_checks", _ops_checks),
+    Stage("discovery", _discovery, (C.COLLECT_REAL_DATA,)),
     Stage("monitor_plan", _monitor_plan, (C.COLLECT_REAL_DATA,)),
     Stage("content_analysis", _content_analysis, (C.CONTENT_GAP_ANALYSIS,)),
     Stage("forecasting", _forecasting, (C.PROXY_FORECASTS, C.DIRECT_SEARCH_FORECASTS)),

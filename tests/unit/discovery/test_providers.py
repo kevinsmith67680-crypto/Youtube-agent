@@ -27,11 +27,7 @@ from trend_agent.discovery.providers.base import (
     HttpFetcher,
     request_quota,
 )
-from trend_agent.discovery.providers.community import (
-    GitHubReleasesProvider,
-    HackerNewsProvider,
-    RedditProvider,
-)
+from trend_agent.discovery.providers.community import HackerNewsProvider, RedditProvider
 from trend_agent.discovery.providers.factory import register_discovery_providers
 from trend_agent.discovery.providers.feeds import FeedDiscoveryProvider, parse_feed
 from trend_agent.discovery.providers.local import CuratedSeedProvider, TrendsRelatedQueriesProvider
@@ -276,33 +272,39 @@ RELEASES = [
 ]
 
 
-@pytest.mark.parametrize("token", [None, "ghp_testtoken"])
+@pytest.mark.parametrize("token", [None, "ghp_testtoken0000000000000000000000"])
 async def test_github_releases(token: str | None) -> None:
-    rec = Recorder(json_response(200, RELEASES))
-    fetcher, _ = make_fetcher(rec, name="github_releases")
-    provider = GitHubReleasesProvider(
-        fetcher=fetcher,
-        token=SecretStr(token) if token else None,
-        user_agent=UA,
-        enabled=True,
-        retention_days=180,
-        clock=MutableClock(NOW),
+    from tests.github_fixtures import FakeGitHub, make_provider, release_json, repo_json
+
+    fake = FakeGitHub()
+    fake.on("/repos/lattice/lattice", httpx.Response(200, json=repo_json(9, "lattice/lattice")))
+    fake.on(
+        "/repos/lattice/lattice/releases",
+        httpx.Response(
+            200,
+            json=[
+                release_json(1, "lattice/lattice", "v5.0.0", name="Lattice 5.0.0"),
+                release_json(2, "lattice/lattice", "v6", draft=True),
+                release_json(3, "lattice/lattice", "v5.1.0-rc1", prerelease=True),
+            ],
+        ),
     )
+    provider = make_provider(fake, token=token, clock=MutableClock(NOW))
     src = source(
         key="gh:lattice",
-        provider="github_releases",
+        provider="github",
         source_type=SourceType.REPOSITORY,
         reference="lattice/lattice",
         entity_hint="Lattice",
     )
     assert provider.supports(src)
     result = await provider.discover(DiscoveryRequest(source=src, max_items=10), ctx())
-    assert [i.title for i in result.items] == ["Lattice 5.0.0", "v5.1.0-rc1"]  # draft skipped
-    assert result.items[0].evidence_type is EvidenceType.CODE_RELEASE
-    assert result.items[1].metadata["prerelease"] is True
-    sent = rec.requests[0]
-    assert sent.url.path == "/repos/lattice/lattice/releases"
-    assert sent.headers["X-GitHub-Api-Version"] == "2022-11-28"
+    releases = [i for i in result.items if i.evidence_type is EvidenceType.CODE_RELEASE]
+    assert [i.title for i in releases] == ["Lattice 5.0.0", "v5.1.0-rc1"]  # draft skipped
+    assert releases[1].metadata["prerelease"] is True
+    assert result.items[0].evidence_type is EvidenceType.REPOSITORY_METADATA
+    sent = fake.calls("/repos/lattice/lattice/releases")[0]
+    assert sent.headers["X-GitHub-Api-Version"] == "2026-03-10"
     assert ("Authorization" in sent.headers) is (token is not None)
     if token:
         assert token not in repr(provider.status())
@@ -310,24 +312,16 @@ async def test_github_releases(token: str | None) -> None:
 
 
 async def test_github_rejects_invalid_repository_references() -> None:
-    fetcher, _ = make_fetcher(Recorder(json_response(200, [])), name="github_releases")
-    provider = GitHubReleasesProvider(
-        fetcher=fetcher,
-        token=None,
-        user_agent=UA,
-        enabled=True,
-        retention_days=None,
-        clock=MutableClock(NOW),
-    )
+    from tests.github_fixtures import FakeGitHub, make_provider
+
+    provider = make_provider(FakeGitHub(), clock=MutableClock(NOW))
     for reference in ("../etc", "owner/..", "owner/.", "a/b/c", "owner", "-x/y"):
-        bad = source(
-            provider="github_releases", source_type=SourceType.REPOSITORY, reference=reference
-        )
+        bad = source(provider="github", source_type=SourceType.REPOSITORY, reference=reference)
         assert not provider.supports(bad), reference
         with pytest.raises(InvalidRequestError):
             await provider.discover(DiscoveryRequest(source=bad), ctx())
     good = source(
-        provider="github_releases", source_type=SourceType.REPOSITORY, reference="org-name/.github"
+        provider="github", source_type=SourceType.REPOSITORY, reference="org-name/.github"
     )
     assert provider.supports(good)
 
@@ -724,5 +718,5 @@ def test_factory_registers_discovery_providers_idempotently() -> None:
     names = set(registry.names())
     register_discovery_providers(registry, **kwargs)
     assert set(registry.names()) == names
-    assert {"feeds", "github_releases", "hackernews", "reddit", "curated_seeds"} <= names
+    assert {"feeds", "github", "hackernews", "reddit", "curated_seeds"} <= names
     assert registry.get("reddit").status().status is ProviderStatus.NOT_CONFIGURED

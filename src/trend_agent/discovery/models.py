@@ -40,6 +40,9 @@ class EvidenceType(StrEnum):
     SEARCH_SUGGESTION = "search_suggestion"
     COMMUNITY_DISCUSSION = "community_discussion"
     CODE_RELEASE = "code_release"
+    # A repository's own record (name, self-description, topics) from the GitHub API: the
+    # identity is verified by GitHub; the description is the owner's unverified claim.
+    REPOSITORY_METADATA = "repository_metadata"
     CURATED_SEED = "curated_seed"
     SYNTHETIC_TEST_DATA = "synthetic_test_data"
 
@@ -134,6 +137,7 @@ class SourceType(StrEnum):
     COMMUNITY = "community"
     SEED = "seed"
     EXPLORATION_QUERY = "exploration_query"
+    REPOSITORY_SEARCH = "repository_search"  # GitHub repository search (bounded, dated)
     SYNTHETIC = "synthetic"
 
 

@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import httpx
 
 from trend_agent.config import Settings
 from trend_agent.discovery.config import LoadedDiscoveryConfig
 from trend_agent.discovery.providers.base import HttpFetcher, request_quota
-from trend_agent.discovery.providers.community import (
-    GitHubReleasesProvider,
-    HackerNewsProvider,
-    RedditProvider,
-)
+from trend_agent.discovery.providers.community import HackerNewsProvider, RedditProvider
 from trend_agent.discovery.providers.feeds import FeedDiscoveryProvider
+from trend_agent.discovery.providers.github import GitHubDiscoveryProvider
 from trend_agent.discovery.providers.local import CuratedSeedProvider, TrendsRelatedQueriesProvider
 from trend_agent.discovery.providers.youtube import YouTubeDiscoveryProvider
+from trend_agent.github.client import build_client
+from trend_agent.github.config import load_github_settings
 from trend_agent.providers.base import Provider
 from trend_agent.providers.errors import ProviderNotFoundError
 from trend_agent.providers.google_trends import GoogleTrendsProvider
@@ -85,13 +86,31 @@ def register_discovery_providers(
             clock=clock,
         )
     )
-    p = cfg.provider("github_releases")
+    p = cfg.provider("github")
+    gh = load_github_settings(p.params)
     add(
-        GitHubReleasesProvider(
-            fetcher=fetcher("github_releases"),
-            token=settings.github_token,
-            user_agent=ua,
+        GitHubDiscoveryProvider(
+            build_client(
+                http_client=http_client,
+                token=settings.github_token if settings.github_api_enabled else None,
+                quota_store=quota_store,
+                clock=clock,
+                retry=retry,
+                base_url=settings.github_api_base_url,
+                api_version=settings.github_api_version,
+                user_agent=ua,
+                core_daily=gh.api.core_daily_budget,
+                search_daily=gh.api.search_daily_budget,
+                max_pages=gh.api.max_pages,
+                min_remaining={
+                    "core": gh.api.min_remaining_core,
+                    "search": gh.api.min_remaining_search,
+                },
+                dedup_ttl=timedelta(seconds=gh.api.dedup_ttl_seconds),
+            ),
+            settings=gh,
             enabled=p.enabled,
+            api_enabled=settings.github_api_enabled,
             retention_days=p.retention_days,
             clock=clock,
         )

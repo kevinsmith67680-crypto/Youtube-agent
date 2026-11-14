@@ -356,6 +356,14 @@ trend-agent discover run --category ai      # or --category gaming, --all; --dry
 trend-agent discover keywords --category gaming --limit 50   # [--include-synthetic] [--status ...]
 trend-agent discover show --query "glacier lance location"   # evidence, scores, clusters, history
 trend-agent discover expand --entity "Nimbus Coder 2"        # grounded hypotheses + skip reasons
+
+# GitHub REST API (external developer activity; never search volume)
+trend-agent github status                   # config, auth mode (never the token), budgets, stored data
+trend-agent github test                     # bounded live test: GET /rate_limit + 1 search
+trend-agent github discover --category ai   # GitHub sources through the discovery pipeline
+trend-agent github repositories --recent 7  # discoveries; --repo owner/name for momentum + keywords
+trend-agent github releases --recent 30     # monitored releases: version, level, quoted notes
+trend-agent github quota --live             # local budgets + GitHub's own rate-limit state
 trend-agent discover entities --recent [--days 7]
 trend-agent discover sources                # providers, readiness, source health
 trend-agent discover clusters               # topic -> intent clusters with merge decisions
@@ -610,4 +618,5 @@ docker compose --profile app up -d --build # full local stack (development crede
 * [docs/model_maintenance.md](docs/model_maintenance.md) — statuses, promotion, drift, rollback, experiments
 * [docs/production_readiness.md](docs/production_readiness.md) — the readiness scorecard and release state
 * [docs/phase8_report.md](docs/phase8_report.md) — Phase 8 report and verdict
+* [docs/github_api_integration_report.md](docs/github_api_integration_report.md) — GitHub REST API integration: repository discovery, releases, developer activity, keyword expansion
 * [docs/youtube_api_connection_report.md](docs/youtube_api_connection_report.md) — live verification of the YouTube Data API v3 key, quota, retention and a real discovery run

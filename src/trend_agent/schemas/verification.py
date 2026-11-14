@@ -56,6 +56,7 @@ class EvidenceSourceKind(StrEnum):
 class EvidenceKind(StrEnum):
     OFFICIAL_ANNOUNCEMENT = "official_announcement"
     CODE_RELEASE = "code_release"
+    REPOSITORY_METADATA = "repository_metadata"  # a repository's own GitHub record
     VIDEO_METADATA = "video_metadata"  # YouTube titles/descriptions (user-generated)
     COMMUNITY_POST = "community_post"
     NEWS_REPORT = "news_report"

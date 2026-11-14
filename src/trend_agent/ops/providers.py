@@ -49,7 +49,7 @@ _CREDENTIALS: dict[str, tuple[str, ...]] = {
     "google_trends": ("google_trends_credentials_file",),
     "google_trends_discovery": ("google_trends_credentials_file",),
     "reddit": ("reddit_client_id", "reddit_client_secret"),
-    "github_releases": (),  # optional token raises the rate limit only
+    "github": (),  # optional GITHUB_TOKEN raises the rate limit only
     "hackernews": (),
     "feeds": (),
     "curated_seeds": (),
@@ -78,7 +78,11 @@ APPROVALS: dict[str, tuple[str, ...]] = {
         "A registered Reddit OAuth application and acceptance of the Reddit Data API terms; "
         "commercial use requires a separate agreement with Reddit",
     ),
-    "github_releases": ("GitHub API terms; respect rate limits (a token raises them)",),
+    "github": (
+        "GitHub Terms of Service and API terms for automated access to public data",
+        "Use a read-only token (fine-grained, no repository permissions) or none; never "
+        "rotate tokens to evade rate limits",
+    ),
     "hackernews": ("Hacker News Firebase API: public, no key; respect fair use",),
     "feeds": ("Each feed publisher's terms; poll no faster than the configured interval",),
     "curated_seeds": (),
@@ -294,6 +298,15 @@ async def _probe(provider: Provider, *, region: str, discovery_sources: Sequence
         ctx = RequestContext()
         await provider.video_categories(region, ctx)
         return 1  # videoCategories.list costs one unit (counted by the provider's quota)
+    from trend_agent.discovery.providers.github import GitHubDiscoveryProvider
+
+    if isinstance(provider, GitHubDiscoveryProvider):
+        from trend_agent.github.service import connection_test
+
+        report = await connection_test(provider.client)
+        if not report["ok"]:
+            raise report["error"]
+        return int(report["search_requests"])  # GET /rate_limit is free; one search
     discover = getattr(provider, "discover", None)
     supports = getattr(provider, "supports", None)
     if discover is not None and supports is not None:

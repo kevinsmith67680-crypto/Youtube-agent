@@ -68,6 +68,7 @@ _MODEL = [EntityType.AI_MODEL]
 _AI_PRODUCT = [EntityType.AI_PRODUCT]
 _SOFT = [EntityType.SOFTWARE, EntityType.FRAMEWORK, EntityType.RELEASE]
 _HW = [EntityType.HARDWARE]
+_DEV = [EntityType.SOFTWARE, EntityType.FRAMEWORK, EntityType.AI_PRODUCT]
 _MAJOR_MINOR: list[str | None] = ["major", "minor"]
 
 TEMPLATES: tuple[IntentTemplate, ...] = (
@@ -205,6 +206,62 @@ TEMPLATES: tuple[IntentTemplate, ...] = (
         _SOFT,
         levels=["major", None],
         priority=75,
+    ),
+    # --- developer tools with a public repository (grounded by the "repository" attribute,
+    #     i.e. a github.com/<owner>/<repo> reference in the evidence itself)
+    _t(
+        "devtool.how_to_use",
+        "how to use {e}",
+        SearchIntent.HOW_TO,
+        _DEV,
+        requires=["repository"],
+        levels=[None],
+        priority=88,
+    ),
+    _t(
+        "devtool.install",
+        "how to install {e}",
+        SearchIntent.TUTORIAL,
+        [EntityType.AI_PRODUCT],
+        requires=["repository"],
+        levels=[None],
+        priority=84,
+    ),
+    _t(
+        "devtool.setup_guide",
+        "{e} setup guide",
+        SearchIntent.TUTORIAL,
+        _DEV,
+        requires=["repository", "install"],
+        levels=[None],
+        priority=78,
+    ),
+    _t(
+        "devtool.coding_example",
+        "{e} coding example",
+        SearchIntent.TUTORIAL,
+        _DEV,
+        requires=["repository"],
+        levels=[None],
+        priority=72,
+    ),
+    _t(
+        "devtool.benchmark",
+        "{e} benchmark",
+        SearchIntent.COMPARISON,
+        _DEV,
+        requires=["repository", "benchmark"],
+        levels=[None],
+        priority=70,
+    ),
+    _t(
+        "devtool.build_app",
+        "building an app with {e}",
+        SearchIntent.TUTORIAL,
+        _DEV,
+        requires=["repository", "build"],
+        levels=[None],
+        priority=74,
     ),
     # --- hardware
     _t("hardware.review", "{e} review", SearchIntent.REVIEW, _HW, priority=90),

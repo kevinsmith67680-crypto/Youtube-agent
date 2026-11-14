@@ -80,8 +80,11 @@ def test_operations_config_loads_and_rejects_unknown_tasks(tmp_path: Path) -> No
     assert cfg.scheduler.tasks["ops_checks"].interval_seconds == 60
     assert cfg.scheduler.tasks["content_analysis"].max_per_run == 10  # from operations.yaml
     assert cfg.alerts.stage_failure_threshold == 3
+    # unattended discovery (GitHub included); runs only with TREND_AGENT_SCHEDULED_DISCOVERY
+    assert cfg.scheduler.tasks["discovery"].max_per_run == 24
     assert set(cfg.scheduler.tasks) == {
         "ops_checks",
+        "discovery",
         "monitor_plan",
         "content_analysis",
         "forecasting",

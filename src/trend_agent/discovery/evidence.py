@@ -19,6 +19,7 @@ from trend_agent.discovery.text import canonical_url, domain_of, jaccard, shingl
 BASE_QUALITY: dict[EvidenceType, float] = {
     EvidenceType.OFFICIAL_ANNOUNCEMENT: 90.0,
     EvidenceType.CODE_RELEASE: 85.0,
+    EvidenceType.REPOSITORY_METADATA: 60.0,  # verified identity, self-described purpose
     EvidenceType.RELATED_QUERY: 80.0,
     EvidenceType.SEARCH_SUGGESTION: 75.0,
     EvidenceType.VIDEO_TITLE: 55.0,

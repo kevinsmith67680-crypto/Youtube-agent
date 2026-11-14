@@ -12,6 +12,8 @@ decides which operating mode a provider can unlock (see :mod:`trend_agent.ops.mo
 * ``VIDEO_ACTIVITY``                  video publication / attention (supply, not demand).
 * ``COMMUNITY_ACTIVITY``              community discussion from authorised APIs.
 * ``OFFICIAL_EVENT_SIGNAL``           official releases, announcements, patches.
+* ``DEVELOPER_ACTIVITY``              external developer activity on GitHub (repositories,
+  stars, forks, pushes). Never search interest.
 * ``SYNTHETIC_TEST_DATA``             artificial data; never live intelligence.
 """
 
@@ -30,6 +32,7 @@ class SignalClass(StrEnum):
     VIDEO_ACTIVITY = "VIDEO_ACTIVITY"
     COMMUNITY_ACTIVITY = "COMMUNITY_ACTIVITY"
     OFFICIAL_EVENT_SIGNAL = "OFFICIAL_EVENT_SIGNAL"
+    DEVELOPER_ACTIVITY = "DEVELOPER_ACTIVITY"
     SYNTHETIC_TEST_DATA = "SYNTHETIC_TEST_DATA"
 
 
@@ -42,6 +45,7 @@ PROXY_CLASSES = frozenset(
         SignalClass.VIDEO_ACTIVITY,
         SignalClass.COMMUNITY_ACTIVITY,
         SignalClass.OFFICIAL_EVENT_SIGNAL,
+        SignalClass.DEVELOPER_ACTIVITY,
     }
 )
 
@@ -51,7 +55,7 @@ _KNOWN: dict[str, tuple[SignalClass, ...]] = {
     "youtube_data_api": (SignalClass.VIDEO_ACTIVITY,),
     "youtube_discovery": (SignalClass.VIDEO_ACTIVITY,),
     "feeds": (SignalClass.OFFICIAL_EVENT_SIGNAL,),
-    "github_releases": (SignalClass.OFFICIAL_EVENT_SIGNAL,),
+    "github": (SignalClass.OFFICIAL_EVENT_SIGNAL, SignalClass.DEVELOPER_ACTIVITY),
     "hackernews": (SignalClass.COMMUNITY_ACTIVITY,),
     "reddit": (SignalClass.COMMUNITY_ACTIVITY,),
     "google_trends_discovery": (SignalClass.SEARCH_SUGGESTION_PRESENCE,),

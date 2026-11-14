@@ -676,5 +676,104 @@ def create_app(
     def data_quality(_ok: Read) -> DataQualityView:
         return be().data_quality()
 
+    # ------------------------------------------------------------------ github
+    # External developer activity from the GitHub REST API (database mode only). Every
+    # response labels its evidence class; nothing here is search interest or volume.
+    github_demo = {
+        "demo": True,
+        "synthetic": True,
+        "detail": "demo mode: GitHub discoveries are not part of the synthetic dataset",
+    }
+
+    def github_read() -> Any:
+        if ops is None:
+            return None
+        from trend_agent.github.service import GitHubReadService
+
+        return GitHubReadService(ops.session_factory, clock=ops.clock)
+
+    def github_provider_state() -> dict[str, Any]:
+        assert ops is not None
+        try:
+            ops.discovery()  # registers discovery providers (no network)
+            provider = ops.registry.get("github")
+            rep = provider.status()
+            client = getattr(provider, "client", None)
+            return {
+                "status": rep.status.value,
+                "detail": rep.detail,
+                "auth_mode": client.auth_mode() if client else None,
+                "api_version": client.api_version if client else None,
+            }
+        except Exception as exc:  # configuration problems are reported, not raised
+            return {"status": "unknown", "detail": f"{type(exc).__name__}"}
+
+    @api.get("/github/summary")
+    def github_summary(_ok: Read) -> dict[str, Any]:
+        from trend_agent.github.service import EVIDENCE_CLASSES
+
+        svc = github_read()
+        if svc is None:
+            empty = {"repositories": 0, "releases": 0, "observations": 0}
+            return {
+                **github_demo,
+                **empty,
+                "provider": {"status": "demo"},
+                "evidence_classes": EVIDENCE_CLASSES,
+            }
+        return {
+            "demo": False,
+            "synthetic": False,
+            **svc.summary(),
+            "provider": github_provider_state(),
+        }
+
+    @api.get("/github/repositories")
+    def github_repositories(
+        _ok: Read,
+        category: Category | None = None,
+        strategy: Annotated[str | None, Query(pattern=r"^(emerging|active|monitored)$")] = None,
+        days: Annotated[int | None, Query(ge=1, le=3650)] = None,
+        order: Annotated[str, Query(pattern=r"^(first_seen|score|created)$")] = "first_seen",
+        page: PageQ = 1,
+        page_size: SizeQ = None,
+    ) -> dict[str, Any]:
+        n = size(page_size)
+        svc = github_read()
+        if svc is None:
+            return {**github_demo, "items": [], "total": 0, "page": page, "page_size": n}
+        data = svc.repositories(
+            days=days, category=category, strategy=strategy, limit=n,
+            offset=(page - 1) * n, order=order,
+        )  # fmt: skip
+        return {"demo": False, "synthetic": False, "page": page, "page_size": n, **data}
+
+    @api.get("/github/repositories/{repository_id}")
+    def github_repository(
+        repository_id: Annotated[int, Path(ge=1, le=10**12)], _ok: Read
+    ) -> dict[str, Any]:
+        svc = github_read()
+        detail: dict[str, Any] | None = (
+            svc.repository_detail(repository_id) if svc is not None else None
+        )
+        if detail is None:
+            raise HTTPException(404, "no such repository")
+        return detail
+
+    @api.get("/github/releases")
+    def github_releases(
+        _ok: Read,
+        category: Category | None = None,
+        days: Annotated[int | None, Query(ge=1, le=3650)] = None,
+        page: PageQ = 1,
+        page_size: SizeQ = None,
+    ) -> dict[str, Any]:
+        n = size(page_size)
+        svc = github_read()
+        if svc is None:
+            return {**github_demo, "items": [], "total": 0, "page": page, "page_size": n}
+        data = svc.releases(days=days, category=category, limit=n, offset=(page - 1) * n)
+        return {"demo": False, "synthetic": False, "page": page, "page_size": n, **data}
+
     app.include_router(api)
     return app

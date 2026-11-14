@@ -157,6 +157,12 @@ class Capability(StrEnum):
     VIDEO_STATISTICS = "video_statistics"
     CHANNEL_METADATA = "channel_metadata"
     TREND_DISCOVERY = "trend_discovery"
+    # GitHub REST API (external developer activity; never search interest)
+    REPOSITORY_DISCOVERY = "repository_discovery"
+    REPOSITORY_METADATA = "repository_metadata"
+    RELEASE_MONITORING = "release_monitoring"
+    TOPIC_DISCOVERY = "topic_discovery"
+    DEVELOPER_ACTIVITY = "developer_activity"
 
 
 class ProviderStatus(StrEnum):

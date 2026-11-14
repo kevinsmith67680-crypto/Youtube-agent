@@ -34,6 +34,24 @@ test.describe("dashboard pages", () => {
     expect(errors).toEqual([]);
   });
 
+  test("github page: labelled evidence classes, demo state explicit, accessible", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto("/github");
+    await expect(page.getByRole("heading", { level: 1, name: "GitHub discoveries" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "GitHub" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByText("GitHub discoveries are not part of the synthetic dataset", { exact: false })).toBeVisible();
+    for (const label of ["GitHub activity", "Verified release", "Keyword hypothesis", "External attention", "Direct YouTube Search interest"]) {
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+    await expect(page.getByText("never YouTube search volume or demand", { exact: false })).toBeVisible();
+    await axe(page);
+    expect(errors).toEqual([]);
+  });
+
   test("the API token never reaches the browser", async ({ page }) => {
     const bodies: string[] = [];
     page.on("response", async (r) => {

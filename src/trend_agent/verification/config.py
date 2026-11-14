@@ -43,6 +43,7 @@ class Freshness(_Strict):
             EvidenceKind.NEWS_REPORT: timedelta(days=14),
             EvidenceKind.OFFICIAL_ANNOUNCEMENT: timedelta(days=30),
             EvidenceKind.CODE_RELEASE: timedelta(days=30),
+            EvidenceKind.REPOSITORY_METADATA: timedelta(days=30),
             EvidenceKind.ENTITY_RECORD: timedelta(days=90),
             EvidenceKind.CURATED_REFERENCE: timedelta(days=365),
             EvidenceKind.SYNTHETIC_TEST_DATA: timedelta(days=3650),

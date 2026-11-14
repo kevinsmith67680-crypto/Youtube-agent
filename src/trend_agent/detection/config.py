@@ -239,6 +239,7 @@ class ColdStartConfig(_Strict):
     corroborating_evidence: tuple[EvidenceType, ...] = (
         EvidenceType.OFFICIAL_ANNOUNCEMENT,
         EvidenceType.CODE_RELEASE,
+        EvidenceType.REPOSITORY_METADATA,
         EvidenceType.SEARCH_SUGGESTION,
         EvidenceType.RELATED_QUERY,
         EvidenceType.VIDEO_TITLE,
