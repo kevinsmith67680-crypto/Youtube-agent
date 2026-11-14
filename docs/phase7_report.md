@@ -161,13 +161,14 @@ All results below were produced by commands run in this environment.
 
 | Check | Result |
 |---|---|
-| Full backend suite, Python 3.12, with coverage (unit + integration, PostgreSQL 16) | TEST_RESULT_312 |
-| Full backend suite, Python 3.13 | TEST_RESULT_313 |
-| Phase 7 backend tests | 39 API, 66 engine, 6 evaluation (unit); 11 integration (incl. Phase 4 → 5 → 6 → 7 on the database) |
+| Full backend suite, Python 3.12, with coverage (unit + integration, PostgreSQL) | **851 passed**, 3 deselected (opt-in live tests), 0 failed; 90% line+branch coverage; 15 min 54 s |
+| Full backend suite, Python 3.13 | **851 passed**, 3 deselected, 0 failed; 10 min 22 s |
+| Changes after those runs started | source: only the `dashboard serve --ui` process handling (verified by starting and stopping it); tests: the Phase 4 → 5 → 6 → 7 database chain test and 4 CLI tests, run separately: all passed (suite total now 856) |
+| Phase 7 backend tests | 115 unit (39 API, 66 engine, 6 evaluation, 4 CLI) and 11 integration (incl. Phase 4 → 5 → 6 → 7 on the database) |
 | Frontend unit/component tests (Vitest, Testing Library, axe-core) | 29 passed |
 | Frontend end-to-end (Playwright, Chromium, against the demo API; axe WCAG 2.1 A/AA on every page) | 13 passed |
 | `ruff check` / `ruff format --check` (src, tests, scripts) | clean |
-| `mypy src` (strict settings of the project) | clean, 236 files |
+| `mypy src` and `mypy tests --strict` | clean (236 and 72 files) |
 | `tsc --noEmit` (frontend, strict) and `next build` | clean |
 | Migrations | upgrade / downgrade / upgrade and `alembic check` clean |
 
@@ -186,13 +187,13 @@ states (`frontend/tests`, `frontend/e2e`); regression of Phases 1–6 (the full 
 
 | Measurement | Result |
 |---|---|
-| generation per opportunity, template generator (incl. verification and ranking) | mean 58 ms, p50 72 ms, p95 105 ms (17 ms per concept); 0 LLM calls, $0 |
-| LLM path engine overhead (scripted client; excludes model latency) | mean 62 ms, p95 117 ms |
+| generation per opportunity, template generator (incl. verification and ranking) | mean 61 ms, p50 74 ms, p95 113 ms (18 ms per concept); 0 LLM calls, $0 |
+| LLM path engine overhead (scripted client; excludes model latency) | mean 65 ms, p95 120 ms |
 | LLM tokens and cost — **estimate, no live call** (characters/4 of the real prompt and of a schema-valid answer; configured list price $4 / $20 per million tokens) | ≈2,070 input + ≈3,650 output tokens per call; ≈$0.081 per opportunity, ≈$0.024 per recommendation; at most 2 calls per opportunity; daily budget 400,000 tokens |
-| API latency, demo backend (p50) | 4.0–5.5 ms for every endpoint measured |
-| Database, 500 opportunities / 2,500 recommendations (p50) | ranked list 13 ms (page 40: 15 ms), category + score 4 ms, text search 16 ms, combined filters 12 ms, opportunities page 61 ms, sort by breakout 97 ms, recommendation detail 10 ms, overview 24 ms |
-| Persistence | 4.8 ms per new recommendation (with hooks, outline, scores); idempotent re-save of 2,500: 3.3 s, 0 rows created |
-| Dashboard load, production build against the demo API (Chromium) | cold first visit: 81–166 ms to load event; warm medians 45–79 ms, trend detail (charts) 166 ms |
+| API latency, demo backend (p50 / p95) | 4.0–6.0 ms / 4.9–7.8 ms for every endpoint measured |
+| Database, 500 opportunities / 2,500 recommendations (p50) | ranked list 15 ms (page 40: 14 ms), category + score 5 ms, text search 18 ms, combined filters 14 ms, opportunities page 63 ms, sort by breakout 105 ms (was 1,526 ms before the fix), recommendation detail 11 ms, overview 25 ms |
+| Persistence | 5.4 ms per new recommendation (with hooks, outline, scores); idempotent re-save of 2,500: 3.4 s, 0 rows created |
+| Dashboard load, production build against the demo API (Chromium, headless) | cold first visit 96–196 ms to the load event; warm medians 55–93 ms; trend detail (charts) 185 ms |
 
 Real LLM latency, token use and cost were not measured (no live calls in this environment;
 the LLM generator is off by default).

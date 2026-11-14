@@ -358,7 +358,7 @@
     },
     "diversity_top10": {
       "items": 9,
-      "mean_pairwise_title_jaccard": 0.117,
+      "mean_pairwise_title_jaccard": 0.112,
       "max_pairwise_title_jaccard": 0.5,
       "distinct_format_families": 8,
       "categories": [
@@ -369,8 +369,8 @@
       "suppressed": 6
     },
     "generation_seconds_per_opportunity": {
-      "mean": 0.0757,
-      "max": 0.1146
+      "mean": 0.0738,
+      "max": 0.1103
     }
   },
   "human_usefulness": {
