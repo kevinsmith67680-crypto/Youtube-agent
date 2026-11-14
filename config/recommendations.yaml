@@ -1,0 +1,81 @@
+# Phase 7: AI video recommendation engine. Every value has an in-code default
+# (src/trend_agent/recommendations/config.py); this file is the documented operating point
+# and is hashed into every recommendation (configuration version).
+version: 1
+config_version: recommendations-v1
+
+ranking:                         # see docs/recommendation_scoring.md
+  version: ranking-1.0
+  weights:                       # experimental engineering weights, NOT optimised
+    demand_evidence: 0.25
+    content_gap: 0.20
+    intent_alignment: 0.15
+    forecast_opportunity: 0.15
+    creator_relevance: 0.10
+    production_feasibility: 0.10
+    concept_originality: 0.05
+  missing_policy:                # exclude = left out of the weighted mean and listed
+    demand_evidence: exclude     # (a missing forecast is never scored as zero growth)
+    content_gap: exclude
+    intent_alignment: exclude
+    forecast_opportunity: exclude
+    creator_relevance: exclude
+    production_feasibility: exclude
+    concept_originality: exclude
+  min_available_weight: 0.6      # less available evidence than this = not ranked
+  require_demand_evidence: true
+  evidence_quality_factor:       # a confidence factor on the composite, not a component
+    APPROVED: 1.0
+    APPROVED_WITH_UNCERTAINTY: 0.85
+  gap_evidence_factor: {strong: 1.0, moderate: 0.92, weak: 0.8}
+
+generation:
+  max_concepts_per_opportunity: 5
+  max_opportunities_per_run: 25
+  eligible_statuses: [candidate]
+  research_hypotheses: true      # insufficient evidence -> one labelled research candidate
+  max_forecast_age_hours: 36
+  max_report_age_hours: 168
+  hooks_per_concept: 3
+  max_title_chars: 70
+  hard_max_title_chars: 100
+
+feasibility:                     # planning assumptions, not guaranteed production times
+  profiles:
+    QUICK_RESPONSE: {hours: 2, description: "quick response"}
+    STANDARD_TUTORIAL: {hours: 8, description: "standard tutorial"}
+    DEEP_TECHNICAL_VIDEO: {hours: 24, description: "deep technical video"}
+  unknown_requirement_hours: 0.75
+  verified_result_testing_factor: 1.5
+
+diversity:
+  title_similarity_merge: 0.6
+  max_per_opportunity: 3
+  max_per_format_family_per_topic: 1
+  max_share_per_category: 0.6
+
+llm:                             # off by default: the template generator is deterministic
+  enabled: false
+  provider: anthropic
+  model: claude-opus-5-5
+  max_output_tokens: 4096
+  max_attempts: 2
+  usd_per_million_input_tokens: 4.0    # list price at the time of writing; set yours
+  usd_per_million_output_tokens: 20.0
+  daily_token_budget: 400000
+  max_concurrency: 2
+
+alerts:
+  min_score_new_recommendation: 70
+  min_opportunity_score: 65
+  score_upgrade_delta: 10
+  cooldown_hours: 24
+  max_delivery_attempts: 3
+  alert_on_synthetic: false
+
+api:
+  page_size_default: 25
+  page_size_max: 100
+  rate_limit_per_minute: 240
+  generate_rate_limit_per_hour: 12
+  max_generate_opportunities: 10
