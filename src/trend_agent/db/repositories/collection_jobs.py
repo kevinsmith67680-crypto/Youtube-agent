@@ -199,6 +199,16 @@ class JobRepository:
             row.updated_at = now
             if exhausted:
                 row.completed_at = now
+                from trend_agent.db.repositories.ops import DeadLetterRepository
+
+                DeadLetterRepository(self._s).record(
+                    source="collection_job",
+                    reference=str(row.id),
+                    error_type=ErrorCategory.LEASE_EXPIRED.value,
+                    error=row.error_details or "lease expired; max attempts reached",
+                    now=now,
+                    payload={"target_id": row.target_id, "attempts": row.attempt_count},
+                )
             self._s.execute(
                 sa.update(MonitoringJobAttemptRow)
                 .where(

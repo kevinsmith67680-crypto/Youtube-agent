@@ -105,7 +105,7 @@ def _gauge(name: str, help_: str, rows: Iterable[tuple[dict[str, str], float]]) 
 def database_gauges(factory: SessionFactory, now: datetime, mode: Any | None) -> list[str]:
     lines: list[str] = []
     with transaction(factory) as s:
-        q = s.execute(sa.text("SELECT status, count(*) FROM collection_jobs GROUP BY status")).all()
+        q = s.execute(sa.text("SELECT status, count(*) FROM monitoring_jobs GROUP BY status")).all()
         lines += _gauge(
             "trend_agent_collection_jobs", "Collection jobs by status",
             (({"status": str(st)}, float(n)) for st, n in q),

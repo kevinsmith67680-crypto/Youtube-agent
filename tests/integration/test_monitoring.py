@@ -423,6 +423,14 @@ async def test_outage_retries_then_permanent_errors_fail(world: World) -> None:
     assert failed[0].error_category is not None
     assert failed[0].error_category.value == "capability"
     assert world.target("ai coding agents").status is MonitoringStatus.PROVIDER_UNAVAILABLE
+    # Phase 8: the permanently failed job is kept as a dead letter for an operator; the
+    # retryable outage above produced none.
+    from trend_agent.db.repositories.ops import DeadLetterRepository
+
+    with transaction(world.factory) as session:
+        letters = DeadLetterRepository(session).open(source="collection_job")
+        assert {d.reference for d in letters} == {str(o.job_id) for o in failed}
+        assert all(d.error_type == "capability" for d in letters)
 
 
 # ---------------------------------------------------------------------------- storage

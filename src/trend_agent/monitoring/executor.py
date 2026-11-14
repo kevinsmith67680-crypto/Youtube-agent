@@ -521,6 +521,23 @@ class Executor:
                 error_details=message,
                 deferred=decision.deferred,
             )
+            if decision.status is JobStatus.FAILED:
+                # Phase 8: a permanently failed job is kept for an operator, not just closed.
+                from trend_agent.db.repositories.ops import DeadLetterRepository
+
+                DeadLetterRepository(session).record(
+                    source="collection_job",
+                    reference=str(job.id),
+                    error_type=category.value,
+                    error=message,
+                    now=now,
+                    payload={
+                        "target_id": job.target_id,
+                        "attempt": job.attempt,
+                        "max_attempts": job.max_attempts,
+                        "backfill": backfill,
+                    },
+                )
             repo = MonitoringRepository(session)
             target = repo.get_target(job.target_id, lock=True)
             if target is not None and not backfill:

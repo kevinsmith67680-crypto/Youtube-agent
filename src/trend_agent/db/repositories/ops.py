@@ -442,6 +442,7 @@ class DeadLetterRepository:
             return False
         row.resolved_at = now
         row.resolution = _clip(resolution, 500)
+        self.s.flush()
         return True
 
     def count_open(self) -> dict[str, int]:
