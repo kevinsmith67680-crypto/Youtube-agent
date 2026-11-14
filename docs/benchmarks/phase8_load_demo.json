@@ -1,0 +1,68 @@
+{
+  "measured_at": "2026-11-14T11:03:57Z",
+  "conditions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39",
+    "cpus": 4,
+    "server": "uvicorn, 1 process, in-process client",
+    "duration_per_level_s": 10.0,
+    "paths": [
+      "/api/overview",
+      "/api/opportunities?page_size=25",
+      "/api/recommendations?page_size=25",
+      "/api/trends",
+      "/api/system/mode",
+      "/health/ready"
+    ],
+    "backend": "demo"
+  },
+  "levels": [
+    {
+      "concurrency": 1,
+      "seconds": 10.0,
+      "requests_ok": 2307,
+      "rps": 230.6,
+      "p50_ms": 4.25,
+      "p95_ms": 5.77,
+      "p99_ms": 6.64,
+      "status_counts": {
+        "200": 2307
+      },
+      "client_errors": 0
+    },
+    {
+      "concurrency": 8,
+      "seconds": 10.03,
+      "requests_ok": 2100,
+      "rps": 209.3,
+      "p50_ms": 36.34,
+      "p95_ms": 46.54,
+      "p99_ms": 54.88,
+      "status_counts": {
+        "200": 2100
+      },
+      "client_errors": 0
+    },
+    {
+      "concurrency": 32,
+      "seconds": 10.12,
+      "requests_ok": 2028,
+      "rps": 200.3,
+      "p50_ms": 129.48,
+      "p95_ms": 311.05,
+      "p99_ms": 607.33,
+      "status_counts": {
+        "200": 2028
+      },
+      "client_errors": 0
+    }
+  ],
+  "throttling_at_240_per_minute": {
+    "requests": 300,
+    "status_counts": {
+      "200": 240,
+      "429": 60
+    },
+    "retry_after": "58"
+  }
+}

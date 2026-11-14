@@ -1,0 +1,83 @@
+{
+  "measured_at": "2026-11-14T11:07:22.235759+00:00",
+  "conditions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39",
+    "cpus": 4,
+    "iterations": 30,
+    "client": "in-process ASGI",
+    "database_rows": {
+      "ts_observations": 2472,
+      "content_opportunities": 0,
+      "video_recommendations": 0,
+      "surge_events": 9,
+      "forecast_predictions": 0
+    },
+    "api_token_configured": false
+  },
+  "results": {
+    "health.database": {
+      "p50_ms": 1.19,
+      "p95_ms": 2.12,
+      "max_ms": 2.13,
+      "n": 30
+    },
+    "health.workers": {
+      "p50_ms": 1.78,
+      "p95_ms": 4.23,
+      "max_ms": 4.28,
+      "n": 30
+    },
+    "system.snapshot": {
+      "p50_ms": 18.33,
+      "p95_ms": 26.98,
+      "max_ms": 37.28,
+      "n": 30
+    },
+    "GET /health/live": {
+      "p50_ms": 5.11,
+      "p95_ms": 6.6,
+      "max_ms": 7.21,
+      "n": 30
+    },
+    "GET /health/ready": {
+      "p50_ms": 8.99,
+      "p95_ms": 12.09,
+      "max_ms": 12.25,
+      "n": 30
+    },
+    "GET /api/system/mode": {
+      "p50_ms": 6.48,
+      "p95_ms": 8.01,
+      "max_ms": 8.39,
+      "n": 30
+    },
+    "GET /api/overview": {
+      "p50_ms": 25.35,
+      "p95_ms": 33.58,
+      "max_ms": 37.96,
+      "n": 30
+    },
+    "GET /api/opportunities": {
+      "p50_ms": 9.82,
+      "p95_ms": 10.88,
+      "max_ms": 10.94,
+      "n": 30
+    },
+    "GET /api/recommendations": {
+      "p50_ms": 11.05,
+      "p95_ms": 12.89,
+      "max_ms": 122.05,
+      "n": 30
+    },
+    "GET /metrics": {
+      "p50_ms": 9.84,
+      "p95_ms": 12.68,
+      "max_ms": 13.43,
+      "n": 30
+    }
+  },
+  "notes": [
+    "Single client, sequential requests; not a concurrency test (see scripts/load_test.py)."
+  ]
+}
