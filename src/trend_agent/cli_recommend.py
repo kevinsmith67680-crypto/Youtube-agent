@@ -410,3 +410,69 @@ def serve(
         if child is not None:
             child.terminate()
         container.engine.dispose()
+
+
+@recommend_app.command("evaluate")
+def evaluate_cmd(
+    split: Annotated[str, typer.Option("--split", help="calibration | heldout | all")] = "all",
+    human_labels: Annotated[
+        Path | None,
+        typer.Option("--human-labels", help="YAML: recommendation id -> useful (true/false)."),
+    ] = None,
+    out: Annotated[Path | None, typer.Option("--out", help="Write the JSON report here.")] = None,
+    json_out: base.JsonOpt = False,
+) -> None:
+    """Offline evaluation on author-labelled synthetic fixtures (no database, no LLM).
+    The results describe the rules' behaviour on these cases, not real-world accuracy."""
+    import json as _json
+
+    from trend_agent.recommendations.config import load_recommendation_config
+    from trend_agent.recommendations.evaluation import SPLITS, evaluate
+
+    if split not in (*SPLITS, "all"):
+        raise base._fail("--split must be calibration, heldout or all", 2)
+    root = resolve_config_dir(None)
+    splits = SPLITS if split == "all" else (split,)
+    rep = evaluate(
+        root, load_recommendation_config(root), splits=splits, human_labels=human_labels
+    ).as_dict()
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(_json.dumps(rep, indent=2, default=str) + "\n", "utf-8")
+    if json_out:
+        base._emit_json(rep)
+        return
+    for name, s in rep["splits"].items():
+        base.console.print(
+            f"[bold]{name}[/] ({s['cases']} labelled drafts): status accuracy "
+            f"{s['status_accuracy']}, false approvals {len(s['false_approvals'])}, "
+            f"unsupported statements published as fact {len(s['unsupported_published_as_fact'])}"
+        )
+        r = s["bad_statement_removal"]
+        base.console.print(
+            f"  bad-statement removal precision {r['precision']} recall {r['recall']}; "
+            f"supported-fact retention {s['supported_fact_retention']}; title rejection F1 "
+            f"{s['title_rejection']['f1']}; hook rejection F1 {s['hook_rejection']['f1']}"
+        )
+    d = rep["duplicates"]
+    if "calibration" in d:
+        base.console.print(
+            f"duplicates (calibration): configured F1 {d['calibration']['configured']['f1']}, "
+            f"best threshold {d['calibration']['best_threshold']}"
+        )
+    if "heldout" in d:
+        base.console.print(f"duplicates (held-out): F1 {d['heldout']['configured']['f1']}")
+    g = rep["generated"]
+    base.console.print(
+        f"generated: {g['recommendations']} ideas; intent alignment "
+        f"{g['search_intent_alignment']['mean_format_alignment']}; unsupported-claim rate "
+        f"{g['factual_grounding']['unsupported_claim_rate']}; gap relevance "
+        f"{g['content_gap_relevance']}; top-10 max title similarity "
+        f"{g['diversity_top10']['max_pairwise_title_jaccard']}"
+    )
+    hu = rep["human_usefulness"]
+    base.console.print(
+        f"human usefulness: {hu.get('useful_rate', 'not measured')}"
+        + ("" if hu.get("labelled") else f" ({hu.get('reason', '')})")
+    )
+    base.console.print(f"[dim]{rep['notice']}[/]")

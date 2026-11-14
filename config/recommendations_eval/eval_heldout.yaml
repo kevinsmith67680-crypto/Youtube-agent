@@ -1,0 +1,115 @@
+# Phase 7 recommendation evaluation: HELD-OUT split.
+#
+# Written separately from the calibration split, with different texts and failure types,
+# and run only after the rules and thresholds were frozen. Labels are the author's (not
+# independent annotators); fictional entities; few cases. Results describe behaviour on
+# these fixtures, not real-world recommendation accuracy.
+split: heldout
+drafts:
+  - id: ho-ai-result-as-fact
+    scenario: A
+    acceptable_status: [APPROVED_WITH_UNCERTAINTY, RESEARCH_REQUIRED]
+    titles:
+      - {strategy: EXPERIMENT, text: "I Tested CodeForge 2 on a Real Project", gold: ok}
+    hooks:
+      - {hook_type: CHALLENGE, text: "We're going to test whether CodeForge 2 can set up a working project on a clean machine.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "CodeForge 2 compiled the demo project twice as fast as CodeForge 1 in our test.", evidence: [ev_o7nvhkfrk73wf6e2sk74buzoe7], gold: result_as_fact}
+      - {label: HYPOTHESIS_TO_TEST, text: "Can CodeForge 2 finish the setup without manual fixes?", gold: plan}
+
+  - id: ho-ai-fake-citation
+    scenario: A
+    acceptable_status: [APPROVED_WITH_UNCERTAINTY, RESEARCH_REQUIRED]
+    titles:
+      - {strategy: TUTORIAL, text: "How to Install CodeForge 2: Complete Setup Guide", gold: ok}
+    hooks:
+      - {hook_type: PROBLEM_FIRST, text: "Stuck getting CodeForge 2 running? We'll go from download to a first working project together.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "Lumen AI releases CodeForge 2.", evidence: [ev_aaaaaaaaaaaaaaaaaaaaaaaaaa], gold: unsupported}
+      - {label: PLANNED_DEMONSTRATION, text: "Install CodeForge 2 on camera and run the first project", gold: plan}
+
+  - id: ho-ai-unknown-version
+    scenario: A
+    acceptable_status: [APPROVED_WITH_UNCERTAINTY, RESEARCH_REQUIRED]
+    titles:
+      - {strategy: TUTORIAL, text: "How to Install CodeForge 3 Before Everyone Else", gold: reject}
+      - {strategy: TUTORIAL, text: "How to Install CodeForge 2: Complete Setup Guide", gold: ok}
+    hooks:
+      - {hook_type: DIRECT_TUTORIAL, text: "Let's install CodeForge 2 from scratch and get a first project running together, step by step.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "CodeForge 3 ships with an offline agent mode.", evidence: [ev_o7nvhkfrk73wf6e2sk74buzoe7], gold: unsupported}
+      - {label: PLANNED_DEMONSTRATION, text: "Install CodeForge 2 on camera and run the first project", gold: plan}
+
+  - id: ho-gaming-clean
+    scenario: B
+    video_format: ITEM_LOCATION_WALKTHROUGH
+    acceptable_status: [APPROVED, APPROVED_WITH_UNCERTAINTY]
+    titles:
+      - {strategy: TUTORIAL, text: "Ember Lantern Location Guide (Skyforge Arena Season 8)", gold: ok}
+    hooks:
+      - {hook_type: PROBLEM_FIRST, text: "Can't find the Ember Lantern? We'll go straight to its location in Skyforge Arena Season 8, no long intro.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "Skyforge Arena Season 8: Emberfall is live.", evidence: [ev_awtki37xhtb5ebmvrrlflmjgdg], gold: supported}
+      - {label: PLANNED_DEMONSTRATION, text: "Walk the route to the volcano region and pick up the Ember Lantern", gold: plan}
+
+  - id: ho-gaming-dates
+    scenario: B
+    video_format: ITEM_LOCATION_WALKTHROUGH
+    acceptable_status: [APPROVED_WITH_UNCERTAINTY, RESEARCH_REQUIRED]
+    titles:
+      - {strategy: DIRECT_ANSWER, text: "Where to Find the Ember Lantern in Skyforge Arena Season 8", gold: ok}
+    hooks:
+      - {hook_type: DEMONSTRATION_FIRST, text: "This is the Ember Lantern in Skyforge Arena Season 8. Let's head straight to where it is and how to pick it up.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "The Ember Lantern was added on 2 November and leaves the game on 30 November.", evidence: [ev_awtki37xhtb5ebmvrrlflmjgdg], gold: unsupported}
+      - {label: PLANNED_DEMONSTRATION, text: "Walk the route to the volcano region and pick up the Ember Lantern", gold: plan}
+
+  - id: ho-tech-superlative
+    scenario: C
+    video_format: SOFTWARE_MIGRATION_GUIDE
+    acceptable_status: [APPROVED, APPROVED_WITH_UNCERTAINTY]
+    titles:
+      - {strategy: CURIOSITY, text: "The Best Pyxis 5 Migration Guide Ever Made", gold: reject}
+      - {strategy: TUTORIAL, text: "How to Migrate to Pyxis 5: Step-by-Step Upgrade Guide", gold: ok}
+    hooks:
+      - {hook_type: DIRECT_TUTORIAL, text: "Let's move a real project from Pyxis 4 to Pyxis 5 together and check every step as we go.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "Pyxis 5 is released.", evidence: [ev_a4vylyyogkqnkdxgrzsa74zmsr], gold: supported}
+      - {label: PLANNED_DEMONSTRATION, text: "Upgrade a sample project and show each change on screen", gold: plan}
+
+  - id: ho-tech-urgency
+    scenario: C
+    video_format: SOFTWARE_MIGRATION_GUIDE
+    acceptable_status: [APPROVED, APPROVED_WITH_UNCERTAINTY]
+    titles:
+      - {strategy: TUTORIAL, text: "How to Migrate to Pyxis 5: Step-by-Step Upgrade Guide", gold: ok}
+    hooks:
+      - {hook_type: PROBLEM_FIRST, text: "Upgrade to Pyxis 5 now before it's too late, everyone is switching today and you'll be left behind.", gold: reject}
+      - {hook_type: DIRECT_TUTORIAL, text: "Let's move a real project from Pyxis 4 to Pyxis 5 together and check every step as we go.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "Pyxis 5 is released.", evidence: [ev_a4vylyyogkqnkdxgrzsa74zmsr], gold: supported}
+      - {label: PLANNED_DEMONSTRATION, text: "Upgrade a sample project and show each change on screen", gold: plan}
+
+  - id: ho-gaming-weak-evidence
+    scenario: G
+    video_format: ITEM_LOCATION_WALKTHROUGH
+    acceptable_status: [RESEARCH_REQUIRED]
+    titles:
+      - {strategy: DIRECT_ANSWER, text: "Where to Find the Void Scythe in Skyforge Arena Season 8", gold: ok}
+    hooks:
+      - {hook_type: PROBLEM_FIRST, text: "Looking for the Void Scythe? We'll check every place the season update mentions, on camera.", gold: ok}
+    items:
+      - {label: VERIFIED_FACT, text: "Skyforge Arena Season 8: Emberfall is live.", evidence: [ev_awtki37xhtb5ebmvrrlflmjgdg], gold: supported}
+      - {label: HYPOTHESIS_TO_TEST, text: "Is the Void Scythe obtainable in the current version?", gold: plan}
+
+duplicates:
+  - {a: "How to Install CodeForge 2: Complete Setup Guide", b: "Installing CodeForge 2: The Complete Setup", duplicate: true}
+  - {a: "How to Install CodeForge 2: Complete Setup Guide", b: "CodeForge 2 vs CodeForge 1: Side-by-Side Test", duplicate: false}
+  - {a: "Where to Find the Ember Lantern in Skyforge Arena Season 8", b: "Ember Lantern Location Guide (Skyforge Arena Season 8)", duplicate: true}
+  - {a: "Where to Find the Ember Lantern in Skyforge Arena Season 8", b: "What Changed in Skyforge Arena Season 8, Explained", duplicate: false}
+  - {a: "How to Migrate to Pyxis 5: Step-by-Step Upgrade Guide", b: "Pyxis 5 Migration: Step-by-Step Guide", duplicate: true}
+  - {a: "How to Migrate to Pyxis 5: Step-by-Step Upgrade Guide", b: "Pyxis 5 Explained: What It Is and What's New", duplicate: false}
+  - {a: "Skyforge Arena Season 8: Complete Event Guide", b: "Complete Event Guide for Skyforge Arena Season 8", duplicate: true}
+  - {a: "I Tested CodeForge 2 on a Real Project", b: "How to Install CodeForge 2: Complete Setup Guide", duplicate: false}
+  - {a: "Pyxis 4 vs Pyxis 5: What Actually Changed", b: "Pyxis 4 vs Pyxis 5 Compared", duplicate: true}
+  - {a: "Skyforge Arena Season 8: Complete Event Guide", b: "Where to Find the Ember Lantern in Skyforge Arena Season 8", duplicate: false}
