@@ -49,7 +49,7 @@ from trend_agent.forecasting.feature_store import (
     SeriesBundle,
     SeriesMeta,
 )
-from trend_agent.forecasting.model_registry import ArtifactStore, Registry
+from trend_agent.forecasting.model_registry import ArtifactError, ArtifactStore, Registry
 from trend_agent.forecasting.model_selection import compare, promote_selected, train_and_register
 from trend_agent.forecasting.prediction import ForecastEngine
 from trend_agent.monitoring.replay import AvailabilityMode
@@ -535,9 +535,36 @@ class ForecastingService:
             raise LookupError(model_id)
         return self.registry.promote(model_id, at=self._clock(), reason=reason, evidence={})
 
-    def rollback(self, model_id: str, reason: str = "operator rollback") -> None:
-        """Retire a champion: the scope falls back to baseline-only forecasts."""
-        self.registry.retire(model_id, at=self._clock(), reason=reason)
+    def rollback(
+        self,
+        model_id: str,
+        reason: str = "operator rollback",
+        *,
+        reject: bool = False,
+        restore_previous: bool = False,
+    ) -> str | None:
+        """Take a champion out of service. Default: RETIRED, and the scope falls back to
+        baseline-only forecasts. ``reject`` marks it REJECTED instead; ``restore_previous``
+        reinstates the champion it replaced (after an artifact checksum check)."""
+        if not reject and not restore_previous:
+            self.registry.retire(model_id, at=self._clock(), reason=reason)
+            return None
+        try:
+            return self.registry.rollback(
+                model_id,
+                at=self._clock(),
+                reason=reason,
+                reject=reject,
+                restore_previous=restore_previous,
+            )
+        except (ValueError, ArtifactError) as exc:
+            raise LookupError(str(exc)) from exc
+
+    def reject(self, model_id: str, reason: str) -> None:
+        try:
+            self.registry.reject(model_id, at=self._clock(), reason=reason)
+        except (ValueError, ArtifactError) as exc:
+            raise LookupError(str(exc)) from exc
 
     # ------------------------------------------------------------------ inference
     def predict(

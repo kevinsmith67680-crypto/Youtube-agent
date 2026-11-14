@@ -245,6 +245,64 @@ class Registry:
     def retire(self, model_id: str, *, at: datetime, reason: str) -> None:
         self.store.set_status(model_id, ModelStatus.RETIRED, reason, at)
 
+    def reject(
+        self,
+        model_id: str,
+        *,
+        at: datetime,
+        reason: str,
+        evidence: dict[str, Any] | None = None,
+    ) -> None:
+        """Mark a model that failed validation (or monitoring) REJECTED: it is never
+        served or promoted. A champion is taken out of service with :meth:`rollback`."""
+        found = self.store.get(model_id)
+        if found is None:
+            raise ArtifactError(f"model {model_id} not registered")
+        if found[0].status is ModelStatus.CHAMPION:
+            raise ValueError("use rollback() to take a champion out of service")
+        self.store.set_status(model_id, ModelStatus.REJECTED, reason, at, evidence)
+
+    def previous_champion(self, model_id: str) -> str | None:
+        """The champion that ``model_id`` replaced when it was promoted (if any)."""
+        wanted = f"replaced by {model_id}"
+        hits = [
+            e
+            for e in self.store.events()
+            if e.to_status == ModelStatus.RETIRED.value and e.reason == wanted
+        ]
+        return hits[-1].model_id if hits else None
+
+    def rollback(
+        self,
+        model_id: str,
+        *,
+        at: datetime,
+        reason: str,
+        reject: bool = True,
+        restore_previous: bool = False,
+    ) -> str | None:
+        """Take a champion out of service (REJECTED, or RETIRED with ``reject=False``).
+
+        With ``restore_previous`` the champion it replaced becomes champion again, but only
+        after its artifact passes the checksum check; otherwise the scope falls back to
+        baseline-only forecasts. Returns the restored model ID (or None). Every change is
+        an explicit, logged model event; nothing is promoted automatically."""
+        found = self.store.get(model_id)
+        if found is None:
+            raise ArtifactError(f"model {model_id} not registered")
+        if found[0].status is not ModelStatus.CHAMPION:
+            raise ValueError(f"{model_id} is not a champion ({found[0].status.value})")
+        prev = self.previous_champion(model_id) if restore_previous else None
+        if prev is not None:
+            self.load(prev)  # raises ArtifactError if the artifact is missing or altered
+        status = ModelStatus.REJECTED if reject else ModelStatus.RETIRED
+        self.store.set_status(model_id, status, f"rollback: {reason}", at)
+        if prev is not None:
+            self.store.set_status(
+                prev, ModelStatus.CHAMPION, f"restored by rollback of {model_id}: {reason}", at
+            )
+        return prev
+
     def mark(
         self,
         model_id: str,

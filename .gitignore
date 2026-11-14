@@ -33,3 +33,8 @@ htmlcov/
 
 # Phase 6 model artifacts (local registry storage)
 var/
+
+# Phase 8: local backups and dumps never go to git
+backups/
+*.dump
+*.manifest.json

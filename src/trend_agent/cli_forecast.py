@@ -382,17 +382,51 @@ def forecast_promote(
 
 
 @forecast_app.command("rollback")
-def forecast_rollback(model_id: Annotated[str, typer.Argument()]) -> None:
-    """Retire a champion; its scope falls back to baseline-only forecasts (logged)."""
+def forecast_rollback(
+    model_id: Annotated[str, typer.Argument()],
+    reject: Annotated[
+        bool, typer.Option("--reject", help="Mark it REJECTED (failed in service).")
+    ] = False,
+    restore_previous: Annotated[
+        bool,
+        typer.Option("--restore-previous", help="Reinstate the champion it replaced."),
+    ] = False,
+    reason: Annotated[str, typer.Option("--reason")] = "operator rollback",
+) -> None:
+    """Take a champion out of service (logged). Default: retire it, and its scope falls
+    back to baseline-only forecasts."""
     container, svc = _service()
     try:
         try:
-            svc.rollback(model_id)
+            restored = svc.rollback(
+                model_id, reason, reject=reject, restore_previous=restore_previous
+            )
         except LookupError as exc:
             raise base._fail(str(exc), 2) from None
     finally:
         _close(container)
-    base.console.print(f"{model_id} retired; baseline-only forecasts for its scope")
+    state = "rejected" if reject else "retired"
+    if restored:
+        base.console.print(f"{model_id} {state}; {restored} restored as champion")
+    else:
+        base.console.print(f"{model_id} {state}; baseline-only forecasts for its scope")
+
+
+@forecast_app.command("reject")
+def forecast_reject(
+    model_id: Annotated[str, typer.Argument()],
+    reason: Annotated[str, typer.Option("--reason")],
+) -> None:
+    """Mark a non-champion model REJECTED (never served or promoted; logged)."""
+    container, svc = _service()
+    try:
+        try:
+            svc.reject(model_id, reason)
+        except LookupError as exc:
+            raise base._fail(str(exc), 2) from None
+    finally:
+        _close(container)
+    base.console.print(f"{model_id} rejected")
 
 
 @forecast_app.command("explain")

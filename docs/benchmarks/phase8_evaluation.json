@@ -1,0 +1,1021 @@
+{
+  "generated_at": "2026-11-14T10:11:30.049069+00:00",
+  "code_version": "0.7.0+d26ae5b",
+  "size": "small",
+  "forecast_scale": 0.4,
+  "experiments": {
+    "detection": "d11e3b73-8d89-4445-a1a7-94038a85d77b",
+    "forecasting": "419675ea-0782-40e4-8196-e0727116261c",
+    "content_gaps": "4701ae26-ed63-489f-af63-25600c71de84",
+    "recommendations": "11635ac7-8627-4486-a82f-037efd0ccbcf"
+  },
+  "scorecard": {
+    "components": {
+      "detection": {
+        "offline": "MEETS_TARGET",
+        "checks": {
+          "precision": {
+            "value": 0.9057,
+            "target": ">= 0.6",
+            "result": "MEETS_TARGET"
+          },
+          "recall": {
+            "value": 1.0,
+            "target": ">= 0.6",
+            "result": "MEETS_TARGET"
+          },
+          "false_alerts_per_1000_series_day": {
+            "value": 0.4167,
+            "target": "<= 5.0",
+            "result": "MEETS_TARGET"
+          }
+        },
+        "real_world": {
+          "status": "UNKNOWN",
+          "reason": "0 real surge labels (minimum 30)"
+        }
+      },
+      "forecasting": {
+        "offline": "MEETS_TARGET",
+        "checks": {
+          "beats_best_baseline_share": {
+            "value": 1.0,
+            "target": ">= 0.5",
+            "result": "MEETS_TARGET"
+          }
+        },
+        "real_world": {
+          "status": "UNKNOWN",
+          "reason": "0 real 'forecast_outcome' labels"
+        }
+      },
+      "content_gaps": {
+        "offline": "MEETS_TARGET",
+        "checks": {
+          "false_gap_rate": {
+            "value": 0.0,
+            "target": "<= 0.25",
+            "result": "MEETS_TARGET"
+          },
+          "false_verified_gaps": {
+            "value": 0,
+            "target": "<= 0.0",
+            "result": "MEETS_TARGET"
+          }
+        },
+        "real_world": {
+          "status": "UNKNOWN",
+          "reason": "0 real 'content_gap' labels"
+        }
+      },
+      "recommendations": {
+        "offline": "MEETS_TARGET",
+        "checks": {
+          "grounding_violation_rate": {
+            "value": 0.0,
+            "target": "<= 0.0",
+            "result": "MEETS_TARGET"
+          },
+          "duplicate_f1": {
+            "value": 0.889,
+            "target": ">= 0.8",
+            "result": "MEETS_TARGET"
+          },
+          "false_approvals": {
+            "value": 0,
+            "target": "<= 0.0",
+            "result": "MEETS_TARGET"
+          }
+        },
+        "real_world": {
+          "status": "UNKNOWN",
+          "reason": "0 real 'recommendation_outcome' labels",
+          "outcomes": {
+            "status": "UNKNOWN",
+            "outcomes": 0,
+            "reason": "no creator-entered outcomes recorded"
+          }
+        }
+      }
+    },
+    "pipeline_integrity": "PASS",
+    "real_world_accuracy": "UNKNOWN",
+    "notice": "Offline results are measured on synthetic data and author-labelled fixtures. They show that the pipeline behaves as designed; they are not evidence of real-world accuracy, which stays UNKNOWN until enough real labels are collected."
+  },
+  "results": {
+    "detection": {
+      "origin": "synthetic",
+      "splits": {
+        "calibration": {
+          "series": 62,
+          "kind": "null (no events)"
+        },
+        "dev": {
+          "series": 120
+        },
+        "test": {
+          "series": 200,
+          "used_for_tuning": false
+        }
+      },
+      "current": {
+        "params": {
+          "cusum_h": 6.0,
+          "fdr_q": 0.05
+        },
+        "dev": {
+          "precision": 0.8,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1,
+          "false_alerts_per_1000_series_day": 0.8333,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.95,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 39,
+          "tp": 24,
+          "fp": 6,
+          "fn": 0,
+          "f1": 0.8889,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 4,
+            "technology": 1,
+            "ai": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "test": {
+          "precision": 0.9057,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.0833,
+          "false_alerts_per_1000_series_day": 0.4167,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 6.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.9744,
+          "confirmed_recall": 0.7917,
+          "labels": 48,
+          "alerts": 73,
+          "tp": 48,
+          "fp": 5,
+          "fn": 0,
+          "f1": 0.9505,
+          "recall_by_kind": {
+            "event": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 15,
+              "detected": 15,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 13,
+              "detected": 13,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 9,
+              "detected": 9,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "ai": 3,
+            "gaming": 1,
+            "technology": 1
+          },
+          "dataset": "synthetic-test"
+        }
+      },
+      "by_source_test": {
+        "direct_youtube_search_interest": {
+          "precision": 0.9057,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.0833,
+          "false_alerts_per_1000_series_day": 0.4167,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 6.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.9744,
+          "confirmed_recall": 0.7917,
+          "labels": 48,
+          "alerts": 73,
+          "tp": 48,
+          "fp": 5,
+          "fn": 0,
+          "f1": 0.9505,
+          "recall_by_kind": {
+            "event": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 15,
+              "detected": 15,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 13,
+              "detected": 13,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 9,
+              "detected": 9,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "ai": 3,
+            "gaming": 1,
+            "technology": 1
+          },
+          "dataset": "synthetic-test-direct_youtube_search_interest"
+        },
+        "video_activity": {
+          "precision": 0.8889,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1,
+          "false_alerts_per_1000_series_day": 0.5,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 6.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": null,
+          "confirmed_recall": 0.0,
+          "labels": 48,
+          "alerts": 76,
+          "tp": 48,
+          "fp": 6,
+          "fn": 0,
+          "f1": 0.9412,
+          "recall_by_kind": {
+            "event": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 15,
+              "detected": 15,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 13,
+              "detected": 13,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 9,
+              "detected": 9,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "ai": 3,
+            "gaming": 1,
+            "technology": 2
+          },
+          "dataset": "synthetic-test-video_activity"
+        }
+      },
+      "tuning": null,
+      "timings_seconds": {
+        "calibration": 2.7,
+        "current": 16.08,
+        "by_source": 21.79
+      }
+    },
+    "forecasting": {
+      "origin": "synthetic",
+      "note": "SYNTHETIC corpus: behaviour of the pipeline, not real-world accuracy.",
+      "scale": 0.4,
+      "dataset": {
+        "rows": 28816,
+        "dataset_version": "ds-8f624859a38e",
+        "rows_hash": "c0a9113cce0f1c1d387fdb8070471d294d82e546ebb9c48c5a3b9da426b173a1",
+        "leakage_audit": {
+          "checked": 6,
+          "mismatches": 0,
+          "details": []
+        }
+      },
+      "splits": "chronological train / validation / calibration / test per scope",
+      "scopes": [
+        {
+          "scope": "youtube_search_interest/day/6h/all",
+          "horizon_hours": 6,
+          "granularity": "day",
+          "task": "all",
+          "status": "UNSUPPORTED",
+          "reason": "horizon not supported for this granularity"
+        },
+        {
+          "scope": "youtube_search_interest/day/24h/breakout",
+          "horizon_hours": 24,
+          "granularity": "day",
+          "task": "breakout",
+          "selected": null,
+          "metric": "brier_skill_vs_climatology",
+          "selected_value": null,
+          "baseline": "climatology",
+          "baseline_value": 0.0,
+          "beats_baseline": false,
+          "lightgbm_candidate": true,
+          "lightgbm_selected": false,
+          "lightgbm_margin_over_logistic": 5.5066,
+          "pr_auc": null,
+          "ece": null,
+          "status": "NO_VALIDATED_MODEL"
+        },
+        {
+          "scope": "youtube_search_interest/day/24h/continuation",
+          "horizon_hours": 24,
+          "granularity": "day",
+          "task": "continuation",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/day/24h/trajectory",
+          "horizon_hours": 24,
+          "granularity": "day",
+          "task": "trajectory",
+          "selected": "lightgbm_regressor",
+          "metric": "mae",
+          "selected_value": 0.093,
+          "baseline": "persistence",
+          "baseline_value": 0.1118,
+          "beats_baseline": true,
+          "relative_mae_gain": 0.1682,
+          "lightgbm_selected": true,
+          "interval_coverage": 0.7983,
+          "status": "SELECTED",
+          "lightgbm_meaningful": true
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/breakout",
+          "horizon_hours": 72,
+          "granularity": "day",
+          "task": "breakout",
+          "selected": null,
+          "metric": "brier_skill_vs_climatology",
+          "selected_value": null,
+          "baseline": "climatology",
+          "baseline_value": 0.0,
+          "beats_baseline": false,
+          "lightgbm_candidate": true,
+          "lightgbm_selected": false,
+          "lightgbm_margin_over_logistic": 0.0126,
+          "pr_auc": null,
+          "ece": null,
+          "status": "NO_VALIDATED_MODEL"
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/continuation",
+          "horizon_hours": 72,
+          "granularity": "day",
+          "task": "continuation",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/trajectory",
+          "horizon_hours": 72,
+          "granularity": "day",
+          "task": "trajectory",
+          "selected": "lightgbm_regressor",
+          "metric": "mae",
+          "selected_value": 0.1067,
+          "baseline": "seasonal_naive",
+          "baseline_value": 0.1261,
+          "beats_baseline": true,
+          "relative_mae_gain": 0.1538,
+          "lightgbm_selected": true,
+          "interval_coverage": 0.7732,
+          "status": "SELECTED",
+          "lightgbm_meaningful": true
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/peak",
+          "horizon_hours": 72,
+          "granularity": "day",
+          "task": "peak",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/hour/6h/breakout",
+          "horizon_hours": 6,
+          "granularity": "hour",
+          "task": "breakout",
+          "selected": null,
+          "metric": "brier_skill_vs_climatology",
+          "selected_value": null,
+          "baseline": "climatology",
+          "baseline_value": 0.0,
+          "beats_baseline": false,
+          "lightgbm_candidate": true,
+          "lightgbm_selected": false,
+          "lightgbm_margin_over_logistic": 17.3494,
+          "pr_auc": null,
+          "ece": null,
+          "status": "NO_VALIDATED_MODEL"
+        },
+        {
+          "scope": "youtube_search_interest/hour/6h/continuation",
+          "horizon_hours": 6,
+          "granularity": "hour",
+          "task": "continuation",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/hour/6h/trajectory",
+          "horizon_hours": 6,
+          "granularity": "hour",
+          "task": "trajectory",
+          "selected": "lightgbm_regressor",
+          "metric": "mae",
+          "selected_value": 0.0827,
+          "baseline": "seasonal_naive",
+          "baseline_value": 0.1156,
+          "beats_baseline": true,
+          "relative_mae_gain": 0.2846,
+          "lightgbm_selected": true,
+          "interval_coverage": 0.8152,
+          "status": "SELECTED",
+          "lightgbm_meaningful": true
+        },
+        {
+          "scope": "youtube_search_interest/hour/24h/breakout",
+          "horizon_hours": 24,
+          "granularity": "hour",
+          "task": "breakout",
+          "selected": null,
+          "metric": "brier_skill_vs_climatology",
+          "selected_value": null,
+          "baseline": "climatology",
+          "baseline_value": 0.0,
+          "beats_baseline": false,
+          "lightgbm_candidate": true,
+          "lightgbm_selected": false,
+          "lightgbm_margin_over_logistic": 0.2357,
+          "pr_auc": null,
+          "ece": null,
+          "status": "NO_VALIDATED_MODEL"
+        },
+        {
+          "scope": "youtube_search_interest/hour/24h/continuation",
+          "horizon_hours": 24,
+          "granularity": "hour",
+          "task": "continuation",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/hour/24h/trajectory",
+          "horizon_hours": 24,
+          "granularity": "hour",
+          "task": "trajectory",
+          "selected": "lightgbm_regressor",
+          "metric": "mae",
+          "selected_value": 0.0979,
+          "baseline": "persistence",
+          "baseline_value": 0.1183,
+          "beats_baseline": true,
+          "relative_mae_gain": 0.1724,
+          "lightgbm_selected": true,
+          "interval_coverage": 0.8176,
+          "status": "SELECTED",
+          "lightgbm_meaningful": true
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/breakout",
+          "horizon_hours": 72,
+          "granularity": "hour",
+          "task": "breakout",
+          "selected": null,
+          "metric": "brier_skill_vs_climatology",
+          "selected_value": null,
+          "baseline": "climatology",
+          "baseline_value": 0.0,
+          "beats_baseline": false,
+          "lightgbm_candidate": true,
+          "lightgbm_selected": false,
+          "lightgbm_margin_over_logistic": 0.0664,
+          "pr_auc": null,
+          "ece": null,
+          "status": "NO_VALIDATED_MODEL"
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/continuation",
+          "horizon_hours": 72,
+          "granularity": "hour",
+          "task": "continuation",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/trajectory",
+          "horizon_hours": 72,
+          "granularity": "hour",
+          "task": "trajectory",
+          "selected": "lightgbm_regressor",
+          "metric": "mae",
+          "selected_value": 0.1283,
+          "baseline": "persistence",
+          "baseline_value": 0.1498,
+          "beats_baseline": true,
+          "relative_mae_gain": 0.1435,
+          "lightgbm_selected": true,
+          "interval_coverage": 0.8266,
+          "status": "SELECTED",
+          "lightgbm_meaningful": true
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/peak",
+          "horizon_hours": 72,
+          "granularity": "hour",
+          "task": "peak",
+          "status": "NO_MODEL",
+          "reason": "no candidates trained"
+        }
+      ],
+      "promotions": [
+        {
+          "scope": "youtube_search_interest/day/24h/trajectory",
+          "promoted": "fm_lightgbm_trajectory_day_24h_fbe17f08c9",
+          "replaced": null
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/trajectory",
+          "promoted": "fm_lightgbm_trajectory_day_72h_c8a1b97748",
+          "replaced": null
+        },
+        {
+          "scope": "youtube_search_interest/day/72h/peak",
+          "promoted": "fm_analog_peak_window_day_72h_283ee84f97"
+        },
+        {
+          "scope": "youtube_search_interest/hour/6h/trajectory",
+          "promoted": "fm_lightgbm_trajectory_hour_6h_148c1e5c32",
+          "replaced": null
+        },
+        {
+          "scope": "youtube_search_interest/hour/24h/trajectory",
+          "promoted": "fm_lightgbm_trajectory_hour_24h_bd3bc36844",
+          "replaced": null
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/trajectory",
+          "promoted": "fm_lightgbm_trajectory_hour_72h_7873b20264",
+          "replaced": null
+        },
+        {
+          "scope": "youtube_search_interest/hour/72h/peak",
+          "promoted": "fm_analog_peak_window_hour_72h_e5d3066203"
+        }
+      ],
+      "models_by_status": {
+        "experimental": 20,
+        "validated": 5,
+        "champion": 7,
+        "challenger": 0,
+        "retired": 0,
+        "rejected": 0
+      },
+      "summary": {
+        "scopes": 18,
+        "unsupported": [
+          "youtube_search_interest/day/6h/all"
+        ],
+        "selected": 5,
+        "beats_best_baseline": 5,
+        "beats_best_baseline_share": 1.0,
+        "lightgbm_selected": 5,
+        "lightgbm_selected_without_meaningful_gain": []
+      },
+      "timings_seconds": {
+        "dataset": 47.6,
+        "training": 41.7
+      }
+    },
+    "content_gaps": {
+      "origin": "synthetic",
+      "splits": {
+        "dev": {
+          "cases": 12,
+          "confusion": {
+            "BLOCKED_POLICY->BLOCKED_POLICY": 1,
+            "GAP->CANDIDATE_GAP": 1,
+            "GAP->VERIFIED_GAP": 3,
+            "INSUFFICIENT_EVIDENCE->INSUFFICIENT_EVIDENCE": 2,
+            "INSUFFICIENT_EVIDENCE->NO_VERIFIABLE_GAP": 1,
+            "NO_GAP->NO_VERIFIABLE_GAP": 4
+          },
+          "predicted_distribution": {
+            "CANDIDATE_GAP": 1,
+            "NO_VERIFIABLE_GAP": 5,
+            "VERIFIED_GAP": 3,
+            "INSUFFICIENT_EVIDENCE": 2,
+            "BLOCKED_POLICY": 1
+          },
+          "gap_precision": 1.0,
+          "gap_recall": 1.0,
+          "false_gap_rate": 0.0,
+          "false_verified_gaps": 0,
+          "verified_gap_precision": 1.0,
+          "abstention_recall": 0.6667,
+          "verified_vs_candidate_correctness": "UNKNOWN (labels do not encode verification)",
+          "rows": [
+            {
+              "case": "D01",
+              "label": "GAP",
+              "predicted": "CANDIDATE_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "D02",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "D03",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "D04",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "D05",
+              "label": "INSUFFICIENT_EVIDENCE",
+              "predicted": "INSUFFICIENT_EVIDENCE",
+              "gap_correct": false
+            },
+            {
+              "case": "D06",
+              "label": "BLOCKED_POLICY",
+              "predicted": "BLOCKED_POLICY",
+              "gap_correct": false
+            },
+            {
+              "case": "D07",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "D08",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "D09",
+              "label": "INSUFFICIENT_EVIDENCE",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "D10",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "D11",
+              "label": "INSUFFICIENT_EVIDENCE",
+              "predicted": "INSUFFICIENT_EVIDENCE",
+              "gap_correct": false
+            },
+            {
+              "case": "D12",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            }
+          ]
+        },
+        "calibration": {
+          "cases": 8,
+          "confusion": {
+            "GAP->CANDIDATE_GAP": 1,
+            "GAP->INSUFFICIENT_EVIDENCE": 1,
+            "GAP->NO_VERIFIABLE_GAP": 1,
+            "GAP->VERIFIED_GAP": 1,
+            "NO_GAP->NO_VERIFIABLE_GAP": 4
+          },
+          "predicted_distribution": {
+            "NO_VERIFIABLE_GAP": 5,
+            "CANDIDATE_GAP": 1,
+            "VERIFIED_GAP": 1,
+            "INSUFFICIENT_EVIDENCE": 1
+          },
+          "gap_precision": 1.0,
+          "gap_recall": 0.5,
+          "false_gap_rate": 0.0,
+          "false_verified_gaps": 0,
+          "verified_gap_precision": 1.0,
+          "abstention_recall": null,
+          "verified_vs_candidate_correctness": "UNKNOWN (labels do not encode verification)",
+          "rows": [
+            {
+              "case": "K01",
+              "label": "GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "K02",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "K03",
+              "label": "GAP",
+              "predicted": "CANDIDATE_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "K04",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "K05",
+              "label": "GAP",
+              "predicted": "INSUFFICIENT_EVIDENCE",
+              "gap_correct": false
+            },
+            {
+              "case": "K06",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "K07",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "K08",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            }
+          ]
+        },
+        "heldout": {
+          "cases": 12,
+          "confusion": {
+            "BLOCKED_POLICY->BLOCKED_POLICY": 1,
+            "GAP->CANDIDATE_GAP": 1,
+            "GAP->NO_VERIFIABLE_GAP": 1,
+            "GAP->VERIFIED_GAP": 3,
+            "INSUFFICIENT_EVIDENCE->INSUFFICIENT_EVIDENCE": 2,
+            "NO_GAP->NO_VERIFIABLE_GAP": 4
+          },
+          "predicted_distribution": {
+            "NO_VERIFIABLE_GAP": 5,
+            "VERIFIED_GAP": 3,
+            "INSUFFICIENT_EVIDENCE": 2,
+            "CANDIDATE_GAP": 1,
+            "BLOCKED_POLICY": 1
+          },
+          "gap_precision": 1.0,
+          "gap_recall": 0.8,
+          "false_gap_rate": 0.0,
+          "false_verified_gaps": 0,
+          "verified_gap_precision": 1.0,
+          "abstention_recall": 1.0,
+          "verified_vs_candidate_correctness": "UNKNOWN (labels do not encode verification)",
+          "rows": [
+            {
+              "case": "H01",
+              "label": "GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "H02",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "H03",
+              "label": "INSUFFICIENT_EVIDENCE",
+              "predicted": "INSUFFICIENT_EVIDENCE",
+              "gap_correct": false
+            },
+            {
+              "case": "H04",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "H05",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "H06",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "H07",
+              "label": "GAP",
+              "predicted": "CANDIDATE_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "H08",
+              "label": "BLOCKED_POLICY",
+              "predicted": "BLOCKED_POLICY",
+              "gap_correct": false
+            },
+            {
+              "case": "H09",
+              "label": "GAP",
+              "predicted": "VERIFIED_GAP",
+              "gap_correct": true
+            },
+            {
+              "case": "H10",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            },
+            {
+              "case": "H11",
+              "label": "INSUFFICIENT_EVIDENCE",
+              "predicted": "INSUFFICIENT_EVIDENCE",
+              "gap_correct": false
+            },
+            {
+              "case": "H12",
+              "label": "NO_GAP",
+              "predicted": "NO_VERIFIABLE_GAP",
+              "gap_correct": false
+            }
+          ]
+        }
+      },
+      "notice": "Fictional cases labelled by the rules' author; the heldout split was not used to tune thresholds. These numbers describe behaviour on fixtures, not real-world accuracy."
+    },
+    "recommendations": {
+      "origin": "synthetic",
+      "judge": "deterministic rules and author labels (no LLM self-judgement)",
+      "heldout": {
+        "cases": 8,
+        "status_accuracy": 1.0,
+        "false_approvals": 0,
+        "unsupported_published_as_fact": 0,
+        "bad_statement_removal": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "tn": 12,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "supported_fact_retention": 1.0
+      },
+      "duplicate_f1": 0.889,
+      "grounding_violation_rate": 0.0,
+      "generated_ideas": 17,
+      "diversity_top10_max_title_jaccard": 0.5,
+      "full_report_splits": [
+        "calibration",
+        "heldout"
+      ]
+    },
+    "integrity": {
+      "stages": {
+        "observations": {
+          "real": 0,
+          "synthetic": 2472
+        },
+        "surge_events": {
+          "real": 0,
+          "synthetic": 9
+        },
+        "analysis_runs": {
+          "real": 0,
+          "synthetic": 0
+        },
+        "opportunities": {
+          "real": 0,
+          "synthetic": 0
+        },
+        "forecasts": {
+          "real": 0,
+          "synthetic": 0
+        },
+        "recommendations": {
+          "real": 0,
+          "synthetic": 0
+        }
+      },
+      "invariants": {
+        "real_opportunity_from_synthetic_analysis": 0,
+        "analysis_synthetic_mismatch_with_surge": 0,
+        "recommendation_synthetic_mismatch_with_opportunity": 0,
+        "recommendation_without_opportunity": 0,
+        "opportunity_without_analysis_run": 0,
+        "forecast_without_observations": 0,
+        "surge_synthetic_mismatch_with_observations": 0,
+        "proxy_stored_as_search_interest": 0
+      },
+      "status": "PASS",
+      "failed": {},
+      "real_pipeline_exercised": false
+    },
+    "backtest_validity": {
+      "live_lag_days": 3,
+      "series": 0,
+      "by_class": {
+        "VALID": 0,
+        "LIMITED": 0,
+        "INVALID": 0
+      },
+      "reportable": 0,
+      "detail": [],
+      "note": "LIMITED and INVALID series are labelled as such in every backtest result."
+    }
+  },
+  "real_world": {
+    "detection": {
+      "status": "UNKNOWN",
+      "reason": "0 real surge labels (minimum 30)"
+    },
+    "content_gaps": {
+      "status": "UNKNOWN",
+      "reason": "0 real 'content_gap' labels"
+    },
+    "forecasting": {
+      "status": "UNKNOWN",
+      "reason": "0 real 'forecast_outcome' labels"
+    },
+    "recommendations": {
+      "status": "UNKNOWN",
+      "reason": "0 real 'recommendation_outcome' labels",
+      "outcomes": {
+        "status": "UNKNOWN",
+        "outcomes": 0,
+        "reason": "no creator-entered outcomes recorded"
+      }
+    }
+  },
+  "timings_seconds": {
+    "detection": 41.5,
+    "forecasting": 89.4,
+    "content_gaps": 1.4,
+    "recommendations": 0.8,
+    "integrity": 0.0,
+    "backtest_validity": 0.0
+  }
+}

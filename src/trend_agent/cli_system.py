@@ -606,7 +606,7 @@ def benchmark(
         import sqlalchemy as sa
 
         sizes = {
-            t: int(conn.execute(sa.text(f"SELECT count(*) FROM {t}")).scalar_one())  # noqa: S608
+            t: int(conn.execute(sa.text(f"SELECT count(*) FROM {t}")).scalar_one())  # noqa: S608  # nosec B608
             for t in (
                 "ts_observations",
                 "content_opportunities",
@@ -686,3 +686,33 @@ def demo(as_json: base.JsonOpt = False) -> None:
         f"{data['research_candidates']}) in {data['seconds']}s"
     )
     base.console.print("Serve it with: trend-agent dashboard serve --demo --ui")
+
+
+@system_app.command("heartbeat-check")
+def heartbeat_check(
+    role: Annotated[str, typer.Option("--role", help="scheduler | worker")],
+    max_age: Annotated[float, typer.Option("--max-age", min=5.0)] = 120.0,
+) -> None:
+    """Container health check: exit 0 when a process of ROLE on this host beat recently."""
+    import socket
+
+    from trend_agent.db.repositories.ops import HeartbeatRepository
+    from trend_agent.db.session import transaction
+
+    container = base._container(require_db=True)
+    host = socket.gethostname()
+    try:
+        with transaction(container.session_factory) as s:
+            beats = [
+                b
+                for b in HeartbeatRepository(s).all(role)
+                if b.hostname == host and b.status == "running"
+            ]
+            now = container.clock()
+            fresh = [b for b in beats if (now - b.last_seen_at).total_seconds() <= max_age]
+    finally:
+        _close(container)
+    if not fresh:
+        base.err_console.print(f"no fresh {role} heartbeat from {host}")
+        raise typer.Exit(1)
+    base.console.print(f"{role} on {host}: ok")

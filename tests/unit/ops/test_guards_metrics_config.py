@@ -76,8 +76,10 @@ def test_metrics_text_format_escapes_labels() -> None:
 
 
 def test_operations_config_loads_and_rejects_unknown_tasks(tmp_path: Path) -> None:
-    cfg = load_operations_config("config")
+    cfg = load_operations_config(str(Path(__file__).resolve().parents[3] / "config"))
     assert cfg.scheduler.tasks["ops_checks"].interval_seconds == 60
+    assert cfg.scheduler.tasks["content_analysis"].max_per_run == 10  # from operations.yaml
+    assert cfg.alerts.stage_failure_threshold == 3
     assert set(cfg.scheduler.tasks) == {
         "ops_checks",
         "monitor_plan",

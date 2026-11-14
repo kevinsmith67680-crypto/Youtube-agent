@@ -1,0 +1,121 @@
+# Production variant (single host). Every secret is REQUIRED from the environment or an
+# env file kept outside the repository - there are no defaults, and the services refuse
+# to start with development credentials (TREND_AGENT_ENVIRONMENT=production enforces it).
+#
+#   docker compose -f docker-compose.prod.yml --env-file /etc/trend-agent/prod.env up -d
+#
+# Why a separate file: the development file publishes the database port, carries
+# development passwords as defaults and builds images locally. This file uses pre-built
+# images, publishes only loopback ports for a TLS-terminating reverse proxy, sets resource
+# limits, runs read-only containers without capabilities and keeps backups on their own
+# volume. The database is an external managed PostgreSQL (TREND_AGENT_DATABASE_URL).
+x-backend: &backend
+  image: ${BACKEND_IMAGE:?set BACKEND_IMAGE (e.g. registry/trend-agent-backend:1.0.0)}
+  environment:
+    TREND_AGENT_ENVIRONMENT: production
+    TREND_AGENT_LOG_FORMAT: json
+    TREND_AGENT_DATABASE_URL: ${TREND_AGENT_DATABASE_URL:?set TREND_AGENT_DATABASE_URL}
+    TREND_AGENT_API_TOKEN: ${TREND_AGENT_API_TOKEN:?set TREND_AGENT_API_TOKEN (>= 32 chars)}
+    TREND_AGENT_VERIFICATION_SIGNING_KEY: ${TREND_AGENT_VERIFICATION_SIGNING_KEY:?set the signing key}
+    TREND_AGENT_API_CORS_ORIGINS: ${TREND_AGENT_API_CORS_ORIGINS:?set the dashboard origin}
+    TREND_AGENT_MOCK_PROVIDER_ENABLED: "false"
+    TREND_AGENT_YOUTUBE_API_KEY: ${TREND_AGENT_YOUTUBE_API_KEY:-}
+    TREND_AGENT_ANTHROPIC_API_KEY: ${TREND_AGENT_ANTHROPIC_API_KEY:-}
+    TREND_AGENT_SMTP_HOST: ${TREND_AGENT_SMTP_HOST:-}
+    TREND_AGENT_SMTP_USERNAME: ${TREND_AGENT_SMTP_USERNAME:-}
+    TREND_AGENT_SMTP_PASSWORD: ${TREND_AGENT_SMTP_PASSWORD:-}
+    TREND_AGENT_ALERT_EMAIL_FROM: ${TREND_AGENT_ALERT_EMAIL_FROM:-}
+    TREND_AGENT_ALERT_EMAIL_TO: ${TREND_AGENT_ALERT_EMAIL_TO:-}
+    TREND_AGENT_DAILY_API_BUDGET: ${TREND_AGENT_DAILY_API_BUDGET:-9000}
+    TREND_AGENT_DAILY_LLM_BUDGET: ${TREND_AGENT_DAILY_LLM_BUDGET:-5}
+    TREND_AGENT_MONTHLY_LLM_BUDGET: ${TREND_AGENT_MONTHLY_LLM_BUDGET:-60}
+    TREND_AGENT_MAX_CONCURRENT_WORKERS: ${TREND_AGENT_MAX_CONCURRENT_WORKERS:-2}
+  restart: unless-stopped
+  init: true
+  stop_grace_period: 90s
+  read_only: true
+  tmpfs: ["/tmp"]
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+  logging:
+    driver: json-file
+    options: {max-size: "20m", max-file: "5"}
+
+services:
+  migrate:
+    <<: *backend
+    command: ["migrate"]
+    restart: "no"
+
+  api:
+    <<: *backend
+    command: ["api"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    deploy: {resources: {limits: {cpus: "1.0", memory: 768M}}}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=5).status == 200 else 1)"]
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 20s
+
+  scheduler:
+    <<: *backend
+    command: ["scheduler"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    deploy: {replicas: 1, resources: {limits: {cpus: "1.0", memory: 1G}}}
+    healthcheck:
+      test: ["CMD", "trend-agent", "system", "heartbeat-check", "--role", "scheduler", "--max-age", "120"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+
+  worker:
+    <<: *backend
+    command: ["worker"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    deploy: {replicas: 2, resources: {limits: {cpus: "1.0", memory: 1G}}}
+    healthcheck:
+      test: ["CMD", "trend-agent", "system", "heartbeat-check", "--role", "worker", "--max-age", "90"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    image: ${FRONTEND_IMAGE:?set FRONTEND_IMAGE}
+    environment:
+      TREND_AGENT_API_URL: http://api:8000
+      TREND_AGENT_API_TOKEN: ${TREND_AGENT_API_TOKEN:?set TREND_AGENT_API_TOKEN}
+      DASHBOARD_BASIC_AUTH_USER: ${DASHBOARD_BASIC_AUTH_USER:?set DASHBOARD_BASIC_AUTH_USER}
+      DASHBOARD_BASIC_AUTH_PASSWORD: ${DASHBOARD_BASIC_AUTH_PASSWORD:?set DASHBOARD_BASIC_AUTH_PASSWORD (>= 16 chars)}
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      api: {condition: service_healthy}
+    read_only: true
+    tmpfs: ["/tmp", "/app/.next/cache"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  backup:
+    # On demand: docker compose -f docker-compose.prod.yml --profile ops run --rm backup
+    <<: *backend
+    profiles: [ops]
+    command: ["system", "backup", "--out", "/backups"]
+    restart: "no"
+    read_only: false
+    volumes: ["trend_agent_backups:/backups"]
+
+volumes:
+  trend_agent_backups:

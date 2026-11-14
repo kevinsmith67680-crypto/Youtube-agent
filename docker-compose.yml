@@ -1,3 +1,21 @@
+# Development stack. `docker compose up -d` starts PostgreSQL only (as before).
+# `docker compose --profile app up -d --build` adds the application services:
+#   migrate (one-shot) -> api, scheduler (exactly one), worker (scale freely), frontend.
+# Development credentials only; production uses docker-compose.prod.yml, which has no
+# defaults for any secret.
+x-backend: &backend
+  build: {context: ., dockerfile: Dockerfile}
+  image: trend-agent-backend:dev
+  environment:
+    TREND_AGENT_ENVIRONMENT: development
+    TREND_AGENT_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-trend_agent}:${POSTGRES_PASSWORD:-trend_agent_dev}@postgres:5432/${POSTGRES_DB:-trend_agent}
+    TREND_AGENT_API_TOKEN: ${TREND_AGENT_API_TOKEN:-dev-only-token-change-me-0123456789abcd}
+    TREND_AGENT_API_CORS_ORIGINS: http://localhost:3000
+    TREND_AGENT_YOUTUBE_API_KEY: ${TREND_AGENT_YOUTUBE_API_KEY:-}
+  restart: unless-stopped
+  init: true
+  stop_grace_period: 60s
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -20,6 +38,73 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  migrate:
+    <<: *backend
+    profiles: [app]
+    command: ["migrate"]
+    restart: "no"
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  api:
+    <<: *backend
+    profiles: [app]
+    command: ["api"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=5).status == 200 else 1)"]
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 20s
+
+  scheduler:
+    <<: *backend
+    profiles: [app]
+    command: ["scheduler"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "trend-agent", "system", "heartbeat-check", "--role", "scheduler", "--max-age", "120"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+
+  worker:
+    <<: *backend
+    profiles: [app]
+    command: ["worker"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "trend-agent", "system", "heartbeat-check", "--role", "worker", "--max-age", "90"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    profiles: [app]
+    build: {context: ./frontend}
+    image: trend-agent-frontend:dev
+    environment:
+      TREND_AGENT_API_URL: http://api:8000
+      TREND_AGENT_API_TOKEN: ${TREND_AGENT_API_TOKEN:-dev-only-token-change-me-0123456789abcd}
+      DASHBOARD_BASIC_AUTH_USER: ${DASHBOARD_BASIC_AUTH_USER:-creator}
+      DASHBOARD_BASIC_AUTH_PASSWORD: ${DASHBOARD_BASIC_AUTH_PASSWORD:-dev-only-password-change-me}
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      api: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   trend_agent_pgdata:

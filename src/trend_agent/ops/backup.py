@@ -105,7 +105,7 @@ def table_counts(url: str) -> dict[str, int]:
             for n in names:
                 if not _NAME.match(n):
                     continue
-                out[n] = int(conn.execute(sa.text(f'SELECT count(*) FROM "{n}"')).scalar_one())  # noqa: S608 - validated identifier
+                out[n] = int(conn.execute(sa.text(f'SELECT count(*) FROM "{n}"')).scalar_one())  # noqa: S608  # nosec B608
             return out
     finally:
         engine.dispose()

@@ -183,3 +183,64 @@ def test_retire_and_rollback_events(registry: Registry) -> None:
     registry.retire(m.model_id, at=T0, reason="rollback")
     assert registry.store.get(m.model_id)[0].status is ModelStatus.RETIRED  # type: ignore[index]
     assert [e.to_status for e in registry.store.events(m.model_id)][-1] == "retired"
+
+
+# ------------------------------------------------------------------ Phase 8 maintenance
+def test_reject_marks_a_model_never_promotable(registry: Registry) -> None:
+    m = _register(registry, meta())
+    registry.reject(m.model_id, at=T0, reason="failed held-out validation")
+    assert registry.store.get(m.model_id)[0].status is ModelStatus.REJECTED  # type: ignore[index]
+    with pytest.raises(ValueError, match="only VALIDATED or CHALLENGER"):
+        registry.promote(m.model_id, at=T0, reason="x", evidence={})
+
+
+def test_reject_refuses_a_champion(registry: Registry) -> None:
+    m = _register(registry, meta())
+    registry.promote(m.model_id, at=T0, reason="go", evidence={})
+    with pytest.raises(ValueError, match="rollback"):
+        registry.reject(m.model_id, at=T0, reason="x")
+
+
+def test_rollback_restores_the_previous_champion(registry: Registry) -> None:
+    old = _register(registry, meta())
+    registry.promote(old.model_id, at=T0, reason="first", evidence={})
+    new = _register(registry, meta())
+    registry.promote(new.model_id, at=T0, reason="beat it", evidence={})
+    assert registry.store.get(old.model_id)[0].status is ModelStatus.RETIRED  # type: ignore[index]
+    assert registry.previous_champion(new.model_id) == old.model_id
+    restored = registry.rollback(new.model_id, at=T0, reason="drift", restore_previous=True)
+    assert restored == old.model_id
+    assert registry.store.get(new.model_id)[0].status is ModelStatus.REJECTED  # type: ignore[index]
+    assert registry.store.get(old.model_id)[0].status is ModelStatus.CHAMPION  # type: ignore[index]
+    reasons = [e.reason for e in registry.store.events(old.model_id)]
+    assert any("restored by rollback" in r for r in reasons)
+
+
+def test_rollback_without_a_previous_champion_falls_back_to_baselines(registry: Registry) -> None:
+    m = _register(registry, meta())
+    registry.promote(m.model_id, at=T0, reason="go", evidence={})
+    assert registry.rollback(m.model_id, at=T0, reason="bad", restore_previous=True) is None
+    assert registry.store.get(m.model_id)[0].status is ModelStatus.REJECTED  # type: ignore[index]
+    found = registry.champion(
+        family="youtube_search_interest",
+        granularity="hour",
+        horizon=24,
+        target_type="breakout",
+        data_origin=DataOrigin.SYNTHETIC,
+    )
+    assert found is None
+
+
+def test_rollback_refuses_a_tampered_previous_artifact(registry: Registry, tmp_path: Path) -> None:
+    old = _register(registry, meta())
+    registry.promote(old.model_id, at=T0, reason="first", evidence={})
+    new = _register(registry, meta())
+    registry.promote(new.model_id, at=T0, reason="beat it", evidence={})
+    _, location = registry.store.get(old.model_id)  # type: ignore[misc]
+    for f in Path(location).rglob("*.json"):
+        f.write_text(f.read_text().replace("0.1", "0.9"))
+    registry._cache.clear()
+    with pytest.raises(ArtifactError):
+        registry.rollback(new.model_id, at=T0, reason="drift", restore_previous=True)
+    # nothing changed: the current champion stays in service
+    assert registry.store.get(new.model_id)[0].status is ModelStatus.CHAMPION  # type: ignore[index]
