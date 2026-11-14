@@ -36,7 +36,9 @@ def _client(demo: DemoBackend, *, token: str | None = TOKEN, **kw: Any) -> TestC
 
 
 def _first_rec(c: TestClient) -> dict[str, Any]:
-    items = c.get("/api/recommendations?sort=rank", headers=AUTH).json()["items"]
+    items: list[dict[str, Any]] = c.get("/api/recommendations?sort=rank", headers=AUTH).json()[
+        "items"
+    ]
     assert items
     return items[0]
 

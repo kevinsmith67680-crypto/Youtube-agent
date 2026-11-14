@@ -151,7 +151,7 @@ def _labels(v: Any) -> dict[str, StatementLabel]:
 
 class ScriptedLLM:
     name = "scripted"
-    model = "scripted-model"
+    model: str | None = "scripted-model"
 
     def __init__(self, outputs: list[LLMResult]) -> None:
         self.outputs = list(outputs)
@@ -786,7 +786,8 @@ def test_ranking_is_the_weighted_mean_of_available_components(
     for r in oc.recommendations:
         rk = r.ranking
         avail = [c for c in rk.components if c.value is not None]
-        expected = sum(c.weight * c.value for c in avail) / sum(c.weight for c in avail)  # type: ignore[operator]
+        weighted = sum(c.weight * (c.value or 0.0) for c in avail)
+        expected = weighted / sum(c.weight for c in avail)
         assert rk.composite_score == pytest.approx(
             round(expected * 100 * rk.evidence_quality_factor, 1), abs=0.11
         )

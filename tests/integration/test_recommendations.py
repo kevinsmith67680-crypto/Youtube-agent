@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from collections.abc import Iterator
 from datetime import timedelta
 from typing import Any
 
@@ -54,7 +53,7 @@ world = phase5_world
 
 
 @pytest.fixture
-def analysed(world: World, fake_youtube: FakeYouTube) -> Iterator[World]:
+def analysed(world: World, fake_youtube: FakeYouTube) -> World:
     """A stored *candidate* opportunity: the (fake) results cover only the previous
     version, so Phase 5 finds a supported gap for "Nimbus Coder 3"."""
     fake = FakeVideos(world.clock.now)
@@ -90,7 +89,7 @@ def _opportunity_status(w: World) -> str:
 
 class FailingLLM:
     name = "scripted"
-    model = "scripted-model"
+    model: str | None = "scripted-model"
 
     def __init__(self) -> None:
         self.calls = 0
@@ -171,7 +170,7 @@ def test_category_filter_and_profile_exclusions(analysed: World) -> None:
     w = analysed
     svc = _rec_svc(w)
     assert svc.generate(category="gaming").considered == 0
-    svc.update_profile(CreatorProfile(content_exclusions=("nimbus",)))
+    svc.update_profile(CreatorProfile(content_exclusions=["nimbus"]))
     res = svc.generate(category="ai")
     assert res.considered == 1
     assert res.generated == 0
@@ -282,13 +281,13 @@ def test_user_state_feedback_and_production_tracking(analysed: World) -> None:
         b.production(
             rid, ProductionIn(status=ProductionStatus.PUBLISHED, published_video_id="abcdefghijk")
         )
-    for s in (
+    for step in (
         ProductionStatus.SCRIPTING,
         ProductionStatus.RECORDING,
         ProductionStatus.EDITING,
         ProductionStatus.READY_TO_PUBLISH,
     ):
-        b.production(rid, ProductionIn(status=s))
+        b.production(rid, ProductionIn(status=step))
     with pytest.raises(TransitionError):  # PUBLISHED needs the video ID
         b.production(rid, ProductionIn(status=ProductionStatus.PUBLISHED))
     st = b.production(
@@ -421,3 +420,31 @@ def test_cli_generate_list_explain_verify_stats(
     assert json.loads(r.stdout)["runs"]
     r = runner.invoke(cli.app, ["recommend", "explain", "--id", str(uuid.uuid4())])
     assert r.exit_code == 4
+
+
+def test_stored_phase6_forecasts_feed_the_recommendations(analysed: World) -> None:
+    """Phase 4 surge -> Phase 5 stored opportunity -> Phase 6 stored forecasts -> Phase 7."""
+    w = analysed
+    with transaction(w.factory) as s:
+        query = s.execute(sa.select(ContentOpportunityRow.canonical_query)).scalar_one()
+    stored = w.container.forecasting(clock=w.clock).predict(query=query, include_synthetic=True)
+    assert stored, "the forecasting service produced no forecast for the opportunity's query"
+    res = _rec_svc(w).generate(all_categories=True)
+    assert res.generated >= 1
+    with transaction(w.factory) as s:
+        docs = [
+            r.concept
+            for r in s.execute(
+                sa.select(VideoRecommendationRow).where(VideoRecommendationRow.is_current)
+            ).scalars()
+        ]
+    assert docs
+    # every idea carries the stored, usable forecast (the 6 h one is unsupported for daily
+    # data and ignored): read from Phase 6, never recomputed
+    usable = {o.prediction_id for o, _ in stored if o.status.value == "READY"}
+    for d in docs:
+        assert d["forecast"]["available"]
+        assert d["forecast"]["prediction_id"] in usable
+        assert d["forecast"]["synthetic"] is True
+        fc = next(c for c in d["ranking"]["components"] if c["name"] == "forecast_opportunity")
+        assert fc["raw"]["status"] == "READY"
