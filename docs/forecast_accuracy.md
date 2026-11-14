@@ -72,7 +72,7 @@ Brier skill against each slice's own observed base rate:
 
 In this corpus, **gaming breakouts are essentially unpredictable**: they are dominated by
 abrupt limited-time events and spikes with no run-up. The models know it, which is the
-desired behaviour: their gaming probabilities stay near the base rate (ECE 0.003–0.005)
+desired behaviour: their gaming probabilities stay near the base rate (gaming-slice ECE 0.003–0.014)
 rather than alerting falsely. Slice sizes are in the JSON. The `history` slice contains
 only established series, because the test segment lies at the end of the timeline;
 cold-start behaviour is covered by eligibility (INSUFFICIENT_HISTORY) and the unseen-topic

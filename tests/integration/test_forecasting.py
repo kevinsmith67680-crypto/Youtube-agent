@@ -382,12 +382,21 @@ def test_evaluate_and_champion_challenger_through_service_and_cli(world: World) 
     cli_rows = as_json("forecast", "evaluate", "--horizon", "24h", "--scale", "0.1",
                        "--workers", "1")  # fmt: skip
     assert [r["model_id"] for r in cli_rows] == [ids[0]]
-    if len(ids) > 1:
-        pairs = as_json("forecast", "compare", "--scale", "0.1")
-        assert pairs
-        assert all(p["comparable"] for p in pairs)
-        assert {p["champion"]["model_id"] for p in pairs} == {ids[0]}
-        assert all(set(p["criteria"]) >= {"brier_better_with_ci", "same_data_origin"}
-                   for p in pairs)  # fmt: skip
-        # comparing is read-only: nothing was promoted
-        assert {m.model_id for m in svc.models() if m.status is ModelStatus.CHAMPION} == {ids[0]}
+    # an identical copy of the champion as challenger: comparable, but never promoted
+    meta, payload, text = svc.registry.load(ids[0])
+    twin = svc.registry.register(
+        meta.model_copy(update={"model_id": ids[0] + "_twin", "status": ModelStatus.VALIDATED}),
+        payload,
+        text,
+    ).model_id
+    pairs = as_json("forecast", "compare", "--scale", "0.1")
+    assert {p["challenger"]["model_id"] for p in pairs} == {*ids[1:], twin}
+    assert all(p["comparable"] for p in pairs)
+    assert {p["champion"]["model_id"] for p in pairs} == {ids[0]}
+    same = next(p for p in pairs if p["challenger"]["model_id"] == twin)
+    assert same["brier_difference_challenger_minus_champion"]["difference"] == 0
+    assert same["promote"] is False
+    # comparing is read-only: nothing was promoted
+    assert {m.model_id for m in svc.models() if m.status is ModelStatus.CHAMPION} == {ids[0]}
+    assert all(set(p["criteria"]) >= {"brier_better_with_ci", "same_data_origin"}
+               for p in pairs)  # fmt: skip

@@ -131,10 +131,10 @@ Of 38 registered models, 13 are champions (synthetic scopes), 8 validated and 17
 
 * Breakout champions exist for every supported scope (hourly 6/24/72 h, daily 24/72 h).
   All beat climatology on their untouched test segment with bootstrap intervals
-  excluding zero, with ECE 0.001–0.013 and false-positive rates of 0.3–3 % at the
+  excluding zero, with ECE 0.001–0.008 and false-positive rates of 0.3–3 % at the
   calibrated threshold.
 * Continuation: only hourly 6 h validated. The others abstain (too few elevated states:
-  149–215 rows).
+  149–189 test rows for hourly 24/72 h, 201–215 training rows for daily).
 * Trajectory: LightGBM beats the reference baseline in all five scopes (scaled MAE
   0.43–0.92). Observed 80 % interval coverage is 0.79–0.82.
 * Calibration: isotonic where supported; ECE before/after and bin support are stored
@@ -160,8 +160,10 @@ Of 38 registered models, 13 are champions (synthetic scopes), 8 validated and 17
 
 LightGBM is used only where it is significantly better. Its PR-AUC gain there is
 0.04–0.10 and precision@50 is not worse (e.g. hourly 72 h: 0.66 vs 0.40). For
-trajectories, LightGBM beats persistence and seasonal naive everywhere, while the
-damped-trend extrapolation is the worst baseline (scaled MAE up to 3.3). Scenario I shows
+trajectories, LightGBM has a lower MAE than persistence and seasonal naive in every
+scope. That is significant (bootstrap) against the reference baseline it is tested
+against; against the other baseline it was not separately tested. The damped-trend
+extrapolation is the worst baseline (scaled MAE up to 3.3). Scenario I shows
 an overfitting LightGBM (in-sample PR-AUC far above held-out) that is rejected, with the
 baseline retained.
 
@@ -221,9 +223,14 @@ Windows estimate demand persistence only. They never predict views or promise re
 
 ## K. Tests, linting, typing and benchmark results
 
-* «TEST_RESULTS»
-* Phase 6 tests: «UNIT_N» unit tests (`tests/unit/forecasting`, offline, fixed seeds) and
-  «INT_N» integration tests (`tests/integration/test_forecasting.py`, isolated test database),
+* Full suite (Phases 1–6, unit + integration against isolated PostgreSQL test databases,
+  no network): **730 passed**, 3 live tests deselected by default, on Python 3.12.3
+  (12 min, with coverage: **91 %** of 27,633 statements) and Python 3.13 (7.7 min).
+  Executed in this environment; `TREND_AGENT_REQUIRE_DB_TESTS=1`, so nothing was skipped
+  for lack of a database. After that run, one integration test was strengthened (it now
+  always registers a challenger) and re-run on its own: passed.
+* Phase 6 tests: 87 unit tests (`tests/unit/forecasting`, offline, fixed seeds) and
+  7 integration tests (`tests/integration/test_forecasting.py`, isolated test database),
   covering all 32 required areas: dataset construction, point-in-time joins, availability
   and revision handling, leakage, missing data, irregular sampling, comparability,
   resolution eligibility, baselines, logistic and LightGBM training (determinism, text
@@ -287,6 +294,11 @@ history, matured labels and confirmation of champions on several later held-out 
 * **Peaks and windows are experimental** (analog model). Daily peak timing is very coarse.
 * **Continuation** mostly abstains (few elevated states).
 * **Gaming** breakouts were not predictable in the synthetic corpus.
+* **Pooled models only.** Each scope pools AI, technology and gaming with category
+  indicator features, and performance is reported per category slice. Category-specific
+  models were not trained: the per-category positive counts (e.g. 43 gaming positives in
+  the hourly 24 h test segment) are too small to compare specialised models reliably.
+  The registry already supports category-scoped champions (category first, then pooled).
 * **Inference cost**: the strict causal detector replay dominates per-series latency
   (about 160 ms per hourly series; 25 forecasts/s in the database batch, with persistence). Batching or caching detector state is the scaling
   lever if needed.
@@ -338,7 +350,7 @@ and must never present a window as a promise of views.
 
 | # | criterion | status |
 |---|---|---|
-| 1 | Phase 1–5 functionality preserved | «AC1» |
+| 1 | Phase 1–5 functionality preserved | met: the full Phase 1–5 suites pass unchanged; Phase 6 only adds tables and read paths (retention extended) |
 | 2 | datasets without future-data leakage | met: point-in-time views, maturity rules, leakage audit 0 mismatches, perturbation tests |
 | 3 | publication and availability times respected | met: Phase 3 availability rule; delayed-publication and revision tests; scenario G |
 | 4 | targets independently defined | met: labels from observed values only, never from detector alerts |
@@ -360,7 +372,7 @@ and must never present a window as a promise of views.
 | 20 | idempotent database writes | met: UUIDv5 ids; re-run stores nothing (tested) |
 | 21 | CLI commands | met: all 17 `forecast` commands exercised in tests |
 | 22 | synthetic end-to-end tests | met: scenarios A–M pass (unit tests and demo) |
-| 23 | regression tests | «AC23» |
+| 23 | regression tests | met: 730 passed on Python 3.12 and 3.13 |
 | 24 | compliance and retention enforced | met: forecasts expire with sources (purge tested); read-only data access; synthetic isolation |
 | 25 | performance documented | met: measured benchmarks in `docs/benchmarks/phase6_benchmark.json` |
 | 26 | no real-world accuracy claimed | met: every accuracy figure is labelled synthetic |
