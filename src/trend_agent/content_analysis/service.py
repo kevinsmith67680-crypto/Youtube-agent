@@ -407,9 +407,23 @@ class ContentAnalysisService:
         canonical = canonicalize_query(query)
         with transaction(self._factory) as s:
             read_only(s)
-            qrow = s.execute(
-                sa.select(SearchQueryRow).where(SearchQueryRow.canonical_query == canonical)
-            ).scalar_one_or_none()
+            # the same text can exist once per (language, region): prefer the requested one
+            qrows = list(
+                s.execute(
+                    sa.select(SearchQueryRow)
+                    .where(SearchQueryRow.canonical_query == canonical)
+                    .order_by(SearchQueryRow.id)
+                ).scalars()
+            )
+            qrow = next(
+                (
+                    q
+                    for q in qrows
+                    if (region is None or q.region == region)
+                    and (language is None or q.language == language)
+                ),
+                qrows[0] if qrows else None,
+            )
             target_id = None
             if qrow is not None:
                 stmt = sa.select(MonitoringTargetRow.id).where(

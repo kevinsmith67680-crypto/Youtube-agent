@@ -6,6 +6,7 @@ which is how the test-suite runs the full stack without network access.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -40,6 +41,11 @@ if TYPE_CHECKING:
     from trend_agent.content_analysis.service import ContentAnalysisService
     from trend_agent.forecasting.config import LoadedForecastingConfig
     from trend_agent.forecasting.service import ForecastingService
+    from trend_agent.recommendations.backend import DashboardBackend
+    from trend_agent.recommendations.config import LoadedRecommendationConfig
+    from trend_agent.recommendations.idea_generator import ConceptGenerator
+    from trend_agent.recommendations.notifications import Channel
+    from trend_agent.recommendations.service import RecommendationService
     from trend_agent.verification.service import VerificationService
 
 
@@ -59,6 +65,7 @@ class AppContainer:
     _verification_config: LoadedVerificationConfig | None = None
     _content_config: LoadedContentConfig | None = None
     _forecasting_config: LoadedForecastingConfig | None = None
+    _recommendation_config: LoadedRecommendationConfig | None = None
 
     def ingestion(self, *, clock: Clock | None = None) -> IngestionService:
         return IngestionService(
@@ -254,6 +261,62 @@ class AppContainer:
             loaded=loaded,
             dloaded=self.detection_config(),
             artifact_dir=self.settings.forecast_artifact_dir or loaded.config.artifact_dir,
+            clock=clock or self.clock,
+        )
+
+    def recommendation_config(self) -> LoadedRecommendationConfig:
+        from trend_agent.recommendations.config import load_recommendation_config
+
+        if self._recommendation_config is None:
+            self._recommendation_config = load_recommendation_config(
+                self.settings.discovery_config_dir
+            )
+        return self._recommendation_config
+
+    def recommendations(
+        self,
+        *,
+        clock: Clock | None = None,
+        generator: ConceptGenerator | None = None,
+        channels: Sequence[Channel] | None = None,
+        include_synthetic: bool = False,
+        loaded: LoadedRecommendationConfig | None = None,
+    ) -> RecommendationService:
+        """Phase 7 recommendation generation over stored Phase 4-6 results."""
+        from trend_agent.recommendations.service import RecommendationService
+
+        clk = clock or self.clock
+        return RecommendationService(
+            session_factory=self.session_factory,
+            loaded=loaded or self.recommendation_config(),
+            settings=self.settings,
+            verification=self.verification(clock=clk),
+            content=lambda: self.content_analysis(clock=clk),
+            clock=clk,
+            generator=generator,
+            channels=channels,
+            include_synthetic=include_synthetic,
+        )
+
+    def dashboard_backend(
+        self, *, clock: Clock | None = None, include_synthetic: bool = False
+    ) -> DashboardBackend:
+        """The API's data source: the database, or (``demo_mode``) the isolated synthetic
+        demonstration, which never reads or writes the database."""
+        if self.settings.demo_mode:
+            from pathlib import Path
+
+            from trend_agent.discovery.config import resolve_config_dir
+            from trend_agent.recommendations.demo import demo_backend
+
+            cache = Path(self.settings.demo_cache_path) if self.settings.demo_cache_path else None
+            return demo_backend(resolve_config_dir(self.settings.discovery_config_dir), cache)
+        from trend_agent.recommendations.db_backend import DatabaseBackend
+
+        return DatabaseBackend(
+            self.recommendations(clock=clock, include_synthetic=include_synthetic),
+            self.session_factory,
+            self.settings,
             clock=clock or self.clock,
         )
 

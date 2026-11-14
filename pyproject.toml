@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "youtube-trend-agent"
-version = "0.6.0"
-description = "YouTube Search Demand Intelligence Agent - Phases 1-5: data acquisition, discovery, monitoring, surge detection, search-intent and content-gap analysis; evidence verification layer."
+version = "0.7.0"
+description = "YouTube Search Demand Intelligence Agent - Phases 1-7: data acquisition, discovery, monitoring, surge detection, search-intent and content-gap analysis, trend forecasting, evidence-verified video recommendations and an intelligence dashboard API."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }
@@ -26,6 +26,9 @@ dependencies = [
     # Phase 6 forecasting (models are stored as JSON / LightGBM text, never pickled).
     "scikit-learn>=1.5,<2.0",
     "lightgbm>=4.3,<5.0",
+    # Phase 7 dashboard API (served locally; the browser UI lives in frontend/).
+    "fastapi>=0.115,<1.0",
+    "uvicorn>=0.30,<1.0",
     # Windows has no system IANA tz database; zoneinfo needs this there.
     "tzdata>=2024.1; sys_platform == 'win32'",
 ]

@@ -408,6 +408,9 @@ class GenerateResult(_M):
     seconds: float
     synthetic: bool
     generator: str
+    reused: int = Field(default=0, description="unchanged evidence: stored ideas reused")
+    notes: list[str] = Field(default_factory=list)
+    dry_run: bool = False
 
 
 class ProfileIn(CreatorProfile):

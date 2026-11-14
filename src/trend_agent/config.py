@@ -111,6 +111,27 @@ class Settings(BaseSettings):
     # Local directory for checksummed model artifacts (JSON + LightGBM text, never pickle).
     forecast_artifact_dir: str | None = None
 
+    # --- Phase 7: recommendations, dashboard API, alerts ----------------------------
+    # Bearer token for the dashboard API. Without it the API serves public read
+    # endpoints only; private user data and every mutation answer 401/503.
+    api_token: SecretStr | None = None
+    # Comma-separated browser origins allowed by CORS (the dashboard's own origin only).
+    api_cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    # Single-creator deployment: the user key that owns saved ideas, feedback and alerts.
+    dashboard_user: str = "creator"
+    # Serve the isolated synthetic demo instead of the database (never mixes the two).
+    demo_mode: bool = False
+    demo_cache_path: str | None = None
+    # Optional alert channels; absent credentials mean the channel is "unconfigured".
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: SecretStr | None = None
+    alert_email_from: str | None = None
+    alert_email_to: str | None = None
+    telegram_bot_token: SecretStr | None = None
+    telegram_chat_id: str | None = None
+
     # --- Synthetic (mock) provider -------------------------------------------------
     mock_provider_enabled: bool = True
     mock_seed: int = 20_260_101
@@ -130,6 +151,9 @@ class Settings(BaseSettings):
         "reddit_client_secret",
         "verification_signing_key",
         "anthropic_api_key",
+        "api_token",
+        "smtp_password",
+        "telegram_bot_token",
         mode="before",
     )
     @classmethod
@@ -193,7 +217,20 @@ class Settings(BaseSettings):
                 "set" if self.verification_signing_key else "missing (development key)"
             ),
             "anthropic_api_key": "set" if self.anthropic_api_key else "missing",
+            "api_token": "set" if self.api_token else "missing (read-only public API)",
+            "api_cors_origins": self.cors_origins(),
+            "demo_mode": self.demo_mode,
+            "smtp": "set" if self.smtp_host and self.alert_email_to else "missing",
+            "telegram": "set" if self.telegram_bot_token and self.telegram_chat_id else "missing",
         }
+
+    def cors_origins(self) -> list[str]:
+        out = []
+        for o in self.api_cors_origins.split(","):
+            o = o.strip().rstrip("/")
+            if o and o != "*" and o.startswith(("http://", "https://")):
+                out.append(o)
+        return out
 
 
 def redact_url_password(url: str) -> str:

@@ -201,7 +201,8 @@ def query_recommendations(
 ) -> Page[RecommendationSummary]:
     out = list(items)
     if not include_research:
-        out = [r for r in out if not r.research]
+        ok = ("APPROVED", "APPROVED_WITH_UNCERTAINTY")
+        out = [r for r in out if not r.research and r.status in ok]  # REJECTED never ranked
     if not include_suppressed:
         out = [r for r in out if not r.suppressed]
     if not include_dismissed:

@@ -1034,3 +1034,7 @@ def main() -> None:
 
 if __name__ == "__main__":  # pragma: no cover
     main()
+from trend_agent import cli_recommend as _cli_recommend  # noqa: E402
+
+app.add_typer(_cli_recommend.recommend_app, name="recommend")
+app.add_typer(_cli_recommend.dashboard_app, name="dashboard")

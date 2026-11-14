@@ -376,7 +376,9 @@ def build_context(
             note="credible source" if r.trust_level in CREDIBLE else "untrusted source text",
         )
         for r in evidence.records
-        if r.evidence_kind.value not in ("measurement",)
+        # third-party video metadata (titles, channel names) is retention-limited: competing
+        # videos are referenced by YouTube ID only, never copied into recommendations
+        if r.evidence_kind.value not in ("measurement", "video_metadata")
     )
     gap = report.primary_gap
     limitations = list(validation.limitations)

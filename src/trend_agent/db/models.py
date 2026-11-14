@@ -396,4 +396,5 @@ from trend_agent.db import detection_models as _detection_models  # noqa: E402,F
 from trend_agent.db import discovery_models as _discovery_models  # noqa: E402, F401
 from trend_agent.db import forecast_models as _forecast_models  # noqa: E402,F401  (Phase 6 tables)
 from trend_agent.db import monitoring_models as _monitoring_models  # noqa: E402,F401  (Phase 3 tables)
+from trend_agent.db import recommendation_models as _recommendation_models  # noqa: E402,F401  (Phase 7 tables)
 from trend_agent.db import verification_models as _verification_models  # noqa: E402,F401  (verification layer)

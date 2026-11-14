@@ -113,6 +113,18 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 7 (recommendations)
+    "notification_deliveries",
+    "notifications",
+    "production_tracking",
+    "recommendation_feedback",
+    "saved_recommendations",
+    "recommendation_scores",
+    "recommendation_outlines",
+    "recommendation_hooks",
+    "video_recommendations",
+    "recommendation_generation_runs",
+    "creator_profiles",
     # Phase 6 (forecasting)
     "opportunity_windows",
     "peak_estimates",
