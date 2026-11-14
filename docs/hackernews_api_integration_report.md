@@ -325,13 +325,17 @@ Worst case at defaults is about 700 requests per hour (each a small JSON GET): n
 | Frontend Vitest (incl. 11 new: evidence classes, accessible badges, safe links, `javascript:` URLs, titles never rendered as HTML, totals not growth, measured momentum only, priority components, observations, source health, axe) | **58 passed** |
 | Playwright (incl. the new `/hackernews` page: evidence labels, demo state, list filter preserved in the URL, axe, phone width) | **17 passed** |
 | Phase 8 ops unit tests (scheduler task list updated) | passed |
-| Full default regression suite | see section 11a |
+| Full default regression suite | **1,144 passed, 0 failed** (section 11a) |
 | `ruff check`, `ruff format --check` (src + tests), `mypy src` (287 files), `tsc --noEmit`, `next build` | clean |
 | detect-secrets on all changed files | no findings (baseline: line numbers only) |
 
 ### 11a. Full regression
 
-Recorded after the run completes.
+Run on commit `47bb127` against a PostgreSQL test database, with no credentials in the environment:
+
+**1,144 passed, 0 failed**, 7 deselected (the opt-in live tests), 15 min 10 s.
+
+The suite was 1,051 tests after the GitHub integration. This work adds 93 Python tests: 78 HN unit tests, 15 HN integration tests, and the updated ops and schema checks. One earlier run was stopped because it had collected the code before two small final changes (the same-poll observation dedup and the smoke probe), so it could not certify the committed code.
 
 ## 12. Known limitations
 
