@@ -231,11 +231,11 @@ Everything is shown as tables of stored observations; no chart is drawn from dat
 | Playwright (incl. `/twitch`: labels, demo state, filters preserved, axe, phone width) | **18 passed** |
 | `ruff check`, `ruff format --check` (src, tests, migrations), `mypy src` (298 files), `tsc --noEmit`, `next build` | clean |
 | detect-secrets on all changed files | clean (three false positives marked inline: a set/missing label, its test, a fake fixture value) |
-| Full default regression suite | see below |
+| Full default regression suite | **1,203 passed, 0 failed**, 8 deselected (opt-in live tests) |
 
 ### Full regression
 
-Recorded after the run completes.
+`pytest -q` against a fresh PostgreSQL test database, with no Twitch, GitHub or other live credentials in the environment: **1,203 passed, 0 failed, 8 deselected** (the opt-in live tests) in 16 min 4 s. That is the previous baseline of 1,144 plus the 59 new Twitch tests; no existing test was changed except those pinning the schema revision, table list and scheduler task list. The run used the final tree except for one later change to `twitch status`, which now shows catalog names for auto-selected games. The 59 Twitch tests were re-run after that change and passed, and ruff, ruff format and mypy are clean.
 
 ## Known limitations
 
