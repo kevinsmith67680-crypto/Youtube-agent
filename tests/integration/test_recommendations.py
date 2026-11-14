@@ -448,3 +448,44 @@ def test_stored_phase6_forecasts_feed_the_recommendations(analysed: World) -> No
         assert d["forecast"]["synthetic"] is True
         fc = next(c for c in d["ranking"]["components"] if c["name"] == "forecast_opportunity")
         assert fc["raw"]["status"] == "READY"
+
+
+def test_creator_outcomes_are_opt_in_and_descriptive(analysed: World) -> None:
+    """Phase 8: outcomes are creator-entered, consent-gated, upserted per day, and only
+    summarised descriptively."""
+    from fastapi.testclient import TestClient
+    from pydantic import SecretStr
+
+    from trend_agent.api.app import create_app
+    from trend_agent.evaluation.recommendations import outcome_summary
+
+    res = _rec_svc(analysed).generate(all_categories=True)
+    assert res.generated > 0
+    with transaction(analysed.factory) as s:
+        rid = str(s.execute(sa.select(VideoRecommendationRow.id).limit(1)).scalar_one())
+    c = analysed.container
+    token = "t" * 40
+    c.settings = c.settings.model_copy(update={"api_token": SecretStr(token)})
+    backend = c.dashboard_backend(clock=analysed.clock, include_synthetic=True)
+    client = TestClient(create_app(backend, c.settings, ops=c))
+    auth = {"Authorization": f"Bearer {token}"}
+    body: dict[str, Any] = {
+        "days_since_publication": 7,
+        "views": 1200,
+        "search_traffic_share": 0.4,
+        "consent": True,
+    }
+    url = f"/api/recommendations/{rid}/outcomes"
+    assert client.post(url, json=body).status_code == 401
+    assert client.post(url, json=body, headers=auth).status_code == 200
+    assert client.post(url, json=body | {"views": 1500}, headers=auth).status_code == 200
+    assert client.post(url, json=body | {"consent": False}, headers=auth).status_code == 422
+    missing = f"/api/recommendations/{uuid.uuid4()}/outcomes"
+    assert client.post(missing, json=body, headers=auth).status_code == 404
+    listed = client.get("/api/outcomes", headers=auth).json()
+    assert len(listed) == 1  # the same day was updated, not duplicated
+    assert listed[0]["views"] == 1500
+    summary = outcome_summary(analysed.factory)
+    assert summary["status"] == "DESCRIPTIVE"
+    assert summary["median_views"] == 1500
+    assert "no causal claim" in summary["caveat"]

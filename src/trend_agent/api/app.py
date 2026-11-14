@@ -42,6 +42,7 @@ from trend_agent.schemas.dashboard import (
     GenerateResult,
     OpportunityDetail,
     OpportunitySummary,
+    OutcomeIn,
     OverviewView,
     Page,
     ProductionIn,
@@ -232,8 +233,15 @@ def create_app(
     # ------------------------------------------------------------- error shapes
     @app.exception_handler(StarletteHTTPException)
     async def http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-        codes = {401: "unauthorized", 403: "forbidden", 404: "not_found", 405: "method_not_allowed",
-                 409: "conflict", 429: "rate_limited", 503: "unavailable"}  # fmt: skip
+        codes = {
+            401: "unauthorized",
+            403: "forbidden",
+            404: "not_found",
+            405: "method_not_allowed",
+            409: "conflict",
+            429: "rate_limited",
+            503: "unavailable",
+        }
         resp = _error(exc.status_code, codes.get(exc.status_code, "error"), exc.detail)
         if exc.headers:
             resp.headers.update(exc.headers)
@@ -294,18 +302,24 @@ def create_app(
     @health_router.get("/database")
     def health_database() -> JSONResponse:
         if ops is None:
-            return _probe(ops_health.CheckResult(
-                "database", ops_health.OK, "demo mode: the database is not used",
-                {"demo": True},
-            ))  # fmt: skip
+            return _probe(
+                ops_health.CheckResult(
+                    "database",
+                    ops_health.OK,
+                    "demo mode: the database is not used",
+                    {"demo": True},
+                )
+            )
         return _probe(ops_health.database(ops.engine))
 
     @health_router.get("/workers")
     def health_workers(ok: Read) -> JSONResponse:
         if ops is None:
-            return _probe(ops_health.CheckResult(
-                "workers", ops_health.OK, "demo mode: no workers run", {"demo": True}
-            ))  # fmt: skip
+            return _probe(
+                ops_health.CheckResult(
+                    "workers", ops_health.OK, "demo mode: no workers run", {"demo": True}
+                )
+            )
         res = ops_health.workers(ops.session_factory, ops.clock())
         if not ok:
             res.data = {"live": res.data.get("live", {})}
@@ -314,22 +328,31 @@ def create_app(
     @health_router.get("/providers")
     def health_providers(ok: Read) -> JSONResponse:
         if ops is None:
-            return JSONResponse({
-                "check": "providers", "status": ops_health.OK, "demo": True,
-                "detail": "demo mode: only the synthetic demonstration dataset is served",
-                "operating_mode": {"mode": "DEMONSTRATION", "direct_search_claims_enabled": False},
-            })  # fmt: skip
+            return JSONResponse(
+                {
+                    "check": "providers",
+                    "status": ops_health.OK,
+                    "demo": True,
+                    "detail": "demo mode: only the synthetic demonstration dataset is served",
+                    "operating_mode": {
+                        "mode": "DEMONSTRATION",
+                        "direct_search_claims_enabled": False,
+                    },
+                }
+            )
         snap = snapshots.get() if snapshots is not None else None
         assert snap is not None
         usable = [r for r in snap.readiness if r.usable_for_real_data]
         status = ops_health.OK if usable else ops_health.DEGRADED
-        return JSONResponse({
-            "check": "providers",
-            "status": status,
-            "detail": f"{len(usable)} real provider(s) usable; mode {snap.decision.mode.value}",
-            "operating_mode": snap.decision.as_dict(),
-            "providers": [r.as_dict() for r in snap.readiness],
-        })  # fmt: skip
+        return JSONResponse(
+            {
+                "check": "providers",
+                "status": status,
+                "detail": f"{len(usable)} real provider(s) usable; mode {snap.decision.mode.value}",
+                "operating_mode": snap.decision.as_dict(),
+                "providers": [r.as_dict() for r in snap.readiness],
+            }
+        )
 
     app.include_router(health_router)
 
@@ -354,12 +377,17 @@ def create_app(
     def system_mode(_ok: Read) -> dict[str, Any]:
         if snapshots is None:
             return {
-                "mode": "DEMONSTRATION", "base_mode": "DEMONSTRATION", "demo": True,
+                "mode": "DEMONSTRATION",
+                "base_mode": "DEMONSTRATION",
+                "demo": True,
                 "direct_search_claims_enabled": False,
                 "reasons": ["demo mode: the isolated synthetic dataset is served; nothing is live"],
-                "degradations": [], "capabilities": {}, "signal_classes_usable": [],
-                "signal_classes_verified": [], "next_mode_requirements": [],
-            }  # fmt: skip
+                "degradations": [],
+                "capabilities": {},
+                "signal_classes_usable": [],
+                "signal_classes_verified": [],
+                "next_mode_requirements": [],
+            }
         return _snapshot_or_503().decision.as_dict()
 
     @api.get("/health")
@@ -401,11 +429,21 @@ def create_app(
         page_size: SizeQ = None,
     ) -> Page[OpportunitySummary]:
         return be().opportunities(
-            category=category, region=region, intent=intent, surge=surge, status=status,
-            verification=verification, min_score=min_score, max_score=max_score,
-            max_age_hours=max_age_hours, q=q, sort=sort, order=order, page=page,
+            category=category,
+            region=region,
+            intent=intent,
+            surge=surge,
+            status=status,
+            verification=verification,
+            min_score=min_score,
+            max_score=max_score,
+            max_age_hours=max_age_hours,
+            q=q,
+            sort=sort,
+            order=order,
+            page=page,
             page_size=size(page_size),
-        )  # fmt: skip
+        )
 
     @api.get("/opportunities/{oid}", response_model=OpportunityDetail)
     def opportunity(oid: AnyId, ok: Read) -> OpportunityDetail:
@@ -433,10 +471,17 @@ def create_app(
         page_size: SizeQ = None,
     ) -> Page[GapRow]:
         return be().gaps(
-            category=category, gap_type=gap_type, strength=strength, primary_only=primary_only,
-            include_unverifiable=include_unverifiable, q=q, sort=sort, order=order, page=page,
+            category=category,
+            gap_type=gap_type,
+            strength=strength,
+            primary_only=primary_only,
+            include_unverifiable=include_unverifiable,
+            q=q,
+            sort=sort,
+            order=order,
+            page=page,
             page_size=size(page_size),
-        )  # fmt: skip
+        )
 
     # ------------------------------------------------------------------ trends
     @api.get("/trends", response_model=Page[TrendSummary])
@@ -481,11 +526,19 @@ def create_app(
         page_size: SizeQ = None,
     ) -> Page[RecommendationSummary]:
         p = be().recommendations(
-            category=category, status=status, urgency=urgency, min_score=min_score, q=q,
-            include_research=include_research, include_suppressed=include_suppressed,
-            include_dismissed=include_dismissed and ok, sort=sort, order=order, page=page,
+            category=category,
+            status=status,
+            urgency=urgency,
+            min_score=min_score,
+            q=q,
+            include_research=include_research,
+            include_suppressed=include_suppressed,
+            include_dismissed=include_dismissed and ok,
+            sort=sort,
+            order=order,
+            page=page,
             page_size=size(page_size),
-        )  # fmt: skip
+        )
         if not ok:
             p = p.model_copy(update={"items": [_strip_summary(r) for r in p.items]})
         return p
@@ -534,6 +587,53 @@ def create_app(
     @api.post("/recommendations/{rid}/production", response_model=UserState)
     def production(rid: RecId, body: ProductionIn, _p: Private) -> UserState:
         return be().production(rid, body)
+
+    @api.post("/recommendations/{rid}/outcomes")
+    def outcome(rid: RecId, body: OutcomeIn, _p: Private) -> dict[str, Any]:
+        """Opt-in, creator-entered outcome (database mode only). Descriptive data: it is
+        never used to claim that a recommendation caused views."""
+        if ops is None:
+            raise HTTPException(503, "outcomes are recorded in database mode only")
+        import uuid as _uuid
+
+        import sqlalchemy as _sa
+
+        from trend_agent.db.repositories.ops import OutcomeRepository
+        from trend_agent.db.session import transaction as _tx
+
+        fields = body.model_dump(exclude={"consent"}) | {
+            "consent": True,
+            "source": "creator_entered",
+            "recorded_at": ops.clock(),
+        }
+        try:
+            with _tx(ops.session_factory) as s:
+                oid = OutcomeRepository(s).record(
+                    user_key=settings.dashboard_user, recommendation_id=_uuid.UUID(rid), **fields
+                )
+        except _sa.exc.IntegrityError:
+            raise HTTPException(404, "no such recommendation") from None
+        return {"id": oid, "recorded": True, "days_since_publication": body.days_since_publication}
+
+    @api.get("/outcomes")
+    def outcomes(_p: Private) -> list[dict[str, Any]]:
+        if ops is None:
+            return []
+        from trend_agent.db.repositories.ops import OutcomeRepository
+        from trend_agent.db.session import transaction as _tx
+
+        with _tx(ops.session_factory) as s:
+            return [
+                {
+                    "recommendation_id": str(r.recommendation_id),
+                    "days": r.days_since_publication,
+                    "views": r.views,
+                    "search_traffic_share": r.search_traffic_share,
+                    "source": r.source,
+                    "recorded_at": r.recorded_at.isoformat(),
+                }
+                for r in OutcomeRepository(s).for_user(settings.dashboard_user)
+            ]
 
     @api.get("/saved", response_model=list[SavedIdea])
     def saved(

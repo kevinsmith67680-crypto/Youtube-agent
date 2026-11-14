@@ -28,6 +28,22 @@ npm run build && npm start                    # http://localhost:3000
 Without a token the API and dashboard run as a read-only view: public reads only, with
 every user-specific field removed; saving, feedback, settings and alerts are disabled.
 
+## Authentication (Phase 8)
+
+`middleware.ts` protects every route except `/healthz` with HTTP Basic authentication
+(`DASHBOARD_BASIC_AUTH_USER`, `DASHBOARD_BASIC_AUTH_PASSWORD`). In production (`next start`)
+it is **mandatory**: without credentials the dashboard answers 503 instead of serving
+pages, and the password must be at least 16 characters. The dashboard's server holds the
+API token, so anyone who could load a page could act through it; authentication closes
+that. In `next dev` it is optional (localhost only). Run behind a TLS-terminating reverse
+proxy so credentials never travel in clear text.
+
+## Operating mode (Phase 8)
+
+Every page shows the system's operating mode (from `/api/system/mode`), whether direct
+YouTube Search surge claims are enabled, the reasons, and a legend of the signal classes.
+An unknown mode is shown as unknown, never hidden.
+
 ## Pages
 
 | Route | Page |

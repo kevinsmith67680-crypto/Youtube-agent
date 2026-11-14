@@ -661,7 +661,6 @@ def demo(as_json: base.JsonOpt = False) -> None:
     t0 = time.perf_counter()
     be = demo_backend(resolve_config_dir(settings.discovery_config_dir), demo_cache_path())
     ov = be.overview()
-    recs = be.recommendations(page=1, page_size=100)
     decision = decide_mode([], now=datetime.now(UTC), demo=True)
     data: dict[str, Any] = {
         "operating_mode": decision.as_dict(),
@@ -672,7 +671,6 @@ def demo(as_json: base.JsonOpt = False) -> None:
         "opportunities": ov.opportunities,
         "approved_recommendations": ov.approved_recommendations,
         "research_candidates": ov.research_candidates,
-        "recommendations": recs.total,
         "notes": ov.notes,
     }
     if as_json:
@@ -681,9 +679,9 @@ def demo(as_json: base.JsonOpt = False) -> None:
     _mode_lines(data["operating_mode"])
     base.console.print(
         f"[magenta]SYNTHETIC DEMO[/] queries {data['monitored_queries']}, surges "
-        f"{data['active_surges']}, opportunities {data['opportunities']}, recommendations "
-        f"{data['recommendations']} (approved {data['approved_recommendations']}, research "
-        f"{data['research_candidates']}) in {data['seconds']}s"
+        f"{data['active_surges']}, opportunities {data['opportunities']}, approved ideas "
+        f"{data['approved_recommendations']}, research candidates "
+        f"{data['research_candidates']} ({data['seconds']}s)"
     )
     base.console.print("Serve it with: trend-agent dashboard serve --demo --ui")
 

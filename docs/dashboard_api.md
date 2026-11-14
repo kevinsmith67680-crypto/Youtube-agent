@@ -77,3 +77,22 @@ Publishing records that a video exists; it is never taken as evidence that it su
 The API depends only on the `DashboardBackend` protocol (`recommendations/backend.py`):
 `DatabaseBackend` (PostgreSQL; synthetic records excluded) or `DemoBackend` (in-memory
 snapshot of the fictional scenarios; writes go to memory only and are lost on restart).
+
+## Phase 8 additions
+
+| Method and path | Access | Purpose |
+|---|---|---|
+| `GET /health/live` | public | process alive (no I/O) |
+| `GET /health/ready` | public | database reachable and schema at the expected revision (503 otherwise) |
+| `GET /health/database` | public | latency and schema revision |
+| `GET /health/workers` | token when configured | heartbeats of the scheduler and workers, and the lease holder (503 when none is live) |
+| `GET /health/providers` | token when configured | provider readiness and the operating mode |
+| `GET /metrics` | token when configured | Prometheus text format |
+| `GET /api/system/mode` | read access | operating mode, capabilities, reasons, requirements for the next mode |
+| `POST /api/recommendations/{id}/outcomes` | private | opt-in, creator-entered outcome (`consent: true` required; one row per day since publication, upserted). Database mode only |
+| `GET /api/outcomes` | private | the creator's recorded outcomes |
+
+Every response carries `X-Request-ID`: the caller's ID if it matches
+`^[A-Za-z0-9._:-]{8,64}$`, otherwise a generated one. The same ID appears on every log
+record of the request. `POST /api/recommendations/generate` answers 503 when the operating
+mode withdraws `recommendations` (for example, when the database is unavailable).

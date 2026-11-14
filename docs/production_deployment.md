@@ -74,8 +74,10 @@ separate, reviewed migration and a backup taken immediately before. Downgrades a
 automatically; revision 0009's downgrade refuses while a model is `rejected`.
 
 **Rollback.** Redeploy the previous image tags. A schema rollback is a manual,
-backed-up procedure. Revision 0009 is additive, so the 0.7 images run against it unchanged
-(they do not use the new tables).
+backed-up procedure. Revision 0009 is additive (new tables, one widened check constraint),
+but running the previous (0.7) images against a 0009 database was **not tested**. The safe
+path is to take a backup immediately before upgrading, and restore it if the release must be
+rolled back.
 
 ## 5. Verify after deploying
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -399,6 +399,23 @@ class ProductionIn(_M):
     planned_publication_time: datetime | None = None
     actual_publication_time: datetime | None = None
     published_video_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{11}$")
+    notes: str | None = Field(default=None, max_length=2000)
+
+
+class OutcomeIn(_M):
+    """A creator-entered outcome for a published recommendation (Phase 8, opt-in).
+
+    Only what the creator reads from their own YouTube Studio; nothing is fetched. The
+    search-traffic share is optional and never inferred. ``consent`` must be true."""
+
+    days_since_publication: int = Field(ge=0, le=3650)
+    published_video_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{11}$")
+    views: int | None = Field(default=None, ge=0)
+    impressions: int | None = Field(default=None, ge=0)
+    click_through_rate: float | None = Field(default=None, ge=0, le=1)
+    average_view_duration_seconds: float | None = Field(default=None, ge=0)
+    search_traffic_share: float | None = Field(default=None, ge=0, le=1)
+    consent: Literal[True] = Field(description="the creator agrees to store this outcome")
     notes: str | None = Field(default=None, max_length=2000)
 
 

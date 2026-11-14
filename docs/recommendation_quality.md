@@ -27,8 +27,11 @@ Creators may record what happened after publishing in `recommendation_outcomes`:
 * views, impressions, click-through rate and average view duration;
 * optionally, the search-traffic share **they read from YouTube Studio**.
 
-The schema requires `consent = true`. The system never fetches owner analytics without
-authorisation and never publishes anything.
+Outcomes are entered through `POST /api/recommendations/{id}/outcomes` (private;
+`consent: true` required; one row per day since publication, updated if re-entered). The
+schema requires `consent = true`. The system never fetches owner analytics without
+authorisation and never publishes anything. The integration test
+`test_creator_outcomes_are_opt_in_and_descriptive` covers this path.
 
 `trend-agent evaluate recommendations` summarises outcomes **descriptively** (medians,
 counts). It makes **no causal claim**:
