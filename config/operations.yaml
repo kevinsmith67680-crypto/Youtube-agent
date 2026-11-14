@@ -15,6 +15,9 @@ scheduler:
     # Hacker News: due story lists (per-source intervals in config/sources/hackernews.yaml)
     # plus incremental refresh of tracked stories; same TREND_AGENT_SCHEDULED_DISCOVERY gate
     hackernews:       {interval_seconds: 900,   timeout_seconds: 600,  max_per_run: 5}
+    # Twitch: every 5 min run what is due (top games 15 min, top streams 10 min, monitored
+    # games 10/45 min), assess attention, promote emerging games; same discovery gate
+    twitch:           {interval_seconds: 300,   timeout_seconds: 240,  max_per_run: 12}
     monitor_plan:     {interval_seconds: 300,   timeout_seconds: 120}
     content_analysis: {interval_seconds: 1800,  timeout_seconds: 900,  max_per_run: 10}
     forecasting:      {interval_seconds: 3600,  timeout_seconds: 900}

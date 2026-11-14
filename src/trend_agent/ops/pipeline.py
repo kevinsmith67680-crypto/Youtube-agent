@@ -152,6 +152,36 @@ async def _hackernews(ctx: StageContext) -> dict[str, Any]:
     return out
 
 
+async def _twitch(ctx: StageContext) -> dict[str, Any]:
+    """Twitch at its own cadence: purge data past the 24-hour cache limit, poll what is due
+    (top games 15 min, top streams 10 min, monitored games 10/45 min by tier), assess
+    attention, then send emerging games to discovery. Livestream activity, never demand."""
+    c = ctx.container
+    if ctx.synthetic:
+        return {"skipped": "synthetic mode: no live collection"}
+    if not c.settings.scheduled_discovery:
+        return {"skipped": "disabled: set TREND_AGENT_SCHEDULED_DISCOVERY=true"}
+    if not c.settings.twitch_api_enabled:
+        return {"skipped": "disabled: TWITCH_API_ENABLED=false"}
+    from trend_agent.twitch.service import promote
+
+    monitor = c.twitch_monitor()
+    if not monitor.enabled:
+        return {"skipped": "Twitch credentials missing (TWITCH_CLIENT_ID/SECRET)"}
+    report = await monitor.run_due(max_game_polls=ctx.max_per_run)
+    out: dict[str, Any] = {
+        k: report.get(k) for k in ("assessed", "auto_monitored", "errors", "purged")
+    }
+    out["polls"] = {
+        k: (len(v) if isinstance(v, list) else v.get("sample_status"))
+        for k, v in report.get("polls", {}).items()
+    }
+    if report.get("candidates"):
+        promoted = await promote(c.discovery(), monitor, c.discovery_config().config)
+        out["promoted"] = promoted.get("promoted")
+    return out
+
+
 def _monitor_plan(ctx: StageContext) -> dict[str, Any]:
     svc = ctx.container.monitoring(include_synthetic=ctx.synthetic or None)
     sync = svc.sync_targets()
@@ -221,6 +251,7 @@ DEFAULT_STAGES: tuple[Stage, ...] = (
     Stage("ops_checks", _ops_checks),
     Stage("discovery", _discovery, (C.COLLECT_REAL_DATA,)),
     Stage("hackernews", _hackernews, (C.COLLECT_REAL_DATA,)),
+    Stage("twitch", _twitch, (C.COLLECT_REAL_DATA,)),
     Stage("monitor_plan", _monitor_plan, (C.COLLECT_REAL_DATA,)),
     Stage("content_analysis", _content_analysis, (C.CONTENT_GAP_ANALYSIS,)),
     Stage("forecasting", _forecasting, (C.PROXY_FORECASTS, C.DIRECT_SEARCH_FORECASTS)),

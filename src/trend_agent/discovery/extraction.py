@@ -51,7 +51,8 @@ def trusted_mention(evidence_type: EvidenceType, extractor: str) -> bool:
     identifier, passed as the item's source hint). Other names in the owner's description
     ("works with GPT-6") are unverified claims until corroborated independently.
     """
-    if evidence_type is EvidenceType.REPOSITORY_METADATA:
+    if evidence_type in (EvidenceType.REPOSITORY_METADATA, EvidenceType.GAME_CATALOG):
+        # A catalog record verifies exactly its own name (the source hint), nothing else.
         return extractor == "source_hint"
     return evidence_type in TRUSTED_EVIDENCE
 
@@ -60,6 +61,7 @@ BASE_CONFIDENCE: dict[EvidenceType, float] = {
     EvidenceType.OFFICIAL_ANNOUNCEMENT: 0.85,
     EvidenceType.CODE_RELEASE: 0.85,
     EvidenceType.REPOSITORY_METADATA: 0.8,
+    EvidenceType.GAME_CATALOG: 0.8,
     EvidenceType.RELATED_QUERY: 0.8,
     EvidenceType.SEARCH_SUGGESTION: 0.8,
     EvidenceType.VIDEO_TITLE: 0.65,

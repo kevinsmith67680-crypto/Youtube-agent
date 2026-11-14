@@ -373,6 +373,18 @@ trend-agent hackernews stories --type show             # stored stories; --story
 trend-agent hackernews trending             # measured discussion momentum (repeat observations only)
 trend-agent hackernews stats                # by category/list/kind, observations, source health
 trend-agent hackernews refresh              # re-observe due stories (+ /updates.json hint), bounded
+
+# Twitch Helix API (livestream activity: external gaming attention; never search volume)
+trend-agent twitch status                   # credentials set/missing (never values), token state, data
+trend-agent twitch test                     # live: token, top 20 games, streams, Fortnite (~5 requests)
+trend-agent twitch top-games                # ranking + change since the previous poll
+trend-agent twitch streams --limit 100      # live streams of the latest collection (--game, --language)
+trend-agent twitch game --name "Fortnite"   # verify via Get Games; stored state, attention, links
+trend-agent twitch monitor --game "Fortnite"   # poll the game's own stream list on a schedule
+trend-agent twitch trending                 # rank / observed-viewer increases (comparable samples)
+trend-agent twitch history --game "Fortnite"   # stored rankings and samples (24 h cache)
+trend-agent twitch quota --live             # local budget + Twitch token-bucket headers
+trend-agent twitch cycle                    # one scheduler cycle now (+ promotion to discovery)
 trend-agent discover entities --recent [--days 7]
 trend-agent discover sources                # providers, readiness, source health
 trend-agent discover clusters               # topic -> intent clusters with merge decisions
@@ -629,4 +641,5 @@ docker compose --profile app up -d --build # full local stack (development crede
 * [docs/phase8_report.md](docs/phase8_report.md) — Phase 8 report and verdict
 * [docs/github_api_integration_report.md](docs/github_api_integration_report.md) — GitHub REST API integration: repository discovery, releases, developer activity, keyword expansion
 * [docs/hackernews_api_integration_report.md](docs/hackernews_api_integration_report.md) — Hacker News official API integration: story lists, classification, discussion momentum, refresh scheduling
+* [docs/twitch_api_integration_report.md](docs/twitch_api_integration_report.md) — Twitch Helix API integration: top games, live streams, observed viewers, attention momentum, game discovery
 * [docs/youtube_api_connection_report.md](docs/youtube_api_connection_report.md) — live verification of the YouTube Data API v3 key, quota, retention and a real discovery run

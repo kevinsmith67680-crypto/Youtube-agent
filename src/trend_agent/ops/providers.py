@@ -52,6 +52,7 @@ _CREDENTIALS: dict[str, tuple[str, ...]] = {
     "github": (),  # optional GITHUB_TOKEN raises the rate limit only
     "hackernews": (),
     "hackernews_firebase": (),  # official API: no key
+    "twitch": ("twitch_client_id", "twitch_client_secret"),  # app access token (client creds)
     "feeds": (),
     "curated_seeds": (),
 }
@@ -90,6 +91,12 @@ APPROVALS: dict[str, tuple[str, ...]] = {
         "poll at the configured bounded intervals",
     ),
     "feeds": ("Each feed publisher's terms; poll no faster than the configured interval",),
+    "twitch": (
+        "Twitch Developer Services Agreement: Twitch data may be cached for 24 hours only "
+        "unless Twitch authorises longer storage in writing; no sharing or re-distribution",
+        "Confirm the use of Twitch data is a permitted purpose under the agreement's Data "
+        "Policy before relying on it in production",
+    ),
     "curated_seeds": (),
 }
 
@@ -315,7 +322,13 @@ async def _probe(provider: Provider, *, region: str, discovery_sources: Sequence
     from trend_agent.discovery.providers.hackernews_firebase import (
         HackerNewsDiscoveryProvider,
     )
+    from trend_agent.discovery.providers.twitch import TwitchDiscoveryProvider
 
+    if isinstance(provider, TwitchDiscoveryProvider):
+        ctx = RequestContext()
+        await provider.client.tokens.validate()  # token request/validation: no Helix points
+        await provider.client.top_games(ctx, count=1)
+        return 1  # one Helix request
     if isinstance(provider, HackerNewsDiscoveryProvider):
         ctx = RequestContext()
         await provider.client.max_item(ctx)

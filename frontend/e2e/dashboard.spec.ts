@@ -71,6 +71,27 @@ test.describe("dashboard pages", () => {
     expect(errors).toEqual([]);
   });
 
+  test("twitch page: evidence classes labelled, demo state explicit, filters, accessible", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto("/twitch?state=rising&max_rank=25&language=en");
+    await expect(page.getByRole("heading", { level: 1, name: "Twitch gaming intelligence" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Twitch" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByText("Twitch data is not part of the synthetic dataset", { exact: false })).toBeVisible();
+    for (const label of ["Twitch activity", "Observed viewers", "Partial sample", "Rank change", "Proxy opportunity", "Direct YouTube Search interest"]) {
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+    await expect(page.getByLabel("Attention status")).toHaveValue("rising");
+    await expect(page.getByLabel("Ranking")).toHaveValue("25");
+    await expect(page.getByLabel("Stream language")).toHaveValue("en");
+    await expect(page.getByText("never YouTube search volume or demand", { exact: false })).toBeVisible();
+    await axe(page);
+    expect(errors).toEqual([]);
+  });
+
   test("the API token never reaches the browser", async ({ page }) => {
     const bodies: string[] = [];
     page.on("response", async (r) => {
@@ -219,7 +240,7 @@ test.describe("dashboard pages", () => {
   });
 
   test("@responsive pages fit a phone screen without horizontal scrolling", async ({ page }) => {
-    for (const path of ["/", "/recommendations", "/gaps", "/hackernews"]) {
+    for (const path of ["/", "/recommendations", "/gaps", "/hackernews", "/twitch"]) {
       await page.goto(path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, path).toBeLessThanOrEqual(1);

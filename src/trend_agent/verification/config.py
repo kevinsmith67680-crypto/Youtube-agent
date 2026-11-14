@@ -44,6 +44,8 @@ class Freshness(_Strict):
             EvidenceKind.OFFICIAL_ANNOUNCEMENT: timedelta(days=30),
             EvidenceKind.CODE_RELEASE: timedelta(days=30),
             EvidenceKind.REPOSITORY_METADATA: timedelta(days=30),
+            # Twitch Developer Agreement: Twitch data is cached for 24 hours at most
+            EvidenceKind.GAME_CATALOG: timedelta(hours=24),
             EvidenceKind.ENTITY_RECORD: timedelta(days=90),
             EvidenceKind.CURATED_REFERENCE: timedelta(days=365),
             EvidenceKind.SYNTHETIC_TEST_DATA: timedelta(days=3650),

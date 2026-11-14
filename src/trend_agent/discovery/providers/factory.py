@@ -14,6 +14,7 @@ from trend_agent.discovery.providers.feeds import FeedDiscoveryProvider
 from trend_agent.discovery.providers.github import GitHubDiscoveryProvider
 from trend_agent.discovery.providers.hackernews_firebase import HackerNewsDiscoveryProvider
 from trend_agent.discovery.providers.local import CuratedSeedProvider, TrendsRelatedQueriesProvider
+from trend_agent.discovery.providers.twitch import TwitchDiscoveryProvider
 from trend_agent.discovery.providers.youtube import YouTubeDiscoveryProvider
 from trend_agent.github.client import build_client
 from trend_agent.github.config import load_github_settings
@@ -26,6 +27,8 @@ from trend_agent.providers.http import RetryPolicy
 from trend_agent.providers.quota import QuotaStore
 from trend_agent.providers.registry import ProviderRegistry
 from trend_agent.providers.youtube import YouTubeDataApiProvider
+from trend_agent.twitch.client import build_client as build_twitch_client
+from trend_agent.twitch.config import load_twitch_settings
 from trend_agent.utils.time import Clock
 
 
@@ -147,6 +150,35 @@ def register_discovery_providers(
             settings=hn,
             enabled=p.enabled,
             api_enabled=settings.hackernews_api_enabled,
+            retention_days=p.retention_days,
+            clock=clock,
+        )
+    )
+    p = cfg.provider("twitch")
+    tw = load_twitch_settings(p.params)
+    add(
+        TwitchDiscoveryProvider(
+            build_twitch_client(
+                http_client=http_client,
+                quota_store=quota_store,
+                clock=clock,
+                retry=retry,
+                client_id=settings.twitch_client_id,
+                client_secret=settings.twitch_client_secret,
+                helix_base_url=tw.helix_base_url,
+                auth_base_url=tw.auth_base_url,
+                user_agent=ua,
+                daily_budget=tw.client.daily_request_budget,
+                max_concurrency=tw.client.max_concurrency,
+                page_size=tw.client.page_size,
+                rate_limit_reserve=tw.client.rate_limit_reserve,
+                max_rate_limit_wait=tw.client.max_rate_limit_wait_seconds,
+                token_refresh_margin_seconds=tw.client.token_refresh_margin_seconds,
+                token_validate_interval_seconds=tw.client.token_validate_interval_seconds,
+            ),
+            settings=tw,
+            enabled=p.enabled,
+            api_enabled=settings.twitch_api_enabled,
             retention_days=p.retention_days,
             clock=clock,
         )

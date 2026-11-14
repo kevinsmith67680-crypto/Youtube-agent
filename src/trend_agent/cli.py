@@ -1051,6 +1051,8 @@ app.add_typer(_cli_evaluate.evaluate_app, name="evaluate")
 
 from trend_agent import cli_github as _cli_github  # noqa: E402  (GitHub integration)
 from trend_agent import cli_hackernews as _cli_hackernews  # noqa: E402  (Hacker News)
+from trend_agent import cli_twitch as _cli_twitch  # noqa: E402  (Twitch)
 
 app.add_typer(_cli_github.github_app, name="github")
 app.add_typer(_cli_hackernews.hackernews_app, name="hackernews")
+app.add_typer(_cli_twitch.twitch_app, name="twitch")

@@ -171,6 +171,14 @@ class Capability(StrEnum):
     STORY_METADATA = "story_metadata"
     STORY_UPDATES = "story_updates"
     DISCUSSION_ACTIVITY = "discussion_activity"
+    # Twitch Helix API: livestream activity (external gaming attention); never search interest
+    TOP_GAMES = "top_games"
+    GAME_LOOKUP = "game_lookup"
+    ACTIVE_STREAMS = "active_streams"
+    GAME_STREAMS = "game_streams"
+    VIEWER_OBSERVATIONS = "viewer_observations"
+    GAME_RANKING_HISTORY = "game_ranking_history"
+    ATTENTION_MOMENTUM = "attention_momentum"
 
 
 class ProviderStatus(StrEnum):

@@ -43,6 +43,9 @@ class EvidenceType(StrEnum):
     # A repository's own record (name, self-description, topics) from the GitHub API: the
     # identity is verified by GitHub; the description is the owner's unverified claim.
     REPOSITORY_METADATA = "repository_metadata"
+    # A game's record in an official platform catalog (Twitch Get Games: ID, name, IGDB ID).
+    # Verifies the game exists under this name; says nothing about updates, events or demand.
+    GAME_CATALOG = "game_catalog"
     CURATED_SEED = "curated_seed"
     SYNTHETIC_TEST_DATA = "synthetic_test_data"
 

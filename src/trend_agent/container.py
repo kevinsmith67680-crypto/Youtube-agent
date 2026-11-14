@@ -48,6 +48,8 @@ if TYPE_CHECKING:
     from trend_agent.recommendations.idea_generator import ConceptGenerator
     from trend_agent.recommendations.notifications import Channel
     from trend_agent.recommendations.service import RecommendationService
+    from trend_agent.twitch.config import TwitchSettings
+    from trend_agent.twitch.service import TwitchMonitor
     from trend_agent.verification.service import VerificationService
 
 
@@ -133,6 +135,30 @@ class AppContainer:
                     clock=clock or self.clock,
                 ),
             ],
+        )
+
+    def twitch_settings(self) -> TwitchSettings:
+        from trend_agent.twitch.config import load_twitch_settings
+
+        return load_twitch_settings(self.discovery_config().config.provider("twitch").params)
+
+    def twitch_monitor(
+        self, *, clock: Clock | None = None, trigger: str = "scheduler"
+    ) -> TwitchMonitor:
+        """Twitch polling/assessment service (registers discovery providers first)."""
+        from trend_agent.discovery.providers.twitch import TwitchDiscoveryProvider
+        from trend_agent.twitch.service import TwitchMonitor
+
+        self.discovery()
+        provider = self.registry.get("twitch")
+        assert isinstance(provider, TwitchDiscoveryProvider)
+        return TwitchMonitor(
+            provider.client,
+            self.session_factory,
+            provider.settings,
+            clock=clock or self.clock,
+            enabled=provider.enabled and provider.client.tokens.configured,
+            trigger=trigger,
         )
 
     def hackernews_refresher(self, *, clock: Clock | None = None) -> HackerNewsRefresher:

@@ -24,8 +24,10 @@ _SENSITIVE_KEY = re.compile(
 )
 # key=..., access_token=..., Bearer ... in free text (URLs, exception messages).
 _SENSITIVE_TEXT = [
-    re.compile(r"(?i)\b((?:api_?)?key|access_token|token|password)=([^&\s\"']+)"),
+    re.compile(r"(?i)\b((?:api_?)?key|access_token|token|password|client_secret)=([^&\s\"']+)"),
     re.compile(r"(?i)\b(bearer)\s+([A-Za-z0-9._~+/=-]+)"),
+    # "Authorization: OAuth <token>" (Twitch's validate endpoint); token-length values only
+    re.compile(r"(?i)\b(oauth)\s+([A-Za-z0-9]{20,})"),
     re.compile(r"\bAIza[0-9A-Za-z_-]{20,}\b"),  # Google API key shape
     # GitHub token shapes: classic/OAuth/user/server/refresh tokens and fine-grained PATs
     re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b"),

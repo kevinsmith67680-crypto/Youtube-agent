@@ -240,6 +240,7 @@ class ColdStartConfig(_Strict):
         EvidenceType.OFFICIAL_ANNOUNCEMENT,
         EvidenceType.CODE_RELEASE,
         EvidenceType.REPOSITORY_METADATA,
+        EvidenceType.GAME_CATALOG,
         EvidenceType.SEARCH_SUGGESTION,
         EvidenceType.RELATED_QUERY,
         EvidenceType.VIDEO_TITLE,

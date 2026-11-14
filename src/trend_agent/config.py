@@ -118,6 +118,28 @@ class Settings(BaseSettings):
     github_api_base_url: str = "https://api.github.com"
     # Official Hacker News Firebase API (no key). false = the provider makes no requests.
     hackernews_api_enabled: bool = True
+    # --- Twitch Helix API (app access token via OAuth client credentials) -------------
+    # Public games/streams endpoints only; no user authorisation is ever requested. The
+    # secret and the app token are never logged, stored in the database or sent to the
+    # browser. TREND_AGENT_TWITCH_* names are accepted as aliases.
+    twitch_client_id: SecretStr | None = Field(  # type: ignore[pydantic-alias]
+        default=None,
+        validation_alias=AliasChoices(
+            "twitch_client_id", "TWITCH_CLIENT_ID", "TREND_AGENT_TWITCH_CLIENT_ID"
+        ),
+    )
+    twitch_client_secret: SecretStr | None = Field(  # type: ignore[pydantic-alias]
+        default=None,
+        validation_alias=AliasChoices(
+            "twitch_client_secret", "TWITCH_CLIENT_SECRET", "TREND_AGENT_TWITCH_CLIENT_SECRET"
+        ),
+    )
+    twitch_api_enabled: bool = Field(  # type: ignore[pydantic-alias]
+        default=True,
+        validation_alias=AliasChoices(
+            "twitch_api_enabled", "TWITCH_API_ENABLED", "TREND_AGENT_TWITCH_API_ENABLED"
+        ),
+    )
     # Run discovery (all providers, GitHub included) from `trend-agent system scheduler`.
     # Off by default so that tests and ad-hoc schedulers never reach the network.
     scheduled_discovery: bool = False
@@ -192,6 +214,8 @@ class Settings(BaseSettings):
     @field_validator(
         "youtube_api_key",
         "github_token",
+        "twitch_client_id",
+        "twitch_client_secret",
         "reddit_client_id",
         "reddit_client_secret",
         "verification_signing_key",
@@ -258,6 +282,10 @@ class Settings(BaseSettings):
             "github_token": "set" if self.github_token else "missing (unauthenticated limits)",
             "github_api_version": self.github_api_version,
             "hackernews_api_enabled": self.hackernews_api_enabled,
+            "twitch_api_enabled": self.twitch_api_enabled,
+            "twitch_credentials": (
+                "set" if self.twitch_client_id and self.twitch_client_secret else "missing"
+            ),
             "reddit_credentials": (
                 "set" if self.reddit_client_id and self.reddit_client_secret else "missing"
             ),

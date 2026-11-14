@@ -119,6 +119,7 @@ sources:
 | `repository_search` | `github` | GitHub search query (`topic:llm`, `"coding agent" in:name,description`); `params.strategy` = `emerging` or `active` (see [github_api_integration_report.md](github_api_integration_report.md)) |
 | `community` | `reddit` | subreddit name (`LocalLLaMA`) |
 | `community` / `api_query` | `hackernews` | `front_page` or a search term |
+| `api_query` | `twitch` | a Twitch game ID; generated at run time (`twitch:game:<id>`) for emerging games, never configured by hand (see [twitch_api_integration_report.md](twitch_api_integration_report.md)) |
 | `community` | `hackernews_firebase` | official story list: `newstories`, `topstories`, `beststories`, `showstories`, `askstories` (see [hackernews_api_integration_report.md](hackernews_api_integration_report.md)) |
 | `api_query` | `youtube_discovery`, `google_trends_discovery` | query text |
 | `chart` | `youtube_discovery` | YouTube video category id (e.g. `20` Gaming, `28` Science & Technology) |

@@ -96,6 +96,13 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "requirement_coverage",
         "content_gaps",
         "content_opportunities",
+        # Twitch integration (revision 0012)
+        "twitch_snapshots",
+        "twitch_games",
+        "twitch_monitored_games",
+        "twitch_rank_observations",
+        "twitch_viewer_observations",
+        "twitch_stream_observations",
         # Hacker News integration (revision 0011)
         "hn_stories",
         "hn_story_observations",
@@ -176,7 +183,7 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "discovery_evidence",
         "keyword_status_history",
     } <= tables
-    assert version == "0011"
+    assert version == "0012"
     command.check(cfg)  # raises if the ORM models and migrations have drifted
 
 

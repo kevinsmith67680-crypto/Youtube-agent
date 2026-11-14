@@ -33,6 +33,9 @@ class SignalClass(StrEnum):
     COMMUNITY_ACTIVITY = "COMMUNITY_ACTIVITY"
     OFFICIAL_EVENT_SIGNAL = "OFFICIAL_EVENT_SIGNAL"
     DEVELOPER_ACTIVITY = "DEVELOPER_ACTIVITY"
+    # concurrent viewers / rankings of live streams on another platform (Twitch): external
+    # gaming attention, never search interest
+    LIVESTREAM_ACTIVITY = "LIVESTREAM_ACTIVITY"
     SYNTHETIC_TEST_DATA = "SYNTHETIC_TEST_DATA"
 
 
@@ -46,6 +49,7 @@ PROXY_CLASSES = frozenset(
         SignalClass.COMMUNITY_ACTIVITY,
         SignalClass.OFFICIAL_EVENT_SIGNAL,
         SignalClass.DEVELOPER_ACTIVITY,
+        SignalClass.LIVESTREAM_ACTIVITY,
     }
 )
 
@@ -59,6 +63,7 @@ _KNOWN: dict[str, tuple[SignalClass, ...]] = {
     "hackernews": (SignalClass.COMMUNITY_ACTIVITY,),
     "hackernews_firebase": (SignalClass.COMMUNITY_ACTIVITY,),
     "reddit": (SignalClass.COMMUNITY_ACTIVITY,),
+    "twitch": (SignalClass.LIVESTREAM_ACTIVITY,),
     "google_trends_discovery": (SignalClass.SEARCH_SUGGESTION_PRESENCE,),
     # operator-curated seed phrases: an input list, not a measurement of anything
     "curated_seeds": (),

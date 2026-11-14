@@ -54,7 +54,16 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 
 
 # Settings read under their own names as well (see Settings.github_token).
-_UNPREFIXED_SETTINGS = frozenset({"GITHUB_TOKEN", "GITHUB_API_ENABLED", "GH_TOKEN"})
+_UNPREFIXED_SETTINGS = frozenset(
+    {
+        "GITHUB_TOKEN",
+        "GITHUB_API_ENABLED",
+        "GH_TOKEN",
+        "TWITCH_CLIENT_ID",
+        "TWITCH_CLIENT_SECRET",
+        "TWITCH_API_ENABLED",
+    }
+)
 
 
 @pytest.fixture(autouse=True)
@@ -118,6 +127,13 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Twitch integration
+    "twitch_stream_observations",
+    "twitch_viewer_observations",
+    "twitch_rank_observations",
+    "twitch_snapshots",
+    "twitch_games",
+    "twitch_monitored_games",
     # Hacker News integration
     "hn_story_observations",
     "hn_stories",

@@ -127,6 +127,7 @@ AUTHORITY = [
     EvidenceType.OFFICIAL_ANNOUNCEMENT,
     EvidenceType.CODE_RELEASE,
     EvidenceType.REPOSITORY_METADATA,
+    EvidenceType.GAME_CATALOG,
     EvidenceType.RELATED_QUERY,
     EvidenceType.SEARCH_SUGGESTION,
     EvidenceType.VIDEO_TITLE,

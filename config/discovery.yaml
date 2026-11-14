@@ -134,6 +134,49 @@ providers:
         min_interval_minutes: 10
         rising_score_per_hour: 20
         rising_comments_per_hour: 15
+  twitch:                        # Twitch Helix API (app access token; games + live streams)
+    enabled: true                # also needs TWITCH_API_ENABLED and TWITCH_CLIENT_ID/SECRET
+    daily_request_limit: 8000    # not used: see params.client.daily_request_budget
+    retention_days: 1            # Twitch-sourced discovery items: 24 h cache limit
+    params:
+      client:
+        daily_request_budget: 8000   # local cap; Twitch's own bucket is 800 points/minute
+        max_concurrency: 4
+        page_size: 100               # Helix maximum per page
+        rate_limit_reserve: 20       # wait/stop when Ratelimit-Remaining falls to this
+        max_rate_limit_wait_seconds: 15
+        token_refresh_margin_seconds: 3600     # new app token 1 h before expiry
+        token_validate_interval_seconds: 3600  # Twitch asks for hourly validation
+      collection:
+        top_games: 100               # games ranked per top-games poll (1 request)
+        top_stream_pages: 3          # top live streams: 3 x 100 (partial sample by design)
+        game_stream_pages: 5         # per monitored game: up to 500 streams
+        languages: []                # e.g. [en, de]; empty = all languages
+        stream_title_chars: 140
+      cadence:                       # minutes between polls
+        top_games_minutes: 15
+        top_streams_minutes: 10
+        high_priority_game_minutes: 10
+        low_priority_game_minutes: 45
+      monitor:
+        games: [Fortnite]            # always monitored (exact Twitch names, high tier)
+        max_monitored_games: 12
+        auto_monitor: true           # emerging games join the low tier for 24 h
+      attention:                     # twitch-attention-v1 (components stored, versioned)
+        min_interval_minutes: 9
+        rising_pct_per_hour: 15
+        falling_pct_per_hour: -15
+        rank_climb_positions: 5
+        new_in_top_min_prior_snapshots: 3
+      promotion:                     # emerging games -> Phase 2 discovery (game_catalog)
+        enabled: true
+        min_attention_score: 45
+        max_per_run: 3
+        require_igdb_id: true
+        cooldown_hours: 24
+      retention:
+        hours: 24                    # Twitch Developer Services Agreement cache limit
+        extended_storage_authorized: false  # true only with written authorisation from Twitch
   reddit:
     enabled: true
     daily_request_limit: 200

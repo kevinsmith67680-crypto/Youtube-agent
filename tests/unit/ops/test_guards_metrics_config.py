@@ -86,6 +86,7 @@ def test_operations_config_loads_and_rejects_unknown_tasks(tmp_path: Path) -> No
         "ops_checks",
         "discovery",
         "hackernews",
+        "twitch",
         "monitor_plan",
         "content_analysis",
         "forecasting",

@@ -901,5 +901,151 @@ def create_app(
             raise HTTPException(404, "no such story")
         return detail
 
+    # ------------------------------------------------------------------ twitch
+    # Livestream activity from the Twitch Helix API (database mode only). Every response
+    # labels its evidence classes; observed viewers are never a game total unless the
+    # sample is complete, and never search interest. No token or secret is ever returned.
+    tw_demo = {
+        "demo": True,
+        "synthetic": True,
+        "detail": "demo mode: Twitch data is not part of the synthetic dataset",
+    }
+
+    def tw_read() -> Any:
+        if ops is None:
+            return None
+        from trend_agent.twitch.service import TwitchReadService
+
+        return TwitchReadService(ops.session_factory, ops.twitch_settings(), clock=ops.clock)
+
+    def tw_provider_state() -> dict[str, Any]:
+        assert ops is not None
+        try:
+            ops.discovery()  # registers discovery providers (no network)
+            provider = ops.registry.get("twitch")
+            rep = provider.status()
+            client = getattr(provider, "client", None)
+            token = client.tokens.state() if client else {}
+            return {
+                "status": rep.status.value,
+                "detail": rep.detail,
+                "api_enabled": ops.settings.twitch_api_enabled,
+                "scheduled_discovery": ops.settings.scheduled_discovery,
+                "credentials": "set" if token.get("configured") else "missing",
+            }
+        except Exception as exc:  # configuration problems are reported, not raised
+            return {"status": "unknown", "detail": f"{type(exc).__name__}"}
+
+    @api.get("/twitch/summary")
+    def twitch_summary(_ok: Read) -> dict[str, Any]:
+        from trend_agent.twitch.models import EVIDENCE_CLASSES
+        from trend_agent.twitch.service import NOT_SEARCH_DEMAND
+
+        svc = tw_read()
+        if svc is None:
+            return {
+                **tw_demo,
+                "games": 0,
+                "freshness": {},
+                "provider": {"status": "demo"},
+                "evidence_classes": EVIDENCE_CLASSES,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        return {"demo": False, "synthetic": False, **svc.summary(), "provider": tw_provider_state()}
+
+    @api.get("/twitch/games")
+    def twitch_games(
+        _ok: Read,
+        name: Annotated[str | None, Query(max_length=80)] = None,
+        category: Annotated[str | None, Query(pattern=r"^(game|non_game|unknown)$")] = None,
+        state: Annotated[
+            str | None,
+            Query(
+                pattern=r"^(rising|sustained_rise|steady|falling|insufficient_observations"
+                r"|incomparable_samples)$"
+            ),
+        ] = None,
+        max_rank: Annotated[int | None, Query(ge=1, le=500)] = None,
+        hours: Annotated[int | None, Query(ge=1, le=720)] = None,
+        order: Annotated[str, Query(pattern=r"^(rank|attention|viewers|name)$")] = "rank",
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    ) -> dict[str, Any]:
+        from trend_agent.twitch.service import NOT_SEARCH_DEMAND
+
+        svc = tw_read()
+        if svc is None:
+            return {
+                **tw_demo,
+                "items": [],
+                "total": 0,
+                "snapshot": None,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        data = svc.top_games(
+            limit=limit, max_rank=max_rank, state=state, category=category, hours=hours,
+            name=name, order=order,
+        )  # fmt: skip
+        return {"demo": False, "synthetic": False, **data}
+
+    @api.get("/twitch/games/{game_id}")
+    def twitch_game(
+        game_id: Annotated[str, Path(pattern=r"^\d{1,20}$")],
+        _ok: Read,
+        hours: Annotated[int, Query(ge=1, le=720)] = 24,
+    ) -> dict[str, Any]:
+        svc = tw_read()
+        detail: dict[str, Any] | None = (
+            svc.game_detail(game_id, hours=hours) if svc is not None else None
+        )
+        if detail is None:
+            raise HTTPException(404, "no such game in the stored Twitch data")
+        return detail
+
+    @api.get("/twitch/streams")
+    def twitch_streams(
+        _ok: Read,
+        game_id: Annotated[str | None, Query(pattern=r"^\d{1,20}$")] = None,
+        language: Annotated[str | None, Query(pattern=r"^[a-z]{2}$|^other$")] = None,
+        limit: Annotated[int, Query(ge=1, le=500)] = 100,
+    ) -> dict[str, Any]:
+        from trend_agent.twitch.service import NOT_SEARCH_DEMAND
+
+        svc = tw_read()
+        if svc is None:
+            return {**tw_demo, "items": [], "snapshot": None, "caveat": NOT_SEARCH_DEMAND}
+        return {
+            "demo": False,
+            "synthetic": False,
+            **svc.streams(game_id=game_id, language=language, limit=limit),
+        }
+
+    @api.get("/twitch/trending")
+    def twitch_trending(
+        _ok: Read, limit: Annotated[int, Query(ge=1, le=100)] = 20
+    ) -> dict[str, Any]:
+        from trend_agent.twitch.service import NOT_SEARCH_DEMAND
+
+        svc = tw_read()
+        if svc is None:
+            return {
+                **tw_demo,
+                "items": [],
+                "measured": 0,
+                "awaiting_comparable_observations": 0,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        return {"demo": False, "synthetic": False, **svc.trending(limit=limit)}
+
+    @api.get("/twitch/opportunities")
+    def twitch_opportunities(
+        _ok: Read, limit: Annotated[int, Query(ge=1, le=50)] = 20
+    ) -> dict[str, Any]:
+        from trend_agent.twitch.service import NOT_SEARCH_DEMAND
+
+        svc = tw_read()
+        if svc is None:
+            return {**tw_demo, "items": [], "caveat": NOT_SEARCH_DEMAND}
+        return {"demo": False, "synthetic": False, **svc.opportunities(limit=limit)}
+
     app.include_router(api)
     return app

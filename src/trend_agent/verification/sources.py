@@ -37,6 +37,7 @@ _ITEM_KIND: dict[EvidenceType, EvidenceKind] = {
     EvidenceType.OFFICIAL_ANNOUNCEMENT: EvidenceKind.OFFICIAL_ANNOUNCEMENT,
     EvidenceType.CODE_RELEASE: EvidenceKind.CODE_RELEASE,
     EvidenceType.REPOSITORY_METADATA: EvidenceKind.REPOSITORY_METADATA,
+    EvidenceType.GAME_CATALOG: EvidenceKind.GAME_CATALOG,
     EvidenceType.VIDEO_TITLE: EvidenceKind.VIDEO_METADATA,
     EvidenceType.VIDEO_DESCRIPTION: EvidenceKind.VIDEO_METADATA,
     EvidenceType.COMMUNITY_DISCUSSION: EvidenceKind.COMMUNITY_POST,
@@ -70,6 +71,9 @@ def item_trust(
         return TrustLevel.SYNTHETIC
     if evidence_type in (EvidenceType.OFFICIAL_ANNOUNCEMENT, EvidenceType.CODE_RELEASE):
         return TrustLevel.OFFICIAL if source_verified else TrustLevel.PUBLISHER
+    if evidence_type is EvidenceType.GAME_CATALOG:
+        # The platform verifies the game's name and ID; it is not an official announcement.
+        return TrustLevel.PUBLISHER if source_verified else TrustLevel.USER_GENERATED
     if evidence_type is EvidenceType.REPOSITORY_METADATA:
         # GitHub verifies the repository exists under this name; the description is the
         # owner's own claim, so it is publisher-level at best.

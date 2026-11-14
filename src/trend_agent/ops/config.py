@@ -33,6 +33,9 @@ def _default_tasks() -> dict[str, TaskConfig]:
         # Hacker News lists due by their own source intervals + incremental story refresh
         # (also gated by TREND_AGENT_SCHEDULED_DISCOVERY and the HN provider switch).
         "hackernews": TaskConfig(interval_seconds=900, timeout_seconds=600, max_per_run=5),
+        # Twitch: due polls by their own cadence (5-minute tick), attention, promotion;
+        # max_per_run bounds monitored-game polls per tick.
+        "twitch": TaskConfig(interval_seconds=300, timeout_seconds=240, max_per_run=12),
         "monitor_plan": TaskConfig(interval_seconds=300, timeout_seconds=120),
         "content_analysis": TaskConfig(interval_seconds=1800, timeout_seconds=900, max_per_run=10),
         "forecasting": TaskConfig(interval_seconds=3600, timeout_seconds=900),
