@@ -27,6 +27,17 @@ _COMPLETED = re.compile(
     re.IGNORECASE,
 )
 
+#: generated text that reads as an instruction to the system, a shell command or a
+#: credential request is removed wherever it appears (it is data, never executed)
+UNSAFE_TEXT = re.compile(
+    r"\b(?:ignore (?:all |any )?(?:previous|prior|above) (?:instructions|rules)|"
+    r"disregard (?:the|all|previous) (?:instructions|rules)|system prompt|"
+    r"api[ _-]?keys?|passwords?|access tokens?|secret keys?)\b|"
+    r"(?:^|[\s`;|&])(?:rm\s+-rf|sudo\s|chmod\s+777|mkfs|dd\s+if=|curl\s[^\n]*\|\s*(?:ba)?sh|"
+    r"wget\s[^\n]*\|\s*(?:ba)?sh|:\(\)\s*\{)",
+    re.IGNORECASE,
+)
+
 _FAILURE_POINTS = {
     "install": (
         "the installer or sign-in step fails on a clean machine",
@@ -358,6 +369,9 @@ def enforce_labels(outline: Outline, bundle_ids: frozenset[str]) -> tuple[Outlin
     for s in outline.sections:
         items = []
         for i in s.items:
+            if UNSAFE_TEXT.search(i.text):
+                removed.append(f"{i.text} (instruction-like, command or credential text)")
+                continue
             if _COMPLETED.search(i.text) and i.label is not L.VERIFIED_FACT:
                 removed.append(f"{i.text} (written as a completed result)")
                 continue

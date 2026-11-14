@@ -4,9 +4,12 @@ gets a fresh in-memory backend over it."""
 
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -43,3 +46,44 @@ def make_demo(
     demo_snapshot: DemoSnapshot, rec_loaded: LoadedRecommendationConfig
 ) -> Callable[[], DemoBackend]:
     return lambda: DemoBackend(demo_snapshot, rec_loaded)
+
+
+# ------------------------------------------------------------ scenario contexts
+@dataclass
+class Scenario:
+    key: str
+    report: Any
+    evidence: Any
+    inputs: Any
+
+
+@pytest.fixture(scope="session")
+def scenarios(rec_loaded: LoadedRecommendationConfig) -> dict[str, Scenario]:
+    """Phase 5 synthetic scenarios analysed once (fast, no forecasting)."""
+    from trend_agent.content_analysis import synthetic as ca_syn
+    from trend_agent.content_analysis.config import load_content_config
+    from trend_agent.recommendations.context_builder import EvidenceContext
+    from trend_agent.verification.config import load_verification_config
+    from trend_agent.verification.world import load_world
+
+    lc, vc = load_content_config(CONFIG), load_verification_config(CONFIG)
+    world = load_world(CONFIG / "content_analysis" / "world.yaml", vc)
+    scen = {s["id"]: s for s in ca_syn.load_scenarios(CONFIG)}
+    out: dict[str, Scenario] = {}
+    for key in ("A", "B", "C", "G", "I", "J"):
+        s = scen[key]
+        target = world.targets[s["target"]]
+        analyzer, _ = ca_syn.analyzer_for(
+            world, lc, vc, [ca_syn._video(v) for v in s.get("videos", ())], target.query
+        )
+        inp = ca_syn.inputs_for(world, s["target"], category=s.get("category"))
+        res = asyncio.run(analyzer.analyse(inp))
+        ev = None
+        if res.bundle is not None:
+            records = world.registry.store.get_many(res.bundle.evidence_ids)
+            ev = EvidenceContext(
+                world.registry, vc, res.bundle, tuple(records.values()), inp.catalog, inp.stats,
+                world.now,
+            )  # fmt: skip
+        out[key] = Scenario(key, res.report, ev, inp)
+    return out

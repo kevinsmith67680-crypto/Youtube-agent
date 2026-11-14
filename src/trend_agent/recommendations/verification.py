@@ -25,13 +25,13 @@ APPROVED (everything checked is verified). Valid JSON is never evidence of corre
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from trend_agent.recommendations.config import LoadedRecommendationConfig
 from trend_agent.recommendations.context_builder import EvidenceContext, RecommendationContext
 from trend_agent.recommendations.hook_generator import check_hook
 from trend_agent.recommendations.idea_generator import ConceptDraft
-from trend_agent.recommendations.outline_generator import enforce_labels
+from trend_agent.recommendations.outline_generator import UNSAFE_TEXT, enforce_labels
 from trend_agent.recommendations.title_generator import check_title, sentence_case
 from trend_agent.schemas.recommendation import (
     Hook,
@@ -139,6 +139,8 @@ def verify_concept(
             soft_max=gcfg.max_title_chars,
             hard_max=gcfg.hard_max_title_chars,
         )
+        if UNSAFE_TEXT.search(dt.text):
+            tc = replace(tc, accepted=False, reasons=(*tc.reasons, "instruction or command text"))
         titles.append(
             TitleOption(
                 strategy=dt.strategy,
@@ -164,6 +166,8 @@ def verify_concept(
     hooks: list[Hook] = []
     for dh in draft.hooks:
         hc = check_hook(dh.text, allowed_names=names, word_range=gcfg.hook_words)
+        if UNSAFE_TEXT.search(dh.text):
+            hc = replace(hc, accepted=False, reasons=(*hc.reasons, "instruction or command text"))
         hooks.append(
             Hook(
                 hook_type=dh.hook_type,
@@ -185,9 +189,13 @@ def verify_concept(
     # --------------------------------------------------------------- outline
     outline, out_removed = enforce_labels(_outline(draft), ctx.bundle_ids)
     removed += [f"outline: {r}" for r in out_removed]
-    downgraded = sum(
-        1 for s in outline.sections for i in s.items if i.note and "without evidence" in i.note
-    )
+    relabelled = [
+        i.text for s in outline.sections for i in s.items if i.note and "without evidence" in i.note
+    ]
+    removed += [
+        f"outline: relabelled UNKNOWN (no evidence from this analysis): {t}" for t in relabelled
+    ]
+    downgraded = len(relabelled)
     checks.append(
         VerificationCheck(
             check="outline_labels",
@@ -393,6 +401,32 @@ def verify_concept(
             )
         )
     else:
+        # without a title the gate does not run, so nothing may keep the VERIFIED_FACT label
+        unverified = [i.text for i in facts]
+        if unverified:
+            outline = outline.model_copy(
+                update={
+                    "sections": tuple(
+                        s.model_copy(
+                            update={
+                                "items": tuple(
+                                    i.model_copy(
+                                        update={
+                                            "label": StatementLabel.UNKNOWN,
+                                            "note": "not verified: no title passed the rules",
+                                        }
+                                    )
+                                    if i.label is StatementLabel.VERIFIED_FACT
+                                    else i
+                                    for i in s.items
+                                )
+                            }
+                        )
+                        for s in outline.sections
+                    )
+                }
+            )
+            removed += [f"fact (unverified, relabelled UNKNOWN): {t}" for t in unverified]
         checks.append(
             VerificationCheck(
                 check="verification_gate", passed=False, detail="no title passed the title rules"

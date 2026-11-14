@@ -71,10 +71,10 @@ def check_hook(
         if m.group(0) not in allowed:
             reasons.append(f"number not from a confirmed name: '{m.group(0)}'")
             break
+    # a few words over the range is tolerated (speaking pace varies); too short never is
     hard = [r for r in reasons if "word range" not in r]
-    return HookCheck(
-        not hard and words <= word_range[1] * 1.5, tuple(reasons), estimate_seconds(text)
-    )
+    fits = word_range[0] <= words <= word_range[1] * 1.5
+    return HookCheck(not hard and fits, tuple(reasons), estimate_seconds(text))
 
 
 @dataclass(frozen=True)

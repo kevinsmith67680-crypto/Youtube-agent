@@ -62,12 +62,16 @@ def evaluate(
         if est_high <= 14
         else Complexity.HIGH
     )
-    testing = expected * 0.25 if spec.requires_verified_results else 0.0
+    # the breakdown sums to the expected hours: the extra research for unknown requirements
+    # (its mid-range share) is research time, the rest splits by the usual proportions
+    extra = research_extra * 0.75
+    base = max(expected - extra, 0.0)
+    testing = base * 0.25 if spec.requires_verified_results else 0.0
     breakdown = {
-        "research": round(expected * 0.2 + research_extra, 1),
+        "research": round(base * 0.2 + extra, 1),
         "testing": round(testing, 1),
-        "recording": round(expected * 0.3, 1),
-        "editing": round(expected * 0.5 - testing, 1),
+        "recording": round(base * 0.3, 1),
+        "editing": round(base * 0.5 - testing, 1),
     }
     other = ctx.other_entity if "{other}" in " ".join(spec.software) else None
     software = _fill(spec.software, ctx.topic, other)
