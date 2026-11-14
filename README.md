@@ -1,14 +1,15 @@
-# YouTube Trend Agent — Phases 1–6: Data Acquisition, Keyword Discovery, Historical Monitoring, Surge Detection, Content-Gap Analysis & Trend Forecasting (+ verification layer)
+# YouTube Trend Agent — Phases 1–7: Data Acquisition, Keyword Discovery, Historical Monitoring, Surge Detection, Content-Gap Analysis, Trend Forecasting, Video Recommendations & Intelligence Dashboard (+ verification layer)
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
-existing videos, and what videos to make. This repository contains **Phases 1–6 of 8**:
+existing videos, and what videos to make. This repository contains **Phases 1–7 of 8**:
 the typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
 controls (Phase 1), an autonomous **keyword discovery engine** for AI, technology and
 gaming (Phase 2), **historical monitoring** with time-series storage and scheduling
 (Phase 3), a **statistical surge detection engine** (Phase 4), **search-intent and
-content-gap analysis** (Phase 5), and **predictive trend forecasting with opportunity-window
-estimation** (Phase 6).
+content-gap analysis** (Phase 5), **predictive trend forecasting with opportunity-window
+estimation** (Phase 6), and an **evidence-verified video recommendation engine with an
+intelligence dashboard** (Phase 7).
 
 > **Read this first — what the data can and cannot tell you.**
 > YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
@@ -162,6 +163,40 @@ can abstain with a typed status. Details: [docs/phase6_architecture.md](docs/pha
 | Model registry (checksummed JSON/LightGBM text, no pickle), explicit promotion, one champion per scope, champion–challenger, drift (never automatic) | Implemented |
 | Migration 0007 (8 tables), idempotent hourly-issued forecasts, retention, typed `forecast/1.0` contract for Phase 7, `trend-agent forecast …` | Implemented |
 | Synthetic evaluation (360 series, untouched test periods, independent held-out corpus) | LightGBM selected for hourly 24/72 h and daily 72 h; logistic where LightGBM was not significantly better; one champion (daily 24 h) failed to generalise to the held-out corpus — **synthetic only** |
+
+## What Phase 7 adds — video recommendations & intelligence dashboard
+
+For verified opportunities, Phase 7 proposes video **ideas** — search-oriented titles (7
+strategies), three opening hooks (5–15 s), a format from 30 specialised AI / technology /
+gaming formats, an outline in which every statement is labelled `VERIFIED_FACT`,
+`PLANNED_DEMONSTRATION`, `HYPOTHESIS_TO_TEST` or `UNKNOWN`, the audience, key questions,
+evidence, production feasibility (2 h / 8 h / 24 h profiles), urgency from the Phase 6
+window, and alternatives — and ranks them with a transparent, versioned score. A
+Next.js dashboard shows demand, gaps, forecasts and ideas with every value labelled
+(`OBSERVED`, `FORECAST`, `PROXY_SIGNAL`, `SYNTHETIC`, `MISSING`). Details:
+[docs/phase7_architecture.md](docs/phase7_architecture.md),
+[docs/recommendation_engine.md](docs/recommendation_engine.md),
+[docs/recommendation_scoring.md](docs/recommendation_scoring.md),
+[docs/dashboard.md](docs/dashboard.md), [docs/dashboard_api.md](docs/dashboard_api.md),
+[docs/phase7_report.md](docs/phase7_report.md).
+
+> Ideas are suggestions to evaluate, never instructions or guarantees. The score ranks
+> research priority; it is **not** a probability of success. Nothing is uploaded or
+> published. Application code verifies every statement — an LLM (optional, off by default)
+> can draft text but cannot approve its own claims. All evaluation figures are on
+> **synthetic, author-labelled** fixtures.
+
+| Area | Status |
+|---|---|
+| Engine: input validation, constrained context, 30 formats, template generator (default) and optional bounded LLM generator with strict schema and fallback | Implemented |
+| Verification: title/hook/outline rules, evidence-reference and label enforcement, injection and command stripping, the verification gate; status decided by code | Implemented |
+| Ranking (7 components, missing = excluded), deduplication, diversity, feasibility, creator profiles | Implemented |
+| Migration 0008 (11 tables), idempotent persistence, reuse of unchanged evidence, LLM daily token budget, retention (saved ideas kept) | Implemented |
+| Alerts: detection, dedup, cooldown, in-app / email / Telegram (optional, unconfigured by default), bounded retries; synthetic data never leaves the dashboard | Implemented |
+| FastAPI API: bearer token, read-only mode, rate limits, restrictive CORS, structured errors | Implemented |
+| Next.js dashboard: 7 page types, labelled charts, accessible (axe WCAG 2.1 AA clean), dark default | Implemented |
+| Isolated synthetic demo (`recommend demo`, `dashboard serve --demo`) | Implemented |
+| Evaluation (labelled calibration / held-out drafts, duplicate sweep, generated-idea metrics) and benchmarks | Implemented — **synthetic, author-labelled; not real-world accuracy** |
 
 ## Architecture overview
 
@@ -363,7 +398,25 @@ trend-agent forecast explain --prediction-id ID          # evidence, contributio
 trend-agent forecast peaks | windows [--status URGENT]   # stored peak ranges / opportunity windows
 trend-agent forecast drift [--days 7]        # data vs concept drift; recommendations only
 trend-agent forecast status
+
+# Phase 7: recommendations and dashboard (see docs/phase7_architecture.md)
+trend-agent recommend demo [--category gaming]   # SYNTHETIC end-to-end demo, no database
+trend-agent recommend generate --category ai     # or --category gaming / technology, or --all
+trend-agent recommend generate --all --dry-run   # template generator, nothing stored
+trend-agent recommend list --limit 20 [--include-research]
+trend-agent recommend explain --id RECOMMENDATION_ID   # evidence, score components, labels
+trend-agent recommend verify --id RECOMMENDATION_ID    # re-check evidence now (read-only)
+trend-agent recommend stats                      # counts, feedback, runs, LLM use and budget
+trend-agent recommend evaluate --out eval.json   # offline evaluation (synthetic fixtures)
+trend-agent dashboard serve [--demo] [--ui]      # API on :8000 (and the built UI on :3000)
 ```
+
+Dashboard (Node 20+): `export TREND_AGENT_API_TOKEN=$(openssl rand -hex 32)`, start the API
+with `trend-agent dashboard serve` (or `--demo`), then in `frontend/`: `npm ci`, put the same
+token in `.env.local` (see `.env.example`), `npm run build && npm start`, and open
+<http://localhost:3000>. The token stays on the servers; without it the dashboard is a
+read-only view. Generation uses only stored opportunities and reuses ideas whose evidence
+has not changed (no new LLM cost).
 
 Forecast listings hide synthetic series unless `--include-synthetic` is given. Models
 trained with `--dataset synthetic` serve synthetic series only; a real series without a
@@ -413,6 +466,11 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
   about 2 minutes for `tests/unit/forecasting`); the integration tests train into the
   isolated test database. Benchmarks: `scripts/benchmark_forecasting.py` (resets a
   `*test*`/`*bench*` database); synthetic evaluation: `scripts/evaluate_forecasting.py`.
+* Recommendation tests use deterministic generators and scripted LLM clients (no
+  credentials); the API tests build the synthetic demo snapshot once per session (about a
+  minute). Dashboard: `cd frontend && npm test` (Vitest + axe) and
+  `npx playwright test --trace off` (end-to-end against the demo API, axe WCAG 2.1 AA).
+  Benchmarks: `scripts/benchmark_recommendations.py`; evaluation: `trend-agent recommend evaluate`.
 
 ## Troubleshooting
 
@@ -432,6 +490,10 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 | `forecast train` says "no eligible series" | Expected without real monitored history: synthetic data is never used for real models. Use `--dataset synthetic` for an isolated experiment |
 | Every forecast is `BASELINE_ONLY` | No validated champion for that scope and data origin: train and `--promote` (or `forecast promote`) explicitly |
 | `FORECAST_UNAVAILABLE` "artifact failed verification" | A model file changed after registration; it is refused. Retrain or restore the artifact directory |
+| `recommend generate` considers 0 opportunities | Expected until Phase 5 has stored `candidate` opportunities; synthetic ones need `--include-synthetic`. Try `trend-agent recommend demo` |
+| Dashboard says "Dashboard API unavailable" | Start `trend-agent dashboard serve`; check `TREND_AGENT_API_URL` in `frontend/.env.local` |
+| Dashboard is read-only / API answers 401 | Set the same `TREND_AGENT_API_TOKEN` for the API and the dashboard server |
+| API answers 429 | Rate limit (`config/recommendations.yaml → api`); wait for `Retry-After` |
 | Integration tests all skipped | Test DB unreachable; `docker compose up -d` (the init script creates `trend_agent_test` on first start — if your volume predates it, run `docker compose exec postgres createdb -U trend_agent trend_agent_test`) |
 
 ## Documentation
@@ -474,3 +536,12 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/forecast_uncertainty.md](docs/forecast_uncertainty.md) — calibration, prediction intervals, OOD, abstention
 * [docs/opportunity_windows.md](docs/opportunity_windows.md) — production assumptions and how to read a window
 * [docs/phase6_report.md](docs/phase6_report.md) — Phase 6 report: implementation, validation, limitations, Phase 7 readiness
+* [docs/phase7_architecture.md](docs/phase7_architecture.md) — recommendation and dashboard architecture, data flow, isolation and safety boundaries
+* [docs/recommendation_engine.md](docs/recommendation_engine.md) — input validation, formats, generation, verification, feasibility, ranking, reuse
+* [docs/video_generation_prompts.md](docs/video_generation_prompts.md) — prompts, structured schemas, parsing, hallucination and cost controls
+* [docs/recommendation_scoring.md](docs/recommendation_scoring.md) — score components, missing-evidence policy, evidence-quality gate, limitations
+* [docs/dashboard.md](docs/dashboard.md) — pages, navigation, filters, visualisations, accessibility
+* [docs/dashboard_api.md](docs/dashboard_api.md) — endpoints, authentication, limits, errors
+* [docs/creator_profiles.md](docs/creator_profiles.md) — personalisation and production settings
+* [docs/recommendation_evaluation.md](docs/recommendation_evaluation.md) — labelled datasets (synthetic), metrics, results
+* [docs/phase7_report.md](docs/phase7_report.md) — Phase 7 report: implementation, tests, measurements, limitations, Phase 8 readiness

@@ -1,0 +1,381 @@
+{
+  "splits": {
+    "calibration": {
+      "cases": 8,
+      "status_accuracy": 1.0,
+      "false_approvals": [],
+      "unsupported_published_as_fact": [],
+      "unsupported_publication_rate": 0.0,
+      "bad_statement_removal": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "tn": 14,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "supported_fact_retention": 1.0,
+      "title_rejection": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "tn": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "hook_rejection": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "tn": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "per_case": [
+        {
+          "id": "cal-ai-clean",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "cal-ai-number",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        },
+        {
+          "id": "cal-ai-clickbait",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "cal-gaming-clean",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "cal-gaming-unlock",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        },
+        {
+          "id": "cal-tech-clean",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "cal-tech-injection",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "cal-tech-forecast-text",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        }
+      ]
+    },
+    "heldout": {
+      "cases": 8,
+      "status_accuracy": 1.0,
+      "false_approvals": [],
+      "unsupported_published_as_fact": [],
+      "unsupported_publication_rate": 0.0,
+      "bad_statement_removal": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "tn": 12,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "supported_fact_retention": 1.0,
+      "title_rejection": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "hook_rejection": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "tn": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "per_case": [
+        {
+          "id": "ho-ai-result-as-fact",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        },
+        {
+          "id": "ho-ai-fake-citation",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "ho-ai-unknown-version",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        },
+        {
+          "id": "ho-gaming-clean",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "ho-gaming-dates",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        },
+        {
+          "id": "ho-tech-superlative",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "ho-tech-urgency",
+          "status": "APPROVED_WITH_UNCERTAINTY",
+          "acceptable": true
+        },
+        {
+          "id": "ho-gaming-weak-evidence",
+          "status": "RESEARCH_REQUIRED",
+          "acceptable": true
+        }
+      ]
+    }
+  },
+  "duplicates": {
+    "calibration": {
+      "configured": {
+        "threshold": 0.6,
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "tn": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "best_threshold": 0.6,
+      "best_f1": 1.0,
+      "sweep": [
+        {
+          "threshold": 0.2,
+          "tp": 7,
+          "fp": 5,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.583,
+          "recall": 1.0,
+          "f1": 0.737
+        },
+        {
+          "threshold": 0.25,
+          "tp": 7,
+          "fp": 5,
+          "fn": 0,
+          "tn": 0,
+          "precision": 0.583,
+          "recall": 1.0,
+          "f1": 0.737
+        },
+        {
+          "threshold": 0.3,
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "tn": 4,
+          "precision": 0.875,
+          "recall": 1.0,
+          "f1": 0.933
+        },
+        {
+          "threshold": 0.35,
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "tn": 4,
+          "precision": 0.875,
+          "recall": 1.0,
+          "f1": 0.933
+        },
+        {
+          "threshold": 0.4,
+          "tp": 7,
+          "fp": 1,
+          "fn": 0,
+          "tn": 4,
+          "precision": 0.875,
+          "recall": 1.0,
+          "f1": 0.933
+        },
+        {
+          "threshold": 0.45,
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "threshold": 0.55,
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "threshold": 0.6,
+          "tp": 7,
+          "fp": 0,
+          "fn": 0,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "threshold": 0.65,
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.857,
+          "f1": 0.923
+        },
+        {
+          "threshold": 0.7,
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.857,
+          "f1": 0.923
+        },
+        {
+          "threshold": 0.75,
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.714,
+          "f1": 0.833
+        },
+        {
+          "threshold": 0.8,
+          "tp": 5,
+          "fp": 0,
+          "fn": 2,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.714,
+          "f1": 0.833
+        },
+        {
+          "threshold": 0.85,
+          "tp": 3,
+          "fp": 0,
+          "fn": 4,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.429,
+          "f1": 0.6
+        },
+        {
+          "threshold": 0.9,
+          "tp": 3,
+          "fp": 0,
+          "fn": 4,
+          "tn": 5,
+          "precision": 1.0,
+          "recall": 0.429,
+          "f1": 0.6
+        }
+      ]
+    },
+    "heldout": {
+      "configured": {
+        "threshold": 0.6,
+        "tp": 4,
+        "fp": 0,
+        "fn": 1,
+        "tn": 5,
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.889
+      }
+    }
+  },
+  "generated": {
+    "recommendations": 17,
+    "eligible": 15,
+    "research_candidates": 2,
+    "search_intent_alignment": {
+      "mean_format_alignment": 0.88,
+      "share_serving_intent": 1.0,
+      "mean_title_query_coverage": 0.563
+    },
+    "factual_grounding": {
+      "verified_facts": 24,
+      "lexically_grounded": 24,
+      "unsupported_claim_rate": 0.0,
+      "ungrounded_examples": []
+    },
+    "content_gap_relevance": 0.667,
+    "originality_mean": 0.733,
+    "production_feasibility": {
+      "share_within_profile_bounds": 1.0,
+      "max_hours_bound": 36.0
+    },
+    "diversity_top10": {
+      "items": 9,
+      "mean_pairwise_title_jaccard": 0.117,
+      "max_pairwise_title_jaccard": 0.5,
+      "distinct_format_families": 8,
+      "categories": [
+        "ai",
+        "gaming",
+        "technology"
+      ],
+      "suppressed": 6
+    },
+    "generation_seconds_per_opportunity": {
+      "mean": 0.0757,
+      "max": 0.1146
+    }
+  },
+  "human_usefulness": {
+    "measured": false,
+    "reason": "needs creator judgements: add a labels file (recommendation id -> true/false) or use recorded USEFUL / NOT_RELEVANT feedback in production"
+  },
+  "notice": "Synthetic, author-labelled fixtures with fictional entities: these numbers describe the rules' behaviour on these cases only. They are not evidence of real-world recommendation accuracy or usefulness."
+}

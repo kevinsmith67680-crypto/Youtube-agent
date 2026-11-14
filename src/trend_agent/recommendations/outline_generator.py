@@ -30,11 +30,15 @@ _COMPLETED = re.compile(
 #: generated text that reads as an instruction to the system, a shell command or a
 #: credential request is removed wherever it appears (it is data, never executed)
 UNSAFE_TEXT = re.compile(
-    r"\b(?:ignore (?:all |any )?(?:previous|prior|above) (?:instructions|rules)|"
-    r"disregard (?:the|all|previous) (?:instructions|rules)|system prompt|"
-    r"api[ _-]?keys?|passwords?|access tokens?|secret keys?)\b|"
-    r"(?:^|[\s`;|&])(?:rm\s+-rf|sudo\s|chmod\s+777|mkfs|dd\s+if=|curl\s[^\n]*\|\s*(?:ba)?sh|"
-    r"wget\s[^\n]*\|\s*(?:ba)?sh|:\(\)\s*\{)",
+    # instructions aimed at the system rather than the viewer
+    r"\b(?:ignore|disregard|forget) (?:all |any )?(?:the )?(?:previous|prior|above|earlier) "
+    r"(?:instructions|rules|prompts?)\b|\bsystem prompt\b|"
+    # requests to disclose credentials (setting up an API key is a normal tutorial topic)
+    r"\b(?:reveal|print|send|leak|expose|output|exfiltrate|dump|email)\b"
+    r"[^.!?\n]{0,40}\b(?:api[ _-]?keys?|passwords?|access tokens?|secret keys?|credentials)\b|"
+    # destructive or remote-execution shell commands
+    r"(?:^|[\s`;|&])(?:rm\s+-rf|sudo\s|chmod\s+777|mkfs|dd\s+if=|"
+    r"curl\s[^\n]*\|\s*(?:ba)?sh|wget\s[^\n]*\|\s*(?:ba)?sh|:\(\)\s*\{)",
     re.IGNORECASE,
 )
 

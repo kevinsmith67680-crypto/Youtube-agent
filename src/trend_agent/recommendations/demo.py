@@ -171,6 +171,9 @@ def snapshot_key(root: Path) -> str:
         if p.is_file():
             h.update(p.read_bytes())
     h.update(f"{__version__}|{RECOMMENDATION_VERSION}|{FORECAST_VERSION}".encode())
+    # the engine's own code: a cached snapshot never outlives a code change
+    for src in sorted(Path(__file__).parent.glob("*.py")):
+        h.update(src.read_bytes())
     return h.hexdigest()[:16]
 
 
