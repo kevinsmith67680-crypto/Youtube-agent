@@ -12,7 +12,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 RECOMMENDATION_SCHEMA_VERSION = "recommendation/1.0"
 
@@ -423,3 +423,43 @@ class CreatorProfile(BaseModel):
         default_factory=lambda: {"in_app": True, "email": False, "telegram": False}
     )
     llm_daily_token_budget: int | None = Field(default=None, ge=0, le=10_000_000)
+
+    @field_validator("profile_id")
+    @classmethod
+    def _profile_id(cls, v: str) -> str:
+        import re
+
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", v):
+            raise ValueError("profile_id: 1-64 letters, digits, '_' or '-'")
+        return v
+
+    @field_validator("preferred_categories")
+    @classmethod
+    def _categories(cls, v: list[str]) -> list[str]:
+        bad = [c for c in v if c not in ("ai", "technology", "gaming")]
+        if bad:
+            raise ValueError(f"unsupported categories: {', '.join(bad)}")
+        return list(dict.fromkeys(v))
+
+    @field_validator("primary_regions")
+    @classmethod
+    def _regions(cls, v: list[str]) -> list[str]:
+        out = [r.upper() for r in v]
+        if any(len(r) != 2 or not r.isalpha() for r in out):
+            raise ValueError("regions are two-letter country codes")
+        return out
+
+    @field_validator("notification_preferences")
+    @classmethod
+    def _channels(cls, v: dict[str, bool]) -> dict[str, bool]:
+        bad = [k for k in v if k not in ("in_app", "email", "telegram")]
+        if bad:
+            raise ValueError(f"unknown notification channels: {', '.join(bad)}")
+        return v
+
+    @field_validator("skills", "equipment", "content_exclusions", "topic_preferences")
+    @classmethod
+    def _short_items(cls, v: list[str]) -> list[str]:
+        if any(len(x) > 80 for x in v):
+            raise ValueError("each entry must be at most 80 characters")
+        return [x.strip() for x in v if x.strip()]
