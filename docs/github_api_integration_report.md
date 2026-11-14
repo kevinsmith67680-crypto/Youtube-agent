@@ -256,7 +256,7 @@ Earlier runs today also surfaced DIYgod/pinky (MCP phone control) and the DeepSe
 | Frontend Vitest (incl. 9 GitHub tests: evidence classes, safe links, quoted releases, momentum without invented growth, "search volume" only negated) | **47 passed** |
 | Playwright (incl. the new `/github` page: labels, demo state, axe) | **16 passed** |
 | Live (opt-in) `tests/live/test_github_live.py` | **2 passed** against the attached repository; with the default third-party repository it fails only with the proxy's `AccessRestrictedError` |
-| Full default regression suite (no credentials, PostgreSQL test database) | **1,050 passed, 1 failed, 5 deselected (live)** in 14 min 50 s. The failure was an outdated assertion listing scheduler tasks (now includes `discovery`); fixed and its module re-run (29 passed). Final full re-run: FINAL_RUN |
+| Full default regression suite (no credentials, PostgreSQL test database) | **1,051 passed, 0 failed**, 5 deselected (opt-in live tests), 14 min 44 s. An earlier full run had 1 failure: an outdated assertion listing the scheduler tasks, now updated to include `discovery`. |
 | `ruff check`, `ruff format --check`, `mypy src` (275 files), `tsc --noEmit`, `next build` | clean |
 | Migration 0010 | upgrade, downgrade and upgrade verified; `alembic check` reports no drift; downgrade refuses while new enum values are in use |
 
