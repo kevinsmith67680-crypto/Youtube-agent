@@ -123,6 +123,24 @@ def _latest_per_horizon(rows: Sequence[Any]) -> list[ForecastOutput]:
     return out
 
 
+_USABLE = ("READY", "LIMITED_CONFIDENCE", "BASELINE_ONLY")
+_HORIZON_ORDER = {24: 0, 72: 1, 6: 2}
+
+
+def _breakout_key(rows: Sequence[Any]) -> float | None:
+    """The breakout probability the summary would show (same forecast choice as
+    ``views.opportunity_summary``), read from the stored columns without validation."""
+    latest: dict[int, Any] = {}
+    for r in rows:  # newest first
+        latest.setdefault(r.horizon_hours, r)
+    pool = [r for r in latest.values() if r.forecast_status in _USABLE] or list(latest.values())
+    if not pool:
+        return None
+    best = sorted(pool, key=lambda r: _HORIZON_ORDER.get(r.horizon_hours, 9))[0]
+    v = best.breakout_probability
+    return float(v) if v is not None else None
+
+
 class DatabaseBackend:
     mode = "database"
 
@@ -276,12 +294,24 @@ class DatabaseBackend:
                 page=None if in_memory else page,
                 page_size=page_size,
             )
-            reports = [OpportunityReport.model_validate(r.report) for r in rows]
             fc = read.forecasts_for_queries(
-                [r.canonical_query for r in reports],
+                [r.canonical_query for r in rows],
                 include_synthetic=self.include_synthetic,
                 since=self._since_forecast(),
             )
+            if in_memory:
+                # sort on the stored forecast columns; validate only the requested page
+                total = len(rows)
+                keyed = [(r, _breakout_key(fc.get(r.canonical_query.lower(), []))) for r in rows]
+                present = sorted(
+                    (x for x in keyed if x[1] is not None),
+                    key=lambda x: (x[1], -x[0].id),
+                    reverse=order == "desc",
+                )
+                missing = [x for x in keyed if x[1] is None]  # missing values always last
+                start = (max(1, page) - 1) * page_size
+                rows = [r for r, _ in [*present, *missing][start : start + page_size]]
+            reports = [OpportunityReport.model_validate(r.report) for r in rows]
             recs: dict[str, list[VideoRecommendationRow]] = {}
             for r in repo.for_opportunities(
                 [x.opportunity_id for x in reports], include_synthetic=self.include_synthetic
@@ -295,10 +325,6 @@ class DatabaseBackend:
                 )
                 for rep in reports
             ]
-        if in_memory:
-            return be.query_opportunities(
-                items, sort=sort, order=order, page=page, page_size=page_size
-            )
         return Page[OpportunitySummary](
             items=items, total=total, page=max(1, page), page_size=page_size
         )

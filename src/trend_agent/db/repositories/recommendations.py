@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Any
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, defer
 
 from trend_agent.db.content_models import ContentAnalysisRunRow, ContentOpportunityRow
 from trend_agent.db.detection_models import SurgeEventRow
@@ -796,7 +796,9 @@ class DashboardReadRepository:
         if page is not None:
             stmt = stmt.offset((max(1, page) - 1) * page_size).limit(page_size)
         else:
-            stmt = stmt.limit(1000)  # bounded in-memory sorts (e.g. by forecast probability)
+            # bounded in-memory sorts (e.g. by forecast probability): the large report
+            # document is loaded later, only for the rows of the requested page
+            stmt = stmt.options(defer(o.report)).limit(1000)
         return list(self._s.execute(stmt).scalars()), total
 
     def opportunity(self, ident: str) -> tuple[ContentOpportunityRow, str | None] | None:
