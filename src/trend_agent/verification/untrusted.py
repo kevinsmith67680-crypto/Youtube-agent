@@ -29,7 +29,7 @@ from typing import Any
 
 DELIMITER = "untrusted_source_data"
 
-_HIDDEN = re.compile("[​-‏‪-‮⁠-⁤⁦-⁩﻿]")
+_HIDDEN = re.compile("[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]")
 _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 _SIGNALS: tuple[tuple[str, re.Pattern[str]], ...] = (
