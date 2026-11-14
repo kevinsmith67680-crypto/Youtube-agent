@@ -185,22 +185,25 @@ def rec_summary(r: RecommendationOutput, user: UserState | None = None) -> Recom
     )
 
 
+def gap_view(g: ContentGap) -> GapView:
+    return GapView(
+        gap_type=g.gap_type.value,
+        statement=g.statement,
+        evidence_strength=g.evidence_strength.value,
+        verification_status=g.verification_status.value,
+        requirement_keys=list(g.requirement_keys),
+        limitations=list(g.limitations),
+        evidence_ids=list(g.supporting_evidence),
+    )
+
+
 def opportunity_detail(
     report: OpportunityReport,
     forecasts: Sequence[ForecastOutput],
     recs: Sequence[RecommendationOutput],
     users: dict[str, UserState],
 ) -> OpportunityDetail:
-    def gap(g: ContentGap) -> GapView:
-        return GapView(
-            gap_type=g.gap_type.value,
-            statement=g.statement,
-            evidence_strength=g.evidence_strength.value,
-            verification_status=g.verification_status.value,
-            requirement_keys=list(g.requirement_keys),
-            limitations=list(g.limitations),
-            evidence_ids=list(g.supporting_evidence),
-        )
+    gap = gap_view
 
     transcript = {
         v.video_id

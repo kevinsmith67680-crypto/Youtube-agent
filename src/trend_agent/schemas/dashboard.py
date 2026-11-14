@@ -133,6 +133,23 @@ class OpportunityDetail(_M):
     notice: str
 
 
+class GapRow(_M):
+    """One content gap of one opportunity (Content Gap Explorer)."""
+
+    opportunity_id: str
+    query: str
+    category: str | None
+    region: str | None
+    is_primary: bool
+    gap: GapView
+    opportunity_score: float | None
+    opportunity_status: str
+    demand_label: str
+    recommendation_count: int
+    analysed_at: datetime
+    synthetic: bool
+
+
 # ---------------------------------------------------------------------- trends
 class SeriesPoint(_M):
     period_start: datetime

@@ -36,6 +36,7 @@ from trend_agent.schemas.dashboard import (
     DataQualityView,
     ForecastView,
     FreshnessView,
+    GapRow,
     GenerateIn,
     GenerateResult,
     OpportunityDetail,
@@ -330,6 +331,24 @@ class DatabaseBackend:
                 ),
             }
         )
+
+    def gaps(self, *, category: str | None = None, **f: Any) -> Page[GapRow]:
+        """Gaps of the (at most 1,000) most recently updated opportunities."""
+        with transaction(self._factory) as s:
+            read, repo = DashboardReadRepository(s), RecommendationRepository(s)
+            rows, _ = read.opportunities(
+                include_synthetic=self.include_synthetic,
+                category=category,
+                sort="updated",
+                page=None,
+            )
+            reports = [OpportunityReport.model_validate(r.report) for r in rows]
+            counts: dict[str, int] = {}
+            for r in repo.for_opportunities(
+                [x.opportunity_id for x in reports], include_synthetic=self.include_synthetic
+            ):
+                counts[r.opportunity_key] = counts.get(r.opportunity_key, 0) + 1
+        return be.query_gaps(be.gap_rows(reports, counts), category=category, **f)
 
     # --------------------------------------------------------------- trends
     @staticmethod

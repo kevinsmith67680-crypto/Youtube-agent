@@ -30,6 +30,7 @@ from trend_agent.schemas.dashboard import (
     DataQualityView,
     FeedbackIn,
     ForecastView,
+    GapRow,
     GenerateIn,
     GenerateResult,
     OpportunityDetail,
@@ -269,6 +270,26 @@ def create_app(
                 update={"recommendations": [_strip_summary(r) for r in d.recommendations]}
             )
         return d
+
+    @api.get("/gaps", response_model=Page[GapRow])
+    def gaps(
+        _ok: Read,
+        category: Category | None = None,
+        gap_type: Annotated[str | None, Query(pattern=r"^[a-z_]{2,48}$")] = None,
+        strength: Literal["strong", "moderate", "weak"] | None = None,
+        primary_only: bool = False,
+        include_unverifiable: bool = False,
+        q: Text = None,
+        sort: Literal["score", "strength", "query", "updated"] = "score",
+        order: Order = "desc",
+        page: PageQ = 1,
+        page_size: SizeQ = None,
+    ) -> Page[GapRow]:
+        return be().gaps(
+            category=category, gap_type=gap_type, strength=strength, primary_only=primary_only,
+            include_unverifiable=include_unverifiable, q=q, sort=sort, order=order, page=page,
+            page_size=size(page_size),
+        )  # fmt: skip
 
     # ------------------------------------------------------------------ trends
     @api.get("/trends", response_model=Page[TrendSummary])

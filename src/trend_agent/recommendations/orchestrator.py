@@ -234,7 +234,10 @@ class RecommendationEngine:
             target_intent=ctx.primary_intent,
             target_sub_intent=ctx.sub_intent,
             title=title,
-            alternative_titles=tuple(vc.titles),
+            # the alternatives exclude the chosen title (no duplicate options)
+            alternative_titles=tuple(
+                t for t in vc.titles if t.text.strip().lower() != title.strip().lower()
+            ),
             hooks=tuple(vc.hooks),
             video_format=spec.fmt,
             format_label=spec.label,

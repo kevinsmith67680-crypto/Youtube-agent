@@ -61,6 +61,7 @@ from trend_agent.schemas.dashboard import (
     DataQualityView,
     ForecastView,
     FreshnessView,
+    GapRow,
     GenerateIn,
     GenerateResult,
     OpportunityDetail,
@@ -521,6 +522,10 @@ class DemoBackend:
         return views.opportunity_detail(
             rep, self._fc(rep.canonical_query), self._recs_for(oid), users
         )
+
+    def gaps(self, **f: Any) -> Page[GapRow]:
+        counts = Counter(r.opportunity_id for r in self.snap.recommendations)
+        return be.query_gaps(be.gap_rows(self.snap.reports, dict(counts)), **f)
 
     def _trend_summary(self, t: TrendBundle) -> TrendSummary:
         main = t.series[0] if t.series else None

@@ -13,10 +13,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Protocol
 
+from trend_agent.schemas.content_opportunity import OpportunityReport
 from trend_agent.schemas.dashboard import (
     AlertView,
     DataQualityView,
     ForecastView,
+    GapRow,
     GenerateIn,
     GenerateResult,
     OpportunityDetail,
@@ -76,6 +78,7 @@ class DashboardBackend(Protocol):
     def overview(self) -> OverviewView: ...
     def opportunities(self, **filters: Any) -> Page[OpportunitySummary]: ...
     def opportunity(self, oid: str) -> OpportunityDetail | None: ...
+    def gaps(self, **filters: Any) -> Page[GapRow]: ...
     def trends(self, **filters: Any) -> Page[TrendSummary]: ...
     def trend(self, tid: str) -> TrendDetail | None: ...
     def forecast(self, fid: str) -> ForecastView | None: ...
@@ -172,6 +175,78 @@ def query_opportunities(
     if q:
         out = [o for o in out if q.lower() in o.query.lower()]
     return paginate(_sorted(out, _OPP_SORT.get(sort, _OPP_SORT["score"]), order), page, page_size)
+
+
+_STRENGTH = {"strong": 3, "moderate": 2, "weak": 1}
+_GAP_SORT: dict[str, Callable[[GapRow], Any]] = {
+    "score": lambda g: g.opportunity_score,
+    "strength": lambda g: _STRENGTH.get(g.gap.evidence_strength, 0),
+    "query": lambda g: g.query.lower(),
+    "updated": lambda g: g.analysed_at,
+}
+
+
+def gap_rows(
+    reports: Sequence[OpportunityReport], rec_counts: dict[str, int] | None = None
+) -> list[GapRow]:
+    from trend_agent.recommendations.views import DEMAND_LABELS, gap_view
+
+    out = []
+    for rep in reports:
+        primary = rep.primary_gap
+        for g in rep.gaps:
+            out.append(
+                GapRow(
+                    opportunity_id=rep.opportunity_id,
+                    query=rep.canonical_query,
+                    category=rep.category,
+                    region=rep.region,
+                    is_primary=primary is not None
+                    and g.gap_type == primary.gap_type
+                    and g.statement == primary.statement,
+                    gap=gap_view(g),
+                    opportunity_score=rep.score.score,
+                    opportunity_status=rep.status.value,
+                    demand_label=DEMAND_LABELS.get(rep.demand.basis.value, rep.demand.basis.value),
+                    recommendation_count=(rec_counts or {}).get(rep.opportunity_id, 0),
+                    analysed_at=rep.analysed_at,
+                    synthetic=rep.synthetic,
+                )
+            )
+    return out
+
+
+def query_gaps(
+    rows: Sequence[GapRow],
+    *,
+    category: str | None = None,
+    gap_type: str | None = None,
+    strength: str | None = None,
+    primary_only: bool = False,
+    include_unverifiable: bool = False,
+    q: str | None = None,
+    sort: str = "score",
+    order: str = "desc",
+    page: int = 1,
+    page_size: int = 25,
+) -> Page[GapRow]:
+    out = list(rows)
+    if not include_unverifiable:  # "no verifiable gap" / "insufficient evidence" are not gaps
+        out = [
+            g for g in out if g.gap.gap_type not in ("no_verifiable_gap", "insufficient_evidence")
+        ]
+    if category:
+        out = [g for g in out if g.category == category]
+    if gap_type:
+        out = [g for g in out if g.gap.gap_type == gap_type]
+    if strength:
+        out = [g for g in out if g.gap.evidence_strength == strength]
+    if primary_only:
+        out = [g for g in out if g.is_primary]
+    if q:
+        ql = q.lower()
+        out = [g for g in out if ql in g.query.lower() or ql in g.gap.statement.lower()]
+    return paginate(_sorted(out, _GAP_SORT.get(sort, _GAP_SORT["score"]), order), page, page_size)
 
 
 _REC_SORT: dict[str, Callable[[RecommendationSummary], Any]] = {
