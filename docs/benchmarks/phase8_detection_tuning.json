@@ -1,0 +1,582 @@
+{
+  "origin": "synthetic",
+  "splits": {
+    "calibration": {
+      "series": 62,
+      "kind": "null (no events)"
+    },
+    "dev": {
+      "series": 120
+    },
+    "test": {
+      "series": 200,
+      "used_for_tuning": false
+    }
+  },
+  "current": {
+    "params": {
+      "cusum_h": 6.0,
+      "fdr_q": 0.05
+    },
+    "dev": {
+      "precision": 0.8,
+      "recall": 1.0,
+      "false_alerts_per_day": 0.1,
+      "false_alerts_per_1000_series_day": 0.8333,
+      "delay_median_days": 0.5,
+      "delay_p90_days": 5.5,
+      "duplication_rate": 0.0,
+      "confirmed_precision": 0.95,
+      "confirmed_recall": 0.7917,
+      "labels": 24,
+      "alerts": 39,
+      "tp": 24,
+      "fp": 6,
+      "fn": 0,
+      "f1": 0.8889,
+      "recall_by_kind": {
+        "event": {
+          "labels": 2,
+          "detected": 2,
+          "recall": 1.0
+        },
+        "ramp": {
+          "labels": 6,
+          "detected": 6,
+          "recall": 1.0
+        },
+        "spike": {
+          "labels": 11,
+          "detected": 11,
+          "recall": 1.0
+        },
+        "step": {
+          "labels": 5,
+          "detected": 5,
+          "recall": 1.0
+        }
+      },
+      "false_alerts_by_category": {
+        "gaming": 4,
+        "technology": 1,
+        "ai": 1
+      },
+      "dataset": "synthetic-dev"
+    },
+    "test": {
+      "precision": 0.9057,
+      "recall": 1.0,
+      "false_alerts_per_day": 0.0833,
+      "false_alerts_per_1000_series_day": 0.4167,
+      "delay_median_days": 0.5,
+      "delay_p90_days": 6.5,
+      "duplication_rate": 0.0,
+      "confirmed_precision": 0.9744,
+      "confirmed_recall": 0.7917,
+      "labels": 48,
+      "alerts": 73,
+      "tp": 48,
+      "fp": 5,
+      "fn": 0,
+      "f1": 0.9505,
+      "recall_by_kind": {
+        "event": {
+          "labels": 11,
+          "detected": 11,
+          "recall": 1.0
+        },
+        "ramp": {
+          "labels": 15,
+          "detected": 15,
+          "recall": 1.0
+        },
+        "spike": {
+          "labels": 13,
+          "detected": 13,
+          "recall": 1.0
+        },
+        "step": {
+          "labels": 9,
+          "detected": 9,
+          "recall": 1.0
+        }
+      },
+      "false_alerts_by_category": {
+        "ai": 3,
+        "gaming": 1,
+        "technology": 1
+      },
+      "dataset": "synthetic-test"
+    }
+  },
+  "by_source_test": {
+    "direct_youtube_search_interest": {
+      "precision": 0.9057,
+      "recall": 1.0,
+      "false_alerts_per_day": 0.0833,
+      "false_alerts_per_1000_series_day": 0.4167,
+      "delay_median_days": 0.5,
+      "delay_p90_days": 6.5,
+      "duplication_rate": 0.0,
+      "confirmed_precision": 0.9744,
+      "confirmed_recall": 0.7917,
+      "labels": 48,
+      "alerts": 73,
+      "tp": 48,
+      "fp": 5,
+      "fn": 0,
+      "f1": 0.9505,
+      "recall_by_kind": {
+        "event": {
+          "labels": 11,
+          "detected": 11,
+          "recall": 1.0
+        },
+        "ramp": {
+          "labels": 15,
+          "detected": 15,
+          "recall": 1.0
+        },
+        "spike": {
+          "labels": 13,
+          "detected": 13,
+          "recall": 1.0
+        },
+        "step": {
+          "labels": 9,
+          "detected": 9,
+          "recall": 1.0
+        }
+      },
+      "false_alerts_by_category": {
+        "ai": 3,
+        "gaming": 1,
+        "technology": 1
+      },
+      "dataset": "synthetic-test-direct_youtube_search_interest"
+    },
+    "video_activity": {
+      "precision": 0.8889,
+      "recall": 1.0,
+      "false_alerts_per_day": 0.1,
+      "false_alerts_per_1000_series_day": 0.5,
+      "delay_median_days": 0.5,
+      "delay_p90_days": 6.5,
+      "duplication_rate": 0.0,
+      "confirmed_precision": null,
+      "confirmed_recall": 0.0,
+      "labels": 48,
+      "alerts": 76,
+      "tp": 48,
+      "fp": 6,
+      "fn": 0,
+      "f1": 0.9412,
+      "recall_by_kind": {
+        "event": {
+          "labels": 11,
+          "detected": 11,
+          "recall": 1.0
+        },
+        "ramp": {
+          "labels": 15,
+          "detected": 15,
+          "recall": 1.0
+        },
+        "spike": {
+          "labels": 13,
+          "detected": 13,
+          "recall": 1.0
+        },
+        "step": {
+          "labels": 9,
+          "detected": 9,
+          "recall": 1.0
+        }
+      },
+      "false_alerts_by_category": {
+        "ai": 3,
+        "gaming": 1,
+        "technology": 2
+      },
+      "dataset": "synthetic-test-video_activity"
+    }
+  },
+  "tuning": {
+    "trials": [
+      {
+        "params": {
+          "cusum_h": 5.0,
+          "fdr_q": 0.05
+        },
+        "dev": {
+          "precision": 0.7273,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.15,
+          "false_alerts_per_1000_series_day": 1.25,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 1.0,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 42,
+          "tp": 24,
+          "fp": 9,
+          "fn": 0,
+          "f1": 0.8421,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 6,
+            "technology": 2,
+            "ai": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": false
+      },
+      {
+        "params": {
+          "cusum_h": 5.0,
+          "fdr_q": 0.1
+        },
+        "dev": {
+          "precision": 0.7059,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1667,
+          "false_alerts_per_1000_series_day": 1.3889,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 1.0,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 43,
+          "tp": 24,
+          "fp": 10,
+          "fn": 0,
+          "f1": 0.8276,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 7,
+            "technology": 2,
+            "ai": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": false
+      },
+      {
+        "params": {
+          "cusum_h": 6.0,
+          "fdr_q": 0.05
+        },
+        "dev": {
+          "precision": 0.8,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1,
+          "false_alerts_per_1000_series_day": 0.8333,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.95,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 39,
+          "tp": 24,
+          "fp": 6,
+          "fn": 0,
+          "f1": 0.8889,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 4,
+            "technology": 1,
+            "ai": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": true
+      },
+      {
+        "params": {
+          "cusum_h": 6.0,
+          "fdr_q": 0.1
+        },
+        "dev": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1333,
+          "false_alerts_per_1000_series_day": 1.1111,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.95,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 41,
+          "tp": 24,
+          "fp": 8,
+          "fn": 0,
+          "f1": 0.8571,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 6,
+            "technology": 1,
+            "ai": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": false
+      },
+      {
+        "params": {
+          "cusum_h": 7.0,
+          "fdr_q": 0.05
+        },
+        "dev": {
+          "precision": 0.8276,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.0833,
+          "false_alerts_per_1000_series_day": 0.6944,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.95,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 37,
+          "tp": 24,
+          "fp": 5,
+          "fn": 0,
+          "f1": 0.9057,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 4,
+            "technology": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": true
+      },
+      {
+        "params": {
+          "cusum_h": 7.0,
+          "fdr_q": 0.1
+        },
+        "dev": {
+          "precision": 0.7742,
+          "recall": 1.0,
+          "false_alerts_per_day": 0.1167,
+          "false_alerts_per_1000_series_day": 0.9722,
+          "delay_median_days": 0.5,
+          "delay_p90_days": 5.5,
+          "duplication_rate": 0.0,
+          "confirmed_precision": 0.95,
+          "confirmed_recall": 0.7917,
+          "labels": 24,
+          "alerts": 39,
+          "tp": 24,
+          "fp": 7,
+          "fn": 0,
+          "f1": 0.8727,
+          "recall_by_kind": {
+            "event": {
+              "labels": 2,
+              "detected": 2,
+              "recall": 1.0
+            },
+            "ramp": {
+              "labels": 6,
+              "detected": 6,
+              "recall": 1.0
+            },
+            "spike": {
+              "labels": 11,
+              "detected": 11,
+              "recall": 1.0
+            },
+            "step": {
+              "labels": 5,
+              "detected": 5,
+              "recall": 1.0
+            }
+          },
+          "false_alerts_by_category": {
+            "gaming": 6,
+            "technology": 1
+          },
+          "dataset": "synthetic-dev"
+        },
+        "eligible": false
+      }
+    ],
+    "selected": {
+      "cusum_h": 7.0,
+      "fdr_q": 0.05
+    },
+    "selected_test": {
+      "precision": 0.8868,
+      "recall": 0.9792,
+      "false_alerts_per_day": 0.1,
+      "false_alerts_per_1000_series_day": 0.5,
+      "delay_median_days": 0.5,
+      "delay_p90_days": 5.5,
+      "duplication_rate": 0.0,
+      "confirmed_precision": 0.9744,
+      "confirmed_recall": 0.7917,
+      "labels": 48,
+      "alerts": 72,
+      "tp": 47,
+      "fp": 6,
+      "fn": 1,
+      "f1": 0.9307,
+      "recall_by_kind": {
+        "event": {
+          "labels": 11,
+          "detected": 11,
+          "recall": 1.0
+        },
+        "ramp": {
+          "labels": 15,
+          "detected": 14,
+          "recall": 0.9333
+        },
+        "spike": {
+          "labels": 13,
+          "detected": 13,
+          "recall": 1.0
+        },
+        "step": {
+          "labels": 9,
+          "detected": 9,
+          "recall": 1.0
+        }
+      },
+      "false_alerts_by_category": {
+        "ai": 3,
+        "gaming": 1,
+        "technology": 2
+      },
+      "dataset": "synthetic-test"
+    },
+    "decision": "rejected",
+    "reason": "test F1 0.9505 -> 0.9307 (gain -0.0198, required >= 0.01); recall kept: False; false alerts not higher: False"
+  },
+  "timings_seconds": {
+    "calibration": 2.81,
+    "current": 17.09,
+    "by_source": 21.84,
+    "tuning": 49.34
+  },
+  "real_labels": {
+    "status": "UNKNOWN",
+    "labels": 0,
+    "minimum": 30,
+    "reason": "not enough labelled real surges"
+  },
+  "experiment": "40baf281-2927-4f59-a7d0-8e34ea5f003a"
+}

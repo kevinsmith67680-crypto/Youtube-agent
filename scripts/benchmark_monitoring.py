@@ -86,7 +86,7 @@ def hardware() -> dict[str, Any]:
     try:
         exe = shutil.which("lscpu")
         lscpu = (
-            subprocess.run([exe], capture_output=True, text=True, check=False).stdout  # noqa: S603
+            subprocess.run([exe], capture_output=True, text=True, check=False).stdout
             if exe
             else ""
         )

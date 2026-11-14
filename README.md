@@ -1,15 +1,23 @@
-# YouTube Trend Agent — Phases 1–7: Data Acquisition, Keyword Discovery, Historical Monitoring, Surge Detection, Content-Gap Analysis, Trend Forecasting, Video Recommendations & Intelligence Dashboard (+ verification layer)
+# YouTube Trend Agent — Phases 1–8: Data Acquisition, Keyword Discovery, Historical Monitoring, Surge Detection, Content-Gap Analysis, Trend Forecasting, Video Recommendations, Intelligence Dashboard, and End-to-End Validation & Production Operations (+ verification layer)
 
 An autonomous intelligence platform (in progress) for understanding **YouTube search
 demand**: what people search for, which searches are surging, which are under-served by
-existing videos, and what videos to make. This repository contains **Phases 1–7 of 8**:
+existing videos, and what videos to make. This repository contains **all 8 phases**:
 the typed foundation, data-acquisition layer, PostgreSQL schema, validation and compliance
 controls (Phase 1), an autonomous **keyword discovery engine** for AI, technology and
 gaming (Phase 2), **historical monitoring** with time-series storage and scheduling
 (Phase 3), a **statistical surge detection engine** (Phase 4), **search-intent and
 content-gap analysis** (Phase 5), **predictive trend forecasting with opportunity-window
-estimation** (Phase 6), and an **evidence-verified video recommendation engine with an
-intelligence dashboard** (Phase 7).
+estimation** (Phase 6), an **evidence-verified video recommendation engine with an
+intelligence dashboard** (Phase 7), and **end-to-end validation, operating modes, production
+operations and deployment artifacts** (Phase 8).
+
+> **Production status (Phase 8 verdict): STAGING_READY — not production-ready, and the
+> original objective is not achieved.** No legitimate source of YouTube Search interest is
+> available, so the system runs at best in `PROXY_OPPORTUNITY_RESEARCH` mode (proxy signals,
+> no search-demand claims), and real-world accuracy is **UNKNOWN** (no labelled real data).
+> See [docs/production_readiness.md](docs/production_readiness.md) and
+> [docs/phase8_report.md](docs/phase8_report.md).
 
 > **Read this first — what the data can and cannot tell you.**
 > YouTube does **not** publish search volume. The YouTube Data API has no endpoint that
@@ -197,6 +205,27 @@ Next.js dashboard shows demand, gaps, forecasts and ideas with every value label
 | Next.js dashboard: 7 page types, labelled charts, accessible (axe WCAG 2.1 AA clean), dark default | Implemented |
 | Isolated synthetic demo (`recommend demo`, `dashboard serve --demo`) | Implemented |
 | Evaluation (labelled calibration / held-out drafts, duplicate sweep, generated-idea metrics) and benchmarks | Implemented — **synthetic, author-labelled; not real-world accuracy** |
+
+## What Phase 8 adds — validation, operating modes, production operations
+
+Phase 8 makes the pipeline operable and honest about what it can claim. Details:
+[docs/phase8_architecture.md](docs/phase8_architecture.md),
+[docs/live_data_readiness.md](docs/live_data_readiness.md),
+[docs/production_readiness.md](docs/production_readiness.md),
+[docs/phase8_report.md](docs/phase8_report.md).
+
+| Area | Status |
+|---|---|
+| Operating modes derived from evidence (FULL / LIMITED / PROXY / DEMONSTRATION / DEGRADED), capability gating, mode changes recorded and alerted, shown on every dashboard page | Implemented |
+| Provider readiness: signal classes, configuration, bounded live smoke tests, required approvals | Implemented |
+| Single-owner pipeline scheduler (database lease + fencing token), scalable workers, heartbeats, graceful SIGTERM shutdown | Implemented |
+| `/health/live|ready|database|workers|providers`, Prometheus `/metrics`, correlation IDs in logs | Implemented |
+| Budgets (`DAILY_API_BUDGET`, `DAILY/MONTHLY_LLM_BUDGET`, `MAX_*`) measured from recorded spend; degraded mode | Implemented |
+| Ops alerts with fingerprint dedup + cooldown; dead letters for permanent failures | Implemented |
+| Evaluation framework (detection dev/calibration/test + tuning loop, forecasts vs baselines per horizon, four-class content gaps, recommendation quality, integrity, backtest validity, label import, experiment registry, quality scorecard) | Implemented — **offline results synthetic; real-world accuracy UNKNOWN** |
+| Model maintenance: REJECTED status, rollback with checksum-verified restoration | Implemented |
+| Dockerfiles (non-root), dev + production compose, GitHub Actions CI, backup + restore drill, production configuration guard, dashboard authentication | Implemented and run locally; **nothing deployed** |
+| 40 end-to-end scenarios, load test, security and API-compliance audits, readiness scorecard | Implemented |
 
 ## Architecture overview
 
@@ -409,6 +438,18 @@ trend-agent recommend verify --id RECOMMENDATION_ID    # re-check evidence now (
 trend-agent recommend stats                      # counts, feedback, runs, LLM use and budget
 trend-agent recommend evaluate --out eval.json   # offline evaluation (synthetic fixtures)
 trend-agent dashboard serve [--demo] [--ui]      # API on :8000 (and the built UI on :3000)
+# Phase 8: operations and evaluation (see docs/operations_runbook.md, docs/end_to_end_evaluation.md)
+trend-agent system providers                     # readiness per provider + operating mode
+trend-agent system health | costs | alerts | dead-letters
+trend-agent system smoke-test                    # <= 1 real request per configured provider
+trend-agent system readiness [--json]            # PASS / FAIL / BLOCKED / NOT_APPLICABLE scorecard
+trend-agent system audit [--strict]              # configuration audit as if in production
+trend-agent system scheduler | worker            # the production processes (Ctrl-C / SIGTERM to stop)
+trend-agent system backup --out backups && trend-agent system restore-drill backups/X.dump
+trend-agent system benchmark | demo
+trend-agent evaluate pipeline | detection [--tune] | forecasting | content-gaps | recommendations | replay
+trend-agent evaluate labels import labels.jsonl --origin real    # ground truth with provenance
+trend-agent forecast rollback MODEL_ID --reject --restore-previous
 ```
 
 Dashboard (Node 20+): `export TREND_AGENT_API_TOKEN=$(openssl rand -hex 32)`, start the API
@@ -451,6 +492,8 @@ pytest                                     # unit + integration; live tests excl
 pytest --cov                               # with coverage
 pytest tests/unit                          # no database, no network
 ruff check . && ruff format --check . && mypy && mypy tests --strict
+pytest tests/e2e                           # Phase 8: 40 end-to-end scenarios (test database)
+docker compose --profile app up -d --build # full local stack (development credentials)
 ```
 
 * Unit tests never touch the network: YouTube HTTP is served by `httpx.MockTransport`
@@ -494,6 +537,10 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 | Dashboard says "Dashboard API unavailable" | Start `trend-agent dashboard serve`; check `TREND_AGENT_API_URL` in `frontend/.env.local` |
 | Dashboard is read-only / API answers 401 | Set the same `TREND_AGENT_API_TOKEN` for the API and the dashboard server |
 | API answers 429 | Rate limit (`config/recommendations.yaml → api`); wait for `Retry-After` |
+| Service exits with "refusing to start in production" (exit 2) | `TREND_AGENT_ENVIRONMENT=production` with development secrets; fix every item listed by `trend-agent system audit --strict` |
+| Dashboard answers 503 "authentication is not configured" | Production dashboards require `DASHBOARD_BASIC_AUTH_USER` / `DASHBOARD_BASIC_AUTH_PASSWORD` (≥ 16 chars) |
+| Operating mode `DEGRADED` | `trend-agent system providers` lists the reasons (no scheduler/worker, exhausted budget, failing provider, stale data) |
+| Worker exits with code 3 | `MAX_CONCURRENT_WORKERS` live workers already run |
 | Integration tests all skipped | Test DB unreachable; `docker compose up -d` (the init script creates `trend_agent_test` on first start — if your volume predates it, run `docker compose exec postgres createdb -U trend_agent trend_agent_test`) |
 
 ## Documentation
@@ -545,3 +592,21 @@ ruff check . && ruff format --check . && mypy && mypy tests --strict
 * [docs/creator_profiles.md](docs/creator_profiles.md) — personalisation and production settings
 * [docs/recommendation_evaluation.md](docs/recommendation_evaluation.md) — labelled datasets (synthetic), metrics, results
 * [docs/phase7_report.md](docs/phase7_report.md) — Phase 7 report: implementation, tests, measurements, limitations, Phase 8 readiness
+
+* [docs/phase8_initial_audit.md](docs/phase8_initial_audit.md) — findings before Phase 8 (CRITICAL / HIGH / MEDIUM / LOW) and the plan
+* [docs/phase8_architecture.md](docs/phase8_architecture.md) — process model, single-owner scheduling, observability, budgets, schema 0009
+* [docs/live_data_readiness.md](docs/live_data_readiness.md) — signal classes, provider readiness, operating modes, what the objective needs
+* [docs/end_to_end_evaluation.md](docs/end_to_end_evaluation.md) — evaluation principles, results, ground truth, backtest validity
+* [docs/detection_accuracy.md](docs/detection_accuracy.md) — splits, per-source metrics, the tuning loop and its outcome
+* [docs/forecast_validation.md](docs/forecast_validation.md) — per-horizon results against baselines
+* [docs/content_gap_accuracy.md](docs/content_gap_accuracy.md) — four-class gap accuracy
+* [docs/recommendation_quality.md](docs/recommendation_quality.md) — rule-based quality and descriptive outcomes
+* [docs/api_compliance_audit.md](docs/api_compliance_audit.md) — sources, storage, derived metrics, what needs approval
+* [docs/security_audit.md](docs/security_audit.md) — scans, findings, fixes, residual risks
+* [docs/production_deployment.md](docs/production_deployment.md) — topology, build, configure, deploy, verify, CI
+* [docs/operations_runbook.md](docs/operations_runbook.md) — daily checks, alerts, incidents, scaling, monitoring
+* [docs/backup_recovery.md](docs/backup_recovery.md) — backups, restore drill, recovery procedure
+* [docs/cost_optimization.md](docs/cost_optimization.md) — budgets, measurement, levers, degraded mode
+* [docs/model_maintenance.md](docs/model_maintenance.md) — statuses, promotion, drift, rollback, experiments
+* [docs/production_readiness.md](docs/production_readiness.md) — the readiness scorecard and release state
+* [docs/phase8_report.md](docs/phase8_report.md) — Phase 8 report and verdict

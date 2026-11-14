@@ -339,7 +339,7 @@ def bench_database(url: str, cache: Path | None) -> dict[str, Any]:
 def bench_dashboard(url: str) -> dict[str, Any]:
     node = shutil.which("node") or "/opt/node22/bin/node"
     script = ROOT / "scripts" / "benchmark_dashboard.cjs"
-    res = subprocess.run(  # noqa: S603
+    res = subprocess.run(
         [node, str(script), url], capture_output=True, text=True, timeout=600, check=False
     )
     if res.returncode != 0:

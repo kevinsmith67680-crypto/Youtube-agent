@@ -72,6 +72,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S105", "S106", "S311", "DTZ001"]
 "migrations/**" = ["E501"]
+# operator scripts run fixed, trusted commands (git, uv, the project's own tools)
+"scripts/**" = ["S603", "S607"]
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["typer.Option", "typer.Argument"]
