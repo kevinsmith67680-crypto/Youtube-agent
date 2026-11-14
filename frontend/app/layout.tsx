@@ -4,12 +4,13 @@ import type { ReactNode } from "react";
 
 import "./globals.css";
 
+import { ModeBanner } from "@/components/ModeBanner";
 import { Nav } from "@/components/Nav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TooltipProvider } from "@/components/ui/InfoTip";
 import { Badge } from "@/components/ui/primitives";
 import { apiGet } from "@/lib/api";
-import type { Health } from "@/lib/types";
+import type { Health, OperatingMode } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: { default: "Trend Intelligence", template: "%s · Trend Intelligence" },
@@ -22,6 +23,7 @@ export const dynamic = "force-dynamic";
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const theme = (await cookies()).get("theme")?.value === "light" ? "light" : "dark";
   const health = await apiGet<Health>("/health");
+  const mode = await apiGet<OperatingMode>("/system/mode");
   return (
     <html lang="en-GB" className={theme === "dark" ? "dark" : ""}>
       <body className="min-h-screen">
@@ -50,6 +52,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               <Nav />
             </div>
           </header>
+          {health.ok ? <ModeBanner mode={mode.ok ? mode.data : null} /> : null}
           {health.ok && health.data.synthetic ? (
             <div role="note" className="border-b border-synthetic/60 bg-synthetic/10">
               <p className="mx-auto max-w-7xl px-4 py-2 text-sm text-ink">

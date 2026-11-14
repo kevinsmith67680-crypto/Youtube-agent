@@ -563,9 +563,11 @@ class LabelRepository:
                 notes=notes,
             )
             .on_conflict_do_nothing(constraint="uq_evaluation_labels_subject")
+            .returning(EvaluationLabelRow.id)
         )
-        res = self.s.execute(stmt)
-        return bool(res.rowcount)  # type: ignore[attr-defined]
+        # RETURNING, not rowcount: the driver's rowcount is not reliable for a skipped
+        # ON CONFLICT DO NOTHING insert.
+        return self.s.execute(stmt).scalar_one_or_none() is not None
 
     def counts(self) -> dict[str, dict[str, int]]:
         rows = self.s.execute(

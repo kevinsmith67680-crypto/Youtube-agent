@@ -655,3 +655,23 @@ export interface Health {
   version: string;
   auth: "configured" | "read-only";
 }
+
+// Phase 8: the operating mode the system derived from provider readiness and evidence.
+export type OperatingModeName =
+  | "FULL_SEARCH_INTELLIGENCE"
+  | "LIMITED_SEARCH_INTELLIGENCE"
+  | "PROXY_OPPORTUNITY_RESEARCH"
+  | "DEMONSTRATION"
+  | "DEGRADED";
+
+export interface OperatingMode {
+  mode: OperatingModeName;
+  base_mode: OperatingModeName;
+  demo: boolean;
+  direct_search_claims_enabled: boolean;
+  reasons: string[];
+  degradations: { kind: string; detail: string }[];
+  signal_classes_usable: string[];
+  signal_classes_verified: string[];
+  next_mode_requirements: string[];
+}

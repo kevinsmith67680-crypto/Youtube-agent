@@ -188,4 +188,32 @@ test.describe("dashboard pages", () => {
       expect(overflow, path).toBeLessThanOrEqual(1);
     }
   });
+
+  test("the dashboard refuses anonymous visitors in production", async ({ baseURL }) => {
+    // plain fetch: Playwright contexts inherit the configured credentials, fetch does not
+    const page = await fetch(`${baseURL}/`);
+    expect(page.status).toBe(401);
+    expect(page.headers.get("www-authenticate")).toContain("Basic");
+    const proxy = await fetch(`${baseURL}/api/proxy/recommendations/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all: true }),
+    });
+    expect(proxy.status).toBe(401);
+    expect((await fetch(`${baseURL}/healthz`)).status).toBe(200);
+  });
+
+  test("the operating mode is shown on every page, with the signal legend", async ({ page }) => {
+    for (const path of ["/", "/opportunities", "/recommendations", "/trends"]) {
+      await page.goto(path);
+      const banner = page.getByRole("status", { name: "Operating mode" });
+      await expect(banner, path).toBeVisible();
+      await expect(banner.getByText("Demonstration")).toBeVisible();
+      await expect(banner.getByText("disabled")).toBeVisible();
+    }
+    await page.getByText("Why, and what each label means").click();
+    await expect(page.getByText("Proxy signal:")).toBeVisible();
+    await page.screenshot({ path: "../docs/screenshots/phase8_mode_banner.png", fullPage: false });
+    await axe(page);
+  });
 });
