@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-11-14T11:08:45Z",
+  "commit": "8154f84",
+  "backend_tests": {
+    "passed": true,
+    "summary": "p8_full312.log: 964 passed, 3 deselected, 1 warning (coverage 89%); p8_full313.log: 964 passed, 3 deselected, 1 warning; p8_delta312.log: 194 passed, 1 warning; p8_delta313.log: 234 passed, 1 warning"
+  },
+  "e2e_scenarios": {
+    "passed": true,
+    "summary": "40 passed, 1 warning",
+    "log": "p8_e2e312.log"
+  },
+  "static_checks": {
+    "passed": true,
+    "summary": "ruff: ok; ruff_format: ok; mypy_src: ok; mypy_tests_strict: ok; tsc: ok"
+  },
+  "frontend_tests": {
+    "passed": true,
+    "summary": "vitest: 38 passed (38); playwright: 15 passed (22.4s); next build: BUILD_EXIT=0"
+  },
+  "dependency_audit": {
+    "passed": true,
+    "summary": "pip-audit: No known vulnerabilities found; npm audit --omit=dev: found 0 vulnerabilities"
+  },
+  "code_security_scan": {
+    "passed": true,
+    "summary": "bandit (medium+): no medium/high findings; detect-secrets (vs baseline): no new secrets"
+  },
+  "deployment_artifacts": {
+    "passed": true,
+    "summary": "backend image built ({'INSTALL_PG_CLIENT': '0'}), uid 10001, ready 200, production guard exit 2; frontend uid 1000, unconfigured 503, anonymous 401, authenticated 200; compose {'dev': 'valid', 'dev_app_profile': 'valid', 'prod_without_secrets': 'refused (required variables)', 'prod_with_secrets': 'valid'}"
+  },
+  "migration_validation": {
+    "passed": true,
+    "summary": "MIGRATIONS_OK: upgrade/check/downgrade/upgrade on an empty database; head 0009 (head)"
+  },
+  "offline_evaluation": {
+    "passed": true,
+    "summary": "offline {'detection': 'MEETS_TARGET', 'forecasting': 'MEETS_TARGET', 'content_gaps': 'MEETS_TARGET', 'recommendations': 'MEETS_TARGET'}; integrity PASS; real world UNKNOWN (synthetic data; 2026-11-14T10:11:30.049069+00:00)"
+  }
+}
