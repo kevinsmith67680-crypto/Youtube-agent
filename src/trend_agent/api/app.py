@@ -11,19 +11,26 @@ Errors are structured: ``{"error": <code>, "detail": <message or field list>, "s
 from __future__ import annotations
 
 import logging
+import threading
+import time
+import uuid
 from collections.abc import Awaitable, Callable
-from typing import Annotated, Any, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, Path, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
 
 from trend_agent import __version__
 from trend_agent.api.security import Authenticator, RateLimiter, client_key
 from trend_agent.config import Settings
+from trend_agent.logging import correlation, valid_correlation_id
+from trend_agent.ops import health as ops_health
+from trend_agent.ops.metrics import REGISTRY, budget_gauges, database_gauges
+from trend_agent.ops.modes import CapabilityBlockedError, SystemCapability
 from trend_agent.recommendations.backend import DashboardBackend, NotFoundError, TransitionError
 from trend_agent.schemas.dashboard import (
     AlertView,
@@ -51,7 +58,12 @@ from trend_agent.schemas.dashboard import (
 )
 from trend_agent.schemas.recommendation import CreatorProfile
 
+if TYPE_CHECKING:
+    from trend_agent.container import AppContainer
+    from trend_agent.ops.system import SystemSnapshot
+
 _log = logging.getLogger("trend_agent.api")
+SNAPSHOT_TTL_SECONDS = 15.0
 
 UUID_RE = r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 KEY_RE = r"^[A-Za-z0-9_.:-]{1,80}$"
@@ -111,12 +123,36 @@ SizeQ = Annotated[int | None, Query(ge=1, le=500)]
 Text = Annotated[str | None, Query(max_length=120)]
 
 
+class _Snapshots:
+    """Caches the system snapshot briefly: it reads providers, budgets and heartbeats."""
+
+    def __init__(self, container: AppContainer) -> None:
+        from trend_agent.ops.system import SystemService
+
+        self.system = SystemService(container)
+        self._lock = threading.Lock()
+        self._at = 0.0
+        self._value: SystemSnapshot | None = None
+
+    def get(self) -> SystemSnapshot:
+        with self._lock:
+            now = time.monotonic()
+            if self._value is None or now - self._at > SNAPSHOT_TTL_SECONDS:
+                self._value = self.system.snapshot()
+                self._at = now
+            return self._value
+
+
 def create_app(
     backend: DashboardBackend,
     settings: Settings,
     *,
     clock: Callable[[], float] | None = None,
+    ops: AppContainer | None = None,
 ) -> FastAPI:
+    """``ops``: the application container in database mode. It backs the health checks,
+    the operating-mode gate on generation and the metrics; without it (demo mode) the
+    health endpoints report the isolated synthetic demo."""
     loaded = getattr(backend, "loaded", None)
     api_cfg = loaded.config.api if loaded is not None else None
     page_default = api_cfg.page_size_default if api_cfg else 25
@@ -145,6 +181,27 @@ def create_app(
         allow_headers=["Authorization", "Content-Type"],
         max_age=600,
     )
+
+    snapshots = _Snapshots(ops) if ops is not None else None
+    app.state.snapshots = snapshots
+
+    @app.middleware("http")
+    async def observe(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        incoming = request.headers.get("x-request-id")
+        cid = incoming if incoming is not None and valid_correlation_id(incoming) else ""
+        cid = cid or uuid.uuid4().hex
+        request.state.correlation_id = cid
+        started = time.perf_counter()
+        with correlation(cid):
+            response = await call_next(request)
+        route = request.scope.get("route")
+        template = getattr(route, "path", None) or "unmatched"
+        REGISTRY.http_requests.inc(request.method, template, str(response.status_code))
+        REGISTRY.http_latency.observe(time.perf_counter() - started, request.method, template)
+        response.headers["X-Request-ID"] = cid
+        return response
 
     @app.middleware("http")
     async def guard(
@@ -213,7 +270,97 @@ def create_app(
             raise HTTPException(422, f"page_size must be at most {page_max}")
         return page_size
 
+    def _snapshot_or_503() -> SystemSnapshot:
+        if snapshots is None:
+            raise HTTPException(503, "demo mode: no operating system state")
+        return snapshots.get()
+
+    def _probe(result: ops_health.CheckResult) -> JSONResponse:
+        code = 503 if result.status == ops_health.FAIL else 200
+        return JSONResponse(result.as_dict(), status_code=code)
+
+    health_router = APIRouter(prefix="/health", tags=["health"])
+
+    @health_router.get("/live")
+    def health_live() -> JSONResponse:
+        return _probe(ops_health.live())
+
+    @health_router.get("/ready")
+    def health_ready() -> JSONResponse:
+        if ops is None:
+            return _probe(ops_health.ready(None, demo=True))
+        return _probe(ops_health.ready(ops.engine, demo=False))
+
+    @health_router.get("/database")
+    def health_database() -> JSONResponse:
+        if ops is None:
+            return _probe(ops_health.CheckResult(
+                "database", ops_health.OK, "demo mode: the database is not used",
+                {"demo": True},
+            ))  # fmt: skip
+        return _probe(ops_health.database(ops.engine))
+
+    @health_router.get("/workers")
+    def health_workers(ok: Read) -> JSONResponse:
+        if ops is None:
+            return _probe(ops_health.CheckResult(
+                "workers", ops_health.OK, "demo mode: no workers run", {"demo": True}
+            ))  # fmt: skip
+        res = ops_health.workers(ops.session_factory, ops.clock())
+        if not ok:
+            res.data = {"live": res.data.get("live", {})}
+        return _probe(res)
+
+    @health_router.get("/providers")
+    def health_providers(ok: Read) -> JSONResponse:
+        if ops is None:
+            return JSONResponse({
+                "check": "providers", "status": ops_health.OK, "demo": True,
+                "detail": "demo mode: only the synthetic demonstration dataset is served",
+                "operating_mode": {"mode": "DEMONSTRATION", "direct_search_claims_enabled": False},
+            })  # fmt: skip
+        snap = snapshots.get() if snapshots is not None else None
+        assert snap is not None
+        usable = [r for r in snap.readiness if r.usable_for_real_data]
+        status = ops_health.OK if usable else ops_health.DEGRADED
+        return JSONResponse({
+            "check": "providers",
+            "status": status,
+            "detail": f"{len(usable)} real provider(s) usable; mode {snap.decision.mode.value}",
+            "operating_mode": snap.decision.as_dict(),
+            "providers": [r.as_dict() for r in snap.readiness],
+        })  # fmt: skip
+
+    app.include_router(health_router)
+
+    @app.get("/metrics", response_class=PlainTextResponse, include_in_schema=False)
+    def metrics(_ok: Read) -> PlainTextResponse:
+        lines = REGISTRY.render()
+        if ops is not None:
+            snap = snapshots.get() if snapshots is not None else None
+            try:
+                lines += database_gauges(
+                    ops.session_factory, ops.clock(), snap.decision if snap else None
+                )
+                lines += budget_gauges(snap.budgets if snap else None)
+            except Exception:
+                _log.exception("metrics.database_gauges_failed")
+                lines.append("# database gauges unavailable")
+        return PlainTextResponse("\n".join(lines) + "\n", media_type="text/plain; version=0.0.4")
+
     api = APIRouter(prefix="/api")
+
+    @api.get("/system/mode")
+    def system_mode(_ok: Read) -> dict[str, Any]:
+        if snapshots is None:
+            return {
+                "mode": "DEMONSTRATION", "base_mode": "DEMONSTRATION", "demo": True,
+                "direct_search_claims_enabled": False,
+                "reasons": ["demo mode: the isolated synthetic dataset is served; nothing is live"],
+                "degradations": [], "capabilities": {}, "signal_classes_usable": [],
+                "signal_classes_verified": [], "next_mode_requirements": [],
+            }  # fmt: skip
+        return _snapshot_or_503().decision.as_dict()
 
     @api.get("/health")
     def health() -> dict[str, Any]:
@@ -361,6 +508,11 @@ def create_app(
             )
         if req.category is None and not req.all:
             raise HTTPException(422, "pass a category or all=true")
+        if snapshots is not None:
+            try:
+                snapshots.get().decision.require(SystemCapability.RECOMMENDATIONS)
+            except CapabilityBlockedError as exc:
+                raise HTTPException(503, str(exc)) from None
         return be().generate(req)
 
     @api.post("/recommendations/{rid}/save", response_model=UserState)

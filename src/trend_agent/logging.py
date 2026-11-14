@@ -12,7 +12,9 @@ import logging
 import math
 import re
 import sys
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import UTC, datetime
 from typing import Any
 
@@ -107,11 +109,43 @@ class TextFormatter(logging.Formatter):
         return redact_text(base)
 
 
+# Correlation ID of the current request / scheduled run; added to every log record.
+_CORRELATION: ContextVar[str | None] = ContextVar("trend_agent_correlation_id", default=None)
+_CORRELATION_RE = re.compile(r"^[A-Za-z0-9._:-]{8,64}$")
+
+
+def current_correlation_id() -> str | None:
+    return _CORRELATION.get()
+
+
+def valid_correlation_id(value: str | None) -> bool:
+    return bool(value and _CORRELATION_RE.match(value))
+
+
+@contextmanager
+def correlation(cid: str) -> Iterator[str]:
+    """Bind ``cid`` to log records emitted inside the block (task- and thread-local)."""
+    token = _CORRELATION.set(cid)
+    try:
+        yield cid
+    finally:
+        _CORRELATION.reset(token)
+
+
+class CorrelationFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        cid = _CORRELATION.get()
+        if cid is not None and not hasattr(record, "correlation_id"):
+            record.correlation_id = cid
+        return True
+
+
 def configure_logging(level: str = "INFO", fmt: str = "json") -> None:
     root = logging.getLogger("trend_agent")
     root.handlers.clear()
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(JsonFormatter() if fmt == "json" else TextFormatter())
+    handler.addFilter(CorrelationFilter())
     root.addHandler(handler)
     root.setLevel(level)
     root.propagate = False

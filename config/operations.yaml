@@ -1,0 +1,23 @@
+# Phase 8 operations: schedule cadence for `trend-agent system scheduler` and the worker.
+# One scheduler owns these schedules at a time (database lease); workers can be scaled out.
+# Budgets and limits are environment settings (TREND_AGENT_DAILY_API_BUDGET, ...), see
+# .env.example and docs/cost_optimization.md.
+version: 1
+scheduler:
+  tick_seconds: 30            # how often the scheduler checks for due tasks
+  lease_ttl_seconds: 120      # a crashed scheduler's lease expires after this
+  stale_run_minutes: 120      # a 'running' stage older than this is closed as abandoned
+  failure_retry_seconds: 60   # first retry after a failed stage (doubles, capped by interval)
+  tasks:
+    ops_checks:       {interval_seconds: 60,    timeout_seconds: 60}
+    monitor_plan:     {interval_seconds: 300,   timeout_seconds: 120}
+    content_analysis: {interval_seconds: 1800,  timeout_seconds: 900,  max_per_run: 10}
+    forecasting:      {interval_seconds: 3600,  timeout_seconds: 900}
+    recommendations:  {interval_seconds: 21600, timeout_seconds: 900}
+    retention:        {interval_seconds: 86400, timeout_seconds: 600}
+worker:
+  tick_seconds: 15            # poll interval when idle
+  max_job_batches: 50         # collection job batches per tick
+alerts:
+  stage_failure_threshold: 3  # consecutive failures before a critical alert
+  worker_missing_minutes: 10  # no live worker for this long -> alert

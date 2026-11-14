@@ -384,7 +384,14 @@ def serve(
         backend = container.dashboard_backend()
     except ConfigError as exc:
         raise base._fail(f"configuration: {exc}", 2) from None
-    app = create_app(backend, settings)
+    from trend_agent.ops.production import ProductionConfigError, enforce
+
+    try:
+        for w in enforce(settings):
+            base.err_console.print(f"[yellow]config warning[/] {w.code}: {w.detail}")
+    except ProductionConfigError as exc:
+        raise base._fail(str(exc), 2) from None
+    app = create_app(backend, settings, ops=None if settings.demo_mode else container)
     if host not in ("127.0.0.1", "localhost", "::1") and settings.api_token is None:
         base.err_console.print(
             "[yellow]Warning:[/] no TREND_AGENT_API_TOKEN: the API is read-only for public "

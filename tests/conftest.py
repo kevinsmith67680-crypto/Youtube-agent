@@ -113,6 +113,17 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Phase 8 (operations, evaluation)
+    "recommendation_outcomes",
+    "experiments",
+    "evaluation_labels",
+    "system_state",
+    "provider_checks",
+    "dead_letters",
+    "ops_alerts",
+    "scheduled_runs",
+    "scheduler_leases",
+    "service_heartbeats",
     # Phase 7 (recommendations)
     "notification_deliveries",
     "notifications",

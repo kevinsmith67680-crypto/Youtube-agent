@@ -136,6 +136,27 @@ class Settings(BaseSettings):
     mock_provider_enabled: bool = True
     mock_seed: int = 20_260_101
 
+    # --- Phase 8: budgets, retries, concurrency (env: TREND_AGENT_<NAME>) -------------
+    # Provider units per UTC day across all providers (YouTube quota units + one per
+    # request for request-counted providers). Exhaustion stops scheduled collection.
+    daily_api_budget: int = Field(default=9_000, ge=0)
+    # Estimated LLM spend in USD (recommendations + content analysis), per UTC day and per
+    # calendar month. Exhaustion falls back to the deterministic template generator.
+    daily_llm_budget: float = Field(default=5.0, ge=0)
+    monthly_llm_budget: float = Field(default=60.0, ge=0)
+    max_recommendations_per_run: int = Field(default=20, ge=1, le=200)
+    # Content analyses of one topic (monitoring target) per rolling 24 hours.
+    max_analysis_requests_per_topic: int = Field(default=2, ge=1, le=50)
+    # Retries after the first attempt for retryable provider errors (permanent errors are
+    # never retried).
+    max_retries: int = Field(default=3, ge=0, le=9)
+    # Worker processes allowed to run at once (checked through heartbeats at start-up).
+    max_concurrent_workers: int = Field(default=4, ge=1, le=64)
+    budget_warning_ratio: float = Field(default=0.8, gt=0, le=1)
+    ops_alert_cooldown_minutes: int = Field(default=60, ge=1, le=10_080)
+    # Directory with operations.yaml (schedule cadence); default ./config.
+    operations_config_dir: str | None = None
+
     @field_validator("log_level")
     @classmethod
     def _normalise_level(cls, value: str) -> str:
@@ -222,7 +243,21 @@ class Settings(BaseSettings):
             "demo_mode": self.demo_mode,
             "smtp": "set" if self.smtp_host and self.alert_email_to else "missing",
             "telegram": "set" if self.telegram_bot_token and self.telegram_chat_id else "missing",
+            "budgets": {
+                "daily_api_budget": self.daily_api_budget,
+                "daily_llm_budget_usd": self.daily_llm_budget,
+                "monthly_llm_budget_usd": self.monthly_llm_budget,
+                "max_recommendations_per_run": self.max_recommendations_per_run,
+                "max_analysis_requests_per_topic": self.max_analysis_requests_per_topic,
+                "max_retries": self.max_retries,
+                "max_concurrent_workers": self.max_concurrent_workers,
+            },
         }
+
+    @property
+    def retry_attempts(self) -> int:
+        """Total provider attempts: the stricter of HTTP_MAX_ATTEMPTS and MAX_RETRIES + 1."""
+        return max(1, min(self.http_max_attempts, self.max_retries + 1))
 
     def cors_origins(self) -> list[str]:
         out = []

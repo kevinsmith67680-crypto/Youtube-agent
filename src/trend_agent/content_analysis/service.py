@@ -18,7 +18,7 @@ from __future__ import annotations
 import asyncio
 import re
 import uuid
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, time
 from typing import Any
@@ -294,6 +294,10 @@ class ContentAnalysisService:
         self.verification = verification
         self.llm = llm or NullAnalysisLLM()
         self._clock = clock
+        # Phase 8: optional spend check (``BudgetGuard.llm_allowed``); when it refuses, the
+        # analysis runs deterministic-only instead of calling the LLM.
+        self.llm_budget: Callable[[], tuple[bool, str]] | None = None
+        self.budget_notes: list[str] = []
         self.policy = policy or PermissionPolicy.default()
         if source is not None:
             self.source: ResultSource = source
@@ -541,6 +545,11 @@ class ContentAnalysisService:
 
     # ------------------------------------------------------------------ analysis
     def _analyzer(self, use_llm: bool) -> ContentAnalyzer:
+        if use_llm and self.llm_budget is not None and not isinstance(self.llm, NullAnalysisLLM):
+            ok, why = self.llm_budget()
+            if not ok:
+                use_llm = False
+                self.budget_notes.append(why)
         loaded = self.loaded
         if not use_llm and loaded.config.llm.enabled:
             loaded = loaded.model_copy(
@@ -742,10 +751,14 @@ class ContentAnalysisService:
         limit: int | None = None,
         force: bool = False,
         category: str | None = None,
+        exclude_targets: frozenset[int] = frozenset(),
     ) -> scheduling.QueuePlan:
         searches, tokens = self.usage_today()
+        candidates = self.candidates(include_synthetic=include_synthetic, category=category)
+        if exclude_targets:  # Phase 8: topics at MAX_ANALYSIS_REQUESTS_PER_TOPIC
+            candidates = [c for c in candidates if c.target_id not in exclude_targets]
         return scheduling.plan(
-            self.candidates(include_synthetic=include_synthetic, category=category),
+            candidates,
             self.config,
             now=self._clock(),
             analysis_version=ANALYSIS_VERSION,
@@ -764,9 +777,14 @@ class ContentAnalysisService:
         limit: int | None = None,
         force: bool = False,
         category: str | None = None,
+        exclude_targets: frozenset[int] = frozenset(),
     ) -> QueueRunReport:
         plan = self.pending(
-            include_synthetic=include_synthetic, limit=limit, force=force, category=category
+            include_synthetic=include_synthetic,
+            limit=limit,
+            force=force,
+            category=category,
+            exclude_targets=exclude_targets,
         )
         report = QueueRunReport(plan)
         sem = asyncio.Semaphore(self.config.scheduling.max_concurrency)

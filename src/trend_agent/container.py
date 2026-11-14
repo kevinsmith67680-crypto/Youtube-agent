@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from trend_agent.content_analysis.service import ContentAnalysisService
     from trend_agent.forecasting.config import LoadedForecastingConfig
     from trend_agent.forecasting.service import ForecastingService
+    from trend_agent.ops.budgets import BudgetGuard
     from trend_agent.recommendations.backend import DashboardBackend
     from trend_agent.recommendations.config import LoadedRecommendationConfig
     from trend_agent.recommendations.idea_generator import ConceptGenerator
@@ -66,6 +67,7 @@ class AppContainer:
     _content_config: LoadedContentConfig | None = None
     _forecasting_config: LoadedForecastingConfig | None = None
     _recommendation_config: LoadedRecommendationConfig | None = None
+    _budget_guard: BudgetGuard | None = None
 
     def ingestion(self, *, clock: Clock | None = None) -> IngestionService:
         return IngestionService(
@@ -231,7 +233,7 @@ class AppContainer:
         from trend_agent.content_analysis.service import ContentAnalysisService, make_llm
 
         loaded = loaded or self.content_config()
-        return ContentAnalysisService(
+        svc = ContentAnalysisService(
             session_factory=self.session_factory,
             loaded=loaded,
             verification=self.verification(clock=clock),
@@ -241,6 +243,9 @@ class AppContainer:
             ingestion=self.ingestion(clock=clock),
             settings=self.settings,
         )
+        if llm is None:  # an injected LLM (tests) is not a paid call
+            svc.llm_budget = self.budget_guard().llm_allowed
+        return svc
 
     def forecasting_config(self) -> LoadedForecastingConfig:
         from trend_agent.forecasting.config import load_forecasting_config
@@ -286,7 +291,7 @@ class AppContainer:
         from trend_agent.recommendations.service import RecommendationService
 
         clk = clock or self.clock
-        return RecommendationService(
+        svc = RecommendationService(
             session_factory=self.session_factory,
             loaded=loaded or self.recommendation_config(),
             settings=self.settings,
@@ -297,6 +302,16 @@ class AppContainer:
             channels=channels,
             include_synthetic=include_synthetic,
         )
+        svc.llm_budget = self.budget_guard().llm_allowed
+        return svc
+
+    def budget_guard(self) -> BudgetGuard:
+        """Phase 8 spend checks against TREND_AGENT_DAILY_*/MONTHLY_* budgets."""
+        from trend_agent.ops.budgets import BudgetGuard
+
+        if self._budget_guard is None:
+            self._budget_guard = BudgetGuard(self.settings, self.session_factory, clock=self.clock)
+        return self._budget_guard
 
     def dashboard_backend(
         self, *, clock: Clock | None = None, include_synthetic: bool = False

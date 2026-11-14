@@ -194,6 +194,9 @@ class RecommendationService:
         self._generator = generator
         self.include_synthetic = include_synthetic
         self.user_key = settings.dashboard_user
+        # Phase 8: optional spend check (``BudgetGuard.llm_allowed``) for the real LLM path.
+        self.llm_budget: Callable[[], tuple[bool, str]] | None = None
+        self.alerts_enabled = True
         self.template = TemplateConceptGenerator(
             hooks_per_concept=self.cfg.generation.hooks_per_concept
         )
@@ -267,6 +270,10 @@ class RecommendationService:
             )
         if gen.name == self.template.name:
             return gen, ""
+        if self._generator is None and self.llm_budget is not None:
+            ok, why = self.llm_budget()
+            if not ok:
+                return self.template, why
         with transaction(self._factory) as s:
             used = RecommendationRepository(s).tokens_since(_start_of_day(now))
         if used + used_this_run >= llm.daily_token_budget:
@@ -626,6 +633,8 @@ class RecommendationService:
             previous_scores=prev_scores,
             previous_status=by_rec,
         )
+        if not self.alerts_enabled:  # Phase 8: the operating mode withdrew creator alerts
+            return DispatchReport()
         return self.notifier.dispatch(events, profile=profile, now=now)
 
     # ------------------------------------------------------------------- reads

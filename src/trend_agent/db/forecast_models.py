@@ -74,7 +74,7 @@ class ForecastModelRow(Base):
         sa.CheckConstraint("horizon_hours > 0", name="positive_horizon"),
         sa.CheckConstraint("data_origin IN ('real', 'synthetic')", name="known_origin"),
         sa.CheckConstraint(
-            "status IN ('experimental','validated','champion','challenger','retired')",
+            "status IN ('experimental','validated','champion','challenger','retired','rejected')",
             name="known_status",
         ),
     )

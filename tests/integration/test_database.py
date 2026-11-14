@@ -96,6 +96,17 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "requirement_coverage",
         "content_gaps",
         "content_opportunities",
+        # Phase 8 (revision 0009)
+        "service_heartbeats",
+        "scheduler_leases",
+        "scheduled_runs",
+        "ops_alerts",
+        "dead_letters",
+        "provider_checks",
+        "system_state",
+        "evaluation_labels",
+        "experiments",
+        "recommendation_outcomes",
         # Phase 7 (revision 0008)
         "creator_profiles",
         "recommendation_generation_runs",
@@ -158,7 +169,7 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "discovery_evidence",
         "keyword_status_history",
     } <= tables
-    assert version == "0008"
+    assert version == "0009"
     command.check(cfg)  # raises if the ORM models and migrations have drifted
 
 

@@ -349,7 +349,7 @@ def test_dashboard_reads(analysed: World) -> None:
     assert b.trend("not-a-number") is None
     assert b.trend("999999") is None
     st = b.system_status()
-    assert st.database.startswith("ok (schema 0008")
+    assert st.database.startswith("ok (schema 0009")
     assert any(p.name == "email" and not p.configured for p in st.notifications)
     assert {p.name for p in b.providers()} >= {"youtube_data_api", "google_trends"}
     assert b.data_quality().items

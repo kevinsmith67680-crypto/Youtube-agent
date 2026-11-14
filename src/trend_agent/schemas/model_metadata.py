@@ -45,6 +45,7 @@ class ModelStatus(StrEnum):
     CHAMPION = "champion"
     CHALLENGER = "challenger"
     RETIRED = "retired"
+    REJECTED = "rejected"  # failed validation or was rolled back; never served
 
 
 class DataOrigin(StrEnum):

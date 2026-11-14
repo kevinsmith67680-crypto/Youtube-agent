@@ -1038,3 +1038,7 @@ from trend_agent import cli_recommend as _cli_recommend  # noqa: E402
 
 app.add_typer(_cli_recommend.recommend_app, name="recommend")
 app.add_typer(_cli_recommend.dashboard_app, name="dashboard")
+
+from trend_agent import cli_system as _cli_system  # noqa: E402  (registers Phase 8 commands)
+
+app.add_typer(_cli_system.system_app, name="system")

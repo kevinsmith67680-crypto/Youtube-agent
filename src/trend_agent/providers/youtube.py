@@ -285,7 +285,7 @@ class YouTubeDataApiProvider:
             http_client=client,
             quota=QuotaManager(youtube_quota_policy(settings), quota_store, clock),
             retry=RetryPolicy(
-                max_attempts=settings.http_max_attempts,
+                max_attempts=settings.retry_attempts,
                 base_delay=settings.http_backoff_base_seconds,
                 max_delay=settings.http_backoff_max_seconds,
             ),
