@@ -775,5 +775,131 @@ def create_app(
         data = svc.releases(days=days, category=category, limit=n, offset=(page - 1) * n)
         return {"demo": False, "synthetic": False, "page": page, "page_size": n, **data}
 
+    # ------------------------------------------------------------------ hackernews
+    # Community discussion activity from the official Hacker News API (database mode
+    # only). Every response carries its evidence class and the not-search-demand caveat.
+    hn_demo = {
+        "demo": True,
+        "synthetic": True,
+        "detail": "demo mode: Hacker News stories are not part of the synthetic dataset",
+    }
+
+    def hn_read() -> Any:
+        if ops is None:
+            return None
+        from trend_agent.hackernews.service import HackerNewsReadService
+
+        return HackerNewsReadService(ops.session_factory, clock=ops.clock)
+
+    def hn_provider_state() -> dict[str, Any]:
+        assert ops is not None
+        try:
+            ops.discovery()  # registers discovery providers (no network)
+            rep = ops.registry.get("hackernews_firebase").status()
+            return {
+                "status": rep.status.value,
+                "detail": rep.detail,
+                "api_enabled": ops.settings.hackernews_api_enabled,
+                "scheduled_discovery": ops.settings.scheduled_discovery,
+            }
+        except Exception as exc:  # configuration problems are reported, not raised
+            return {"status": "unknown", "detail": f"{type(exc).__name__}"}
+
+    @api.get("/hackernews/summary")
+    def hackernews_summary(_ok: Read) -> dict[str, Any]:
+        from trend_agent.hackernews.service import EVIDENCE_CLASSES, NOT_SEARCH_DEMAND
+
+        svc = hn_read()
+        if svc is None:
+            return {
+                **hn_demo,
+                "stories": 0,
+                "observations": 0,
+                "sources": [],
+                "provider": {"status": "demo"},
+                "evidence_classes": EVIDENCE_CLASSES,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        return {
+            "demo": False,
+            "synthetic": False,
+            **svc.summary(),
+            "provider": hn_provider_state(),
+        }
+
+    @api.get("/hackernews/stories")
+    def hackernews_stories(
+        _ok: Read,
+        category: Annotated[str | None, Query(pattern=r"^(ai|technology|gaming)$")] = None,
+        list_type: Annotated[
+            str | None, Query(alias="list", pattern=r"^(new|top|best|show|ask)$")
+        ] = None,
+        kind: Annotated[
+            str | None, Query(pattern=r"^(story|show_hn|ask_hn|launch_hn|tell_hn)$")
+        ] = None,
+        momentum: Annotated[str | None, Query(pattern=r"^(rising|steady|unknown)$")] = None,
+        days: Annotated[int | None, Query(ge=1, le=3650)] = None,
+        order: Annotated[
+            str, Query(pattern=r"^(published|priority|score|comments|momentum)$")
+        ] = "published",
+        page: PageQ = 1,
+        page_size: SizeQ = None,
+    ) -> dict[str, Any]:
+        from trend_agent.hackernews.models import LIST_BY_TYPE
+        from trend_agent.hackernews.service import NOT_SEARCH_DEMAND
+
+        n = size(page_size)
+        svc = hn_read()
+        if svc is None:
+            return {
+                **hn_demo,
+                "items": [],
+                "total": 0,
+                "page": page,
+                "page_size": n,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        data = svc.stories(
+            days=days,
+            category=category,
+            list_name=LIST_BY_TYPE[list_type] if list_type else None,
+            kind=kind,
+            momentum_state=momentum,
+            limit=n,
+            offset=(page - 1) * n,
+            order=order,
+        )
+        return {"demo": False, "synthetic": False, "page": page, "page_size": n, **data}
+
+    @api.get("/hackernews/trending")
+    def hackernews_trending(
+        _ok: Read,
+        hours: Annotated[int, Query(ge=1, le=168)] = 48,
+        limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    ) -> dict[str, Any]:
+        from trend_agent.hackernews.service import NOT_SEARCH_DEMAND
+
+        svc = hn_read()
+        if svc is None:
+            return {
+                **hn_demo,
+                "items": [],
+                "measured": 0,
+                "awaiting_repeat_observation": 0,
+                "window_hours": hours,
+                "caveat": NOT_SEARCH_DEMAND,
+            }
+        return {"demo": False, "synthetic": False, **svc.trending(hours=hours, limit=limit)}
+
+    @api.get("/hackernews/stories/{story_id}")
+    def hackernews_story(
+        story_id: Annotated[int, Path(ge=1, le=10**12)], _ok: Read
+    ) -> dict[str, Any]:
+        svc = hn_read()
+        detail: dict[str, Any] | None = svc.story_detail(story_id) if svc is not None else None
+        if detail is None:
+            raise HTTPException(404, "no such story")
+        return detail
+
     app.include_router(api)
     return app

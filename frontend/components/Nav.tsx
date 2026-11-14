@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/gaps", label: "Content gaps" },
   { href: "/trends", label: "Trends" },
   { href: "/github", label: "GitHub" },
+  { href: "/hackernews", label: "Hacker News" },
   { href: "/recommendations", label: "Recommendations" },
   { href: "/saved", label: "Saved ideas" },
   { href: "/settings", label: "Settings" },

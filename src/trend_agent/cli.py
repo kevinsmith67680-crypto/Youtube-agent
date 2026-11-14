@@ -1050,5 +1050,7 @@ from trend_agent import cli_evaluate as _cli_evaluate  # noqa: E402  (Phase 8 ev
 app.add_typer(_cli_evaluate.evaluate_app, name="evaluate")
 
 from trend_agent import cli_github as _cli_github  # noqa: E402  (GitHub integration)
+from trend_agent import cli_hackernews as _cli_hackernews  # noqa: E402  (Hacker News)
 
 app.add_typer(_cli_github.github_app, name="github")
+app.add_typer(_cli_hackernews.hackernews_app, name="hackernews")

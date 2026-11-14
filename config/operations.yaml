@@ -12,6 +12,9 @@ scheduler:
     ops_checks:       {interval_seconds: 60,    timeout_seconds: 60}
     # unattended discovery (GitHub, feeds, YouTube, ...); needs TREND_AGENT_SCHEDULED_DISCOVERY=true
     discovery:        {interval_seconds: 3600,  timeout_seconds: 900,  max_per_run: 24}
+    # Hacker News: due story lists (per-source intervals in config/sources/hackernews.yaml)
+    # plus incremental refresh of tracked stories; same TREND_AGENT_SCHEDULED_DISCOVERY gate
+    hackernews:       {interval_seconds: 900,   timeout_seconds: 600,  max_per_run: 5}
     monitor_plan:     {interval_seconds: 300,   timeout_seconds: 120}
     content_analysis: {interval_seconds: 1800,  timeout_seconds: 900,  max_per_run: 10}
     forecasting:      {interval_seconds: 3600,  timeout_seconds: 900}

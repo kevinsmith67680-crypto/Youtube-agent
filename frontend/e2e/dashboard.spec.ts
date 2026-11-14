@@ -52,6 +52,25 @@ test.describe("dashboard pages", () => {
     expect(errors).toEqual([]);
   });
 
+  test("hacker news page: community activity labelled, demo state explicit, accessible", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto("/hackernews?list=show&order=momentum");
+    await expect(page.getByRole("heading", { level: 1, name: "Hacker News" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Hacker News" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByText("Hacker News stories are not part of the synthetic dataset", { exact: false })).toBeVisible();
+    for (const label of ["Community activity", "Keyword hypothesis", "External attention", "Direct YouTube Search interest"]) {
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+    await expect(page.getByLabel("Source list")).toHaveValue("show");
+    await expect(page.getByText("never YouTube search volume or demand", { exact: false })).toBeVisible();
+    await axe(page);
+    expect(errors).toEqual([]);
+  });
+
   test("the API token never reaches the browser", async ({ page }) => {
     const bodies: string[] = [];
     page.on("response", async (r) => {
@@ -200,7 +219,7 @@ test.describe("dashboard pages", () => {
   });
 
   test("@responsive pages fit a phone screen without horizontal scrolling", async ({ page }) => {
-    for (const path of ["/", "/recommendations", "/gaps"]) {
+    for (const path of ["/", "/recommendations", "/gaps", "/hackernews"]) {
       await page.goto(path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, path).toBeLessThanOrEqual(1);

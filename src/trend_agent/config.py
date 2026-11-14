@@ -116,6 +116,8 @@ class Settings(BaseSettings):
     # 2022-11-28 stays supported until 2028-03-10.
     github_api_version: Literal["2026-03-10", "2022-11-28"] = "2026-03-10"
     github_api_base_url: str = "https://api.github.com"
+    # Official Hacker News Firebase API (no key). false = the provider makes no requests.
+    hackernews_api_enabled: bool = True
     # Run discovery (all providers, GitHub included) from `trend-agent system scheduler`.
     # Off by default so that tests and ad-hoc schedulers never reach the network.
     scheduled_discovery: bool = False
@@ -255,6 +257,7 @@ class Settings(BaseSettings):
             "github_api_enabled": self.github_api_enabled,
             "github_token": "set" if self.github_token else "missing (unauthenticated limits)",
             "github_api_version": self.github_api_version,
+            "hackernews_api_enabled": self.hackernews_api_enabled,
             "reddit_credentials": (
                 "set" if self.reddit_client_id and self.reddit_client_secret else "missing"
             ),

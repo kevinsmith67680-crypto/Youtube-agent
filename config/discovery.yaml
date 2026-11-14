@@ -99,6 +99,41 @@ providers:
     daily_request_limit: 300
     retention_days: 90
     params: {categories: [ai, technology]}
+  hackernews_firebase:           # official Hacker News Firebase API (lists + items; no search)
+    enabled: true                # also needs TREND_AGENT_HACKERNEWS_API_ENABLED (default true)
+    daily_request_limit: 20000   # not used: see params.client.daily_request_budget
+    retention_days: 90
+    params:
+      client:
+        daily_request_budget: 20000  # local cap; the API documents no limit, we keep one
+        max_concurrency: 6           # parallel item requests
+        item_cache_seconds: 120      # identical item requests within 2 min reuse the answer
+        list_cache_seconds: 60
+        max_items_per_list: 60       # items read per list per poll (per-source max_items <=)
+      classifier:
+        min_relevance: 0.3           # one specific term in the title is enough
+        ambiguity_ratio: 0.8         # 2nd category within 80% of the 1st -> ambiguous (kept)
+      priority:                      # story priority weights (heuristic; components stored)
+        relevance: 0.25
+        novelty: 0.10
+        recency: 0.15
+        discussion_activity: 0.15
+        launch_significance: 0.15
+        corroboration: 0.08
+        entity_verification: 0.07
+        source_reliability: 0.05
+      refresh:                       # repeated observations of tracked stories
+        high_priority_minutes: 15
+        normal_priority_minutes: 60
+        low_priority_minutes: 240
+        high_priority_threshold: 60
+        normal_priority_threshold: 35
+        stop_after_hours: 72
+        max_per_run: 60
+      momentum:
+        min_interval_minutes: 10
+        rising_score_per_hour: 20
+        rising_comments_per_hour: 15
   reddit:
     enabled: true
     daily_request_limit: 200

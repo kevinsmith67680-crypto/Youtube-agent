@@ -96,6 +96,9 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "requirement_coverage",
         "content_gaps",
         "content_opportunities",
+        # Hacker News integration (revision 0011)
+        "hn_stories",
+        "hn_story_observations",
         # GitHub integration (revision 0010)
         "github_repositories",
         "github_repository_observations",
@@ -173,7 +176,7 @@ def test_migrations_apply_to_clean_database_and_round_trip(db_engine: sa.Engine)
         "discovery_evidence",
         "keyword_status_history",
     } <= tables
-    assert version == "0010"
+    assert version == "0011"
     command.check(cfg)  # raises if the ORM models and migrations have drifted
 
 

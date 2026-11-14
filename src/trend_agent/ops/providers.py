@@ -51,6 +51,7 @@ _CREDENTIALS: dict[str, tuple[str, ...]] = {
     "reddit": ("reddit_client_id", "reddit_client_secret"),
     "github": (),  # optional GITHUB_TOKEN raises the rate limit only
     "hackernews": (),
+    "hackernews_firebase": (),  # official API: no key
     "feeds": (),
     "curated_seeds": (),
 }
@@ -83,7 +84,11 @@ APPROVALS: dict[str, tuple[str, ...]] = {
         "Use a read-only token (fine-grained, no repository permissions) or none; never "
         "rotate tokens to evade rate limits",
     ),
-    "hackernews": ("Hacker News Firebase API: public, no key; respect fair use",),
+    "hackernews": ("HN Search API (Algolia): public, no key; respect fair use",),
+    "hackernews_firebase": (
+        "Official Hacker News Firebase API: public, no key; no documented rate limit, so "
+        "poll at the configured bounded intervals",
+    ),
     "feeds": ("Each feed publisher's terms; poll no faster than the configured interval",),
     "curated_seeds": (),
 }
@@ -307,6 +312,17 @@ async def _probe(provider: Provider, *, region: str, discovery_sources: Sequence
         if not report["ok"]:
             raise report["error"]
         return int(report["search_requests"])  # GET /rate_limit is free; one search
+    from trend_agent.discovery.providers.hackernews_firebase import (
+        HackerNewsDiscoveryProvider,
+    )
+
+    if isinstance(provider, HackerNewsDiscoveryProvider):
+        ctx = RequestContext()
+        await provider.client.max_item(ctx)
+        ids = await provider.client.story_ids("topstories", ctx)
+        if ids:
+            await provider.client.item(ids[0], ctx)
+        return 2 + bool(ids)  # maxitem + one list + one item (no key, local budget only)
     discover = getattr(provider, "discover", None)
     supports = getattr(provider, "supports", None)
     if discover is not None and supports is not None:

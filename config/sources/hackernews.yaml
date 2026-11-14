@@ -1,0 +1,12 @@
+# Official Hacker News Firebase API story lists (provider hackernews_firebase).
+# One poll = 1 list request + up to max_items item requests. new/show/ask are read
+# incrementally (only stories newer than the last one seen); top/best are re-read so their
+# stories get repeated observations. Category only allots planner slots: every story is
+# classified on its own and stories that are not AI, technology or gaming are dropped.
+# Polling (min_poll_interval_minutes): new 15, show 15, top 30, ask 60, best 120.
+sources:
+  - {key: "hn:list:newstories", provider: hackernews_firebase, name: "Hacker News new stories", source_type: community, category: ai, reference: newstories, evidence_type: community_discussion, reliability: 0.55, min_poll_interval_minutes: 15, verified: true, params: {max_items: 50}}
+  - {key: "hn:list:showstories", provider: hackernews_firebase, name: "Show HN", source_type: community, category: technology, reference: showstories, evidence_type: community_discussion, reliability: 0.6, min_poll_interval_minutes: 15, verified: true, params: {max_items: 40}}
+  - {key: "hn:list:topstories", provider: hackernews_firebase, name: "Hacker News top stories", source_type: community, category: technology, reference: topstories, evidence_type: community_discussion, reliability: 0.6, min_poll_interval_minutes: 30, verified: true, params: {max_items: 30}}
+  - {key: "hn:list:askstories", provider: hackernews_firebase, name: "Ask HN", source_type: community, category: technology, reference: askstories, evidence_type: community_discussion, reliability: 0.5, min_poll_interval_minutes: 60, verified: true, params: {max_items: 20}}
+  - {key: "hn:list:beststories", provider: hackernews_firebase, name: "Hacker News best stories", source_type: community, category: ai, reference: beststories, evidence_type: community_discussion, reliability: 0.65, min_poll_interval_minutes: 120, verified: true, params: {max_items: 30}}

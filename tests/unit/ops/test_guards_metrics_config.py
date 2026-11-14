@@ -85,6 +85,7 @@ def test_operations_config_loads_and_rejects_unknown_tasks(tmp_path: Path) -> No
     assert set(cfg.scheduler.tasks) == {
         "ops_checks",
         "discovery",
+        "hackernews",
         "monitor_plan",
         "content_analysis",
         "forecasting",

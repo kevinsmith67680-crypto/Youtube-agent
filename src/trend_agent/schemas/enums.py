@@ -163,6 +163,14 @@ class Capability(StrEnum):
     RELEASE_MONITORING = "release_monitoring"
     TOPIC_DISCOVERY = "topic_discovery"
     DEVELOPER_ACTIVITY = "developer_activity"
+    # Hacker News (official Firebase API): community discussion; never search interest
+    NEW_STORY_DISCOVERY = "new_story_discovery"
+    TOP_STORY_DISCOVERY = "top_story_discovery"
+    SHOW_HN_DISCOVERY = "show_hn_discovery"
+    ASK_HN_DISCOVERY = "ask_hn_discovery"
+    STORY_METADATA = "story_metadata"
+    STORY_UPDATES = "story_updates"
+    DISCUSSION_ACTIVITY = "discussion_activity"
 
 
 class ProviderStatus(StrEnum):

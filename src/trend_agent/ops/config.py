@@ -30,6 +30,9 @@ def _default_tasks() -> dict[str, TaskConfig]:
         # Unattended discovery (feeds, GitHub, YouTube, ...): only when
         # TREND_AGENT_SCHEDULED_DISCOVERY=true; bounded by max_per_run fetches per run.
         "discovery": TaskConfig(interval_seconds=3600, timeout_seconds=900, max_per_run=24),
+        # Hacker News lists due by their own source intervals + incremental story refresh
+        # (also gated by TREND_AGENT_SCHEDULED_DISCOVERY and the HN provider switch).
+        "hackernews": TaskConfig(interval_seconds=900, timeout_seconds=600, max_per_run=5),
         "monitor_plan": TaskConfig(interval_seconds=300, timeout_seconds=120),
         "content_analysis": TaskConfig(interval_seconds=1800, timeout_seconds=900, max_per_run=10),
         "forecasting": TaskConfig(interval_seconds=3600, timeout_seconds=900),

@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from trend_agent.content_analysis.service import ContentAnalysisService
     from trend_agent.forecasting.config import LoadedForecastingConfig
     from trend_agent.forecasting.service import ForecastingService
+    from trend_agent.hackernews.service import HackerNewsRefresher
     from trend_agent.ops.budgets import BudgetGuard
     from trend_agent.recommendations.backend import DashboardBackend
     from trend_agent.recommendations.config import LoadedRecommendationConfig
@@ -115,13 +116,43 @@ class AppContainer:
             http_client=self.http_client,
         )
         from trend_agent.github.service import GitHubObservationRecorder
+        from trend_agent.hackernews.config import load_hackernews_settings
+        from trend_agent.hackernews.service import HackerNewsObservationRecorder
 
+        hn = loaded.config.provider("hackernews_firebase")
         return DiscoveryService(
             registry=self.registry,
             session_factory=self.session_factory,
             loaded=loaded,
             clock=clock or self.clock,
-            observers=[GitHubObservationRecorder(loaded.config.provider("github").retention_days)],
+            observers=[
+                GitHubObservationRecorder(loaded.config.provider("github").retention_days),
+                HackerNewsObservationRecorder(
+                    load_hackernews_settings(hn.params),
+                    hn.retention_days,
+                    clock=clock or self.clock,
+                ),
+            ],
+        )
+
+    def hackernews_refresher(self, *, clock: Clock | None = None) -> HackerNewsRefresher:
+        """Re-observation of tracked Hacker News stories (registers providers first)."""
+        from trend_agent.discovery.providers.hackernews_firebase import (
+            HackerNewsDiscoveryProvider,
+        )
+        from trend_agent.hackernews.service import HackerNewsRefresher
+
+        self.discovery()
+        provider = self.registry.get("hackernews_firebase")
+        assert isinstance(provider, HackerNewsDiscoveryProvider)
+        retention = self.discovery_config().config.provider("hackernews_firebase").retention_days
+        return HackerNewsRefresher(
+            provider.client,
+            self.session_factory,
+            provider.settings,
+            retention_days=retention,
+            clock=clock or self.clock,
+            enabled=provider.status().status.value != "disabled",
         )
 
     def monitoring_config(self) -> LoadedMonitoringConfig:

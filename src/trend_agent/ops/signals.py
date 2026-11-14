@@ -57,6 +57,7 @@ _KNOWN: dict[str, tuple[SignalClass, ...]] = {
     "feeds": (SignalClass.OFFICIAL_EVENT_SIGNAL,),
     "github": (SignalClass.OFFICIAL_EVENT_SIGNAL, SignalClass.DEVELOPER_ACTIVITY),
     "hackernews": (SignalClass.COMMUNITY_ACTIVITY,),
+    "hackernews_firebase": (SignalClass.COMMUNITY_ACTIVITY,),
     "reddit": (SignalClass.COMMUNITY_ACTIVITY,),
     "google_trends_discovery": (SignalClass.SEARCH_SUGGESTION_PRESENCE,),
     # operator-curated seed phrases: an input list, not a measurement of anything

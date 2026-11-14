@@ -396,6 +396,7 @@ from trend_agent.db import detection_models as _detection_models  # noqa: E402,F
 from trend_agent.db import discovery_models as _discovery_models  # noqa: E402, F401
 from trend_agent.db import forecast_models as _forecast_models  # noqa: E402,F401  (Phase 6 tables)
 from trend_agent.db import github_models as _github_models  # noqa: E402,F401  (GitHub tables)
+from trend_agent.db import hackernews_models as _hackernews_models  # noqa: E402,F401  (Hacker News tables)
 from trend_agent.db import monitoring_models as _monitoring_models  # noqa: E402,F401  (Phase 3 tables)
 from trend_agent.db import ops_models as _ops_models  # noqa: E402,F401  (Phase 8 tables)
 from trend_agent.db import recommendation_models as _recommendation_models  # noqa: E402,F401  (Phase 7 tables)

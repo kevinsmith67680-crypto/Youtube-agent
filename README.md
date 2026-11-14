@@ -364,6 +364,15 @@ trend-agent github discover --category ai   # GitHub sources through the discove
 trend-agent github repositories --recent 7  # discoveries; --repo owner/name for momentum + keywords
 trend-agent github releases --recent 30     # monitored releases: version, level, quoted notes
 trend-agent github quota --live             # local budgets + GitHub's own rate-limit state
+
+# Hacker News, official Firebase API (community discussion activity; never search volume)
+trend-agent hackernews status               # provider health, list cadences, budget, stored data
+trend-agent hackernews test                 # bounded live test of every endpoint (~10 requests)
+trend-agent hackernews discover --category ai          # read lists, classify, store; --type new|show
+trend-agent hackernews stories --type show             # stored stories; --story ID; --live (no storage)
+trend-agent hackernews trending             # measured discussion momentum (repeat observations only)
+trend-agent hackernews stats                # by category/list/kind, observations, source health
+trend-agent hackernews refresh              # re-observe due stories (+ /updates.json hint), bounded
 trend-agent discover entities --recent [--days 7]
 trend-agent discover sources                # providers, readiness, source health
 trend-agent discover clusters               # topic -> intent clusters with merge decisions
@@ -619,4 +628,5 @@ docker compose --profile app up -d --build # full local stack (development crede
 * [docs/production_readiness.md](docs/production_readiness.md) — the readiness scorecard and release state
 * [docs/phase8_report.md](docs/phase8_report.md) — Phase 8 report and verdict
 * [docs/github_api_integration_report.md](docs/github_api_integration_report.md) — GitHub REST API integration: repository discovery, releases, developer activity, keyword expansion
+* [docs/hackernews_api_integration_report.md](docs/hackernews_api_integration_report.md) — Hacker News official API integration: story lists, classification, discussion momentum, refresh scheduling
 * [docs/youtube_api_connection_report.md](docs/youtube_api_connection_report.md) — live verification of the YouTube Data API v3 key, quota, retention and a real discovery run

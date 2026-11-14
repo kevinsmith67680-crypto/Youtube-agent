@@ -108,6 +108,50 @@ async def _discovery(ctx: StageContext) -> dict[str, Any]:
     }
 
 
+async def _hackernews(ctx: StageContext) -> dict[str, Any]:
+    """Hacker News at its own cadence: the story lists that are due (each source keeps its
+    configured minimum interval: new/show 15 min, top 30, ask 60, best 120) and then an
+    incremental refresh of tracked stories. Community activity only, never search demand."""
+    c = ctx.container
+    if ctx.synthetic:
+        return {"skipped": "synthetic mode: no live discovery"}
+    if not c.settings.scheduled_discovery:
+        return {"skipped": "disabled: set TREND_AGENT_SCHEDULED_DISCOVERY=true"}
+    if not c.settings.hackernews_api_enabled:
+        return {"skipped": "disabled: TREND_AGENT_HACKERNEWS_API_ENABLED=false"}
+    from trend_agent.hackernews.service import run_list_discovery
+
+    service = c.discovery()
+    sources = [
+        s
+        for s in service.configured_sources(now=c.clock())
+        if s.provider == "hackernews_firebase" and s.enabled
+    ]
+    out: dict[str, Any] = {"sources": len(sources)}
+    if sources:
+        summaries = await run_list_discovery(
+            service, sources, config=c.discovery_config().config, max_fetches=ctx.max_per_run
+        )
+        fetched = [o for x in summaries for o in x.sources if o.status != "skipped"]
+        out["discovery"] = {
+            "runs": len(summaries),
+            "status": [x.status.value for x in summaries],
+            "fetched": len(fetched),
+            "failed": sum(1 for o in fetched if o.status == "failed"),
+            "items_new": sum(o.items_new for o in fetched),
+            "candidates_new": sum(
+                v.candidates_new for x in summaries for v in x.categories.values()
+            ),
+        }
+    refresh = await c.hackernews_refresher().run()
+    out["refresh"] = {
+        k: refresh.get(k)
+        for k in ("skipped", "requests", "selected", "observed", "deactivated", "failed", "errors")
+        if k in refresh
+    }
+    return out
+
+
 def _monitor_plan(ctx: StageContext) -> dict[str, Any]:
     svc = ctx.container.monitoring(include_synthetic=ctx.synthetic or None)
     sync = svc.sync_targets()
@@ -176,6 +220,7 @@ def _retention(ctx: StageContext) -> dict[str, Any]:
 DEFAULT_STAGES: tuple[Stage, ...] = (
     Stage("ops_checks", _ops_checks),
     Stage("discovery", _discovery, (C.COLLECT_REAL_DATA,)),
+    Stage("hackernews", _hackernews, (C.COLLECT_REAL_DATA,)),
     Stage("monitor_plan", _monitor_plan, (C.COLLECT_REAL_DATA,)),
     Stage("content_analysis", _content_analysis, (C.CONTENT_GAP_ANALYSIS,)),
     Stage("forecasting", _forecasting, (C.PROXY_FORECASTS, C.DIRECT_SEARCH_FORECASTS)),

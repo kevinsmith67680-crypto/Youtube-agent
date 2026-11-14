@@ -12,10 +12,13 @@ from trend_agent.discovery.providers.base import HttpFetcher, request_quota
 from trend_agent.discovery.providers.community import HackerNewsProvider, RedditProvider
 from trend_agent.discovery.providers.feeds import FeedDiscoveryProvider
 from trend_agent.discovery.providers.github import GitHubDiscoveryProvider
+from trend_agent.discovery.providers.hackernews_firebase import HackerNewsDiscoveryProvider
 from trend_agent.discovery.providers.local import CuratedSeedProvider, TrendsRelatedQueriesProvider
 from trend_agent.discovery.providers.youtube import YouTubeDiscoveryProvider
 from trend_agent.github.client import build_client
 from trend_agent.github.config import load_github_settings
+from trend_agent.hackernews.client import build_client as build_hn_client
+from trend_agent.hackernews.config import load_hackernews_settings
 from trend_agent.providers.base import Provider
 from trend_agent.providers.errors import ProviderNotFoundError
 from trend_agent.providers.google_trends import GoogleTrendsProvider
@@ -121,6 +124,29 @@ def register_discovery_providers(
             fetcher=fetcher("hackernews"),
             user_agent=ua,
             enabled=p.enabled,
+            retention_days=p.retention_days,
+            clock=clock,
+        )
+    )
+    p = cfg.provider("hackernews_firebase")
+    hn = load_hackernews_settings(p.params)
+    add(
+        HackerNewsDiscoveryProvider(
+            build_hn_client(
+                http_client=http_client,
+                quota_store=quota_store,
+                clock=clock,
+                retry=retry,
+                base_url=hn.base_url,
+                user_agent=ua,
+                daily_budget=hn.client.daily_request_budget,
+                max_concurrency=hn.client.max_concurrency,
+                item_cache_seconds=hn.client.item_cache_seconds,
+                list_cache_seconds=hn.client.list_cache_seconds,
+            ),
+            settings=hn,
+            enabled=p.enabled,
+            api_enabled=settings.hackernews_api_enabled,
             retention_days=p.retention_days,
             clock=clock,
         )

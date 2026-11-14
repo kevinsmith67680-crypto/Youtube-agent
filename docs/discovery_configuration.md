@@ -16,6 +16,7 @@ config/
   sources/official_feeds.yaml       RSS/Atom: PyPI release feeds, vendor blogs, Steam news
   sources/repositories.yaml         GitHub repositories (releases)
   sources/communities.yaml          subreddits, Hacker News front page
+  sources/hackernews.yaml           Hacker News official API story lists (new/top/best/show/ask)
   sources/youtube.yaml              YouTube most-popular charts
   sources/monitored_channels.yaml   YouTube channels (uploads)
   sources/trends.yaml               Google Trends related-query sources
@@ -118,6 +119,7 @@ sources:
 | `repository_search` | `github` | GitHub search query (`topic:llm`, `"coding agent" in:name,description`); `params.strategy` = `emerging` or `active` (see [github_api_integration_report.md](github_api_integration_report.md)) |
 | `community` | `reddit` | subreddit name (`LocalLLaMA`) |
 | `community` / `api_query` | `hackernews` | `front_page` or a search term |
+| `community` | `hackernews_firebase` | official story list: `newstories`, `topstories`, `beststories`, `showstories`, `askstories` (see [hackernews_api_integration_report.md](hackernews_api_integration_report.md)) |
 | `api_query` | `youtube_discovery`, `google_trends_discovery` | query text |
 | `chart` | `youtube_discovery` | YouTube video category id (e.g. `20` Gaming, `28` Science & Technology) |
 | `channel` | `youtube_discovery` | `@handle` or `UC…` channel id |
@@ -129,7 +131,8 @@ are generated at run time and need no YAML.
 Bundled source files: 26 feeds (20 PyPI release feeds, `verified: true`; 6 vendor blog and
 Steam news feeds are `verified: false` because they could not be reached from the build
 environment),
-10 GitHub repositories, 8 subreddits + Hacker News front page, 3 YouTube charts, 3 YouTube
+10 GitHub repositories, 8 subreddits + Hacker News front page, 5 Hacker News official story
+lists, 3 YouTube charts, 3 YouTube
 channels (disabled until their handles are confirmed), 3 Trends related-query sources.
 
 ### Adding things

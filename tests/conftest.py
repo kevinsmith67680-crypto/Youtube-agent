@@ -118,6 +118,9 @@ def make_youtube(
 
 # ----------------------------------------------------------------------------- database
 TABLES = [
+    # Hacker News integration
+    "hn_story_observations",
+    "hn_stories",
     # GitHub integration
     "github_repository_observations",
     "github_releases",
