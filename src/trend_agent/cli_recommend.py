@@ -7,7 +7,9 @@ weights, not probabilities that a video will succeed.
 
 from __future__ import annotations
 
+import contextlib
 import os
+import signal
 import subprocess
 from pathlib import Path
 from typing import Annotated, Any
@@ -398,17 +400,44 @@ def serve(
             "PORT": str(ui_port),
             "TREND_AGENT_API_URL": f"http://{host}:{port}",
         }
-        child = subprocess.Popen(["npm", "run", "start"], cwd=frontend, env=env)  # noqa: S607
+        # its own process group, so stopping the API also stops Next's server process
+        # (npm does not forward signals to the processes it starts)
+        child = subprocess.Popen(
+            ["npm", "run", "start"],  # noqa: S607
+            cwd=frontend,
+            env=env,
+            start_new_session=True,
+        )
         base.console.print(f"Dashboard UI: http://localhost:{ui_port}")
     base.console.print(
         f"Dashboard API ({backend.mode}{', SYNTHETIC' if backend.synthetic else ''}) on "
         f"http://{host}:{port}/api"
     )
+
+    def stop_ui() -> None:
+        if child is None or child.poll() is not None:
+            return
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(child.pid, signal.SIGTERM)
+        try:
+            child.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            with contextlib.suppress(ProcessLookupError):
+                os.killpg(child.pid, signal.SIGKILL)
+
+    if child is not None:
+        # uvicorn re-raises SIGINT/SIGTERM after its graceful shutdown; these handlers then
+        # run, so the UI process group never outlives the API
+        def on_signal(signum: int, _frame: object) -> None:
+            stop_ui()
+            raise SystemExit(128 + signum)
+
+        signal.signal(signal.SIGTERM, on_signal)
+        signal.signal(signal.SIGINT, on_signal)
     try:
         uvicorn.run(app, host=host, port=port, log_level="info", proxy_headers=False)
     finally:
-        if child is not None:
-            child.terminate()
+        stop_ui()
         container.engine.dispose()
 
 
